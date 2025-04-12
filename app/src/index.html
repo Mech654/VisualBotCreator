@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Creator - Dashboard</title>
+  <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+  <!-- Page Transition Overlay -->
+  <div class="page-transition">
+    <span class="transition-icon">🤖</span>
+    Loading...
+  </div>
+  
+  <!-- Side Panel -->
+  <div class="side-panel">
+    <div class="logo">
+      <span class="logo-icon">🤖</span>
+      Bot Creator
+    </div>
+    <div class="menu">
+      <div class="menu-item active">
+        <span class="menu-icon">📊</span>
+        Dashboard
+      </div>
+      <div class="menu-item">
+        <span class="menu-icon">🧠</span>
+        Bot Builder
+      </div>
+      <div class="menu-item">
+        <span class="menu-icon">🔌</span>
+        Integrations
+      </div>
+      <div class="menu-item">
+        <span class="menu-icon">📈</span>
+        Analytics
+      </div>
+      <div class="menu-item">
+        <span class="menu-icon">⚙️</span>
+        Settings
+      </div>
+    </div>
+    <div class="user-profile">
+      <div class="avatar">U</div>
+      <div>User Name</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="top-bar">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Search bots...">
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-outline">
+          <span class="btn-icon">🔄</span>
+          Import
+        </button>
+        <button class="btn btn-danger">
+          <span class="btn-icon">🗑️</span>
+          Delete
+        </button>
+        <button class="btn btn-primary">
+          <span class="btn-icon">➕</span>
+          Create New Bot
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="section-title">
+        <h2>Bot Templates</h2>
+        <div class="view-options">
+          <div class="view-option active">📋</div>
+          <div class="view-option">📊</div>
+        </div>
+      </div>
+
+      <!-- Bot Schema Row -->
+      <div class="bot-schemas">
+        <div class="schema-card">
+          <div class="schema-icon">💬</div>
+          <div class="schema-name">Customer Support</div>
+          <div class="schema-description">Answer FAQs and handle customer inquiries</div>
+        </div>
+        <div class="schema-card">
+          <div class="schema-icon">🛒</div>
+          <div class="schema-name">E-Commerce</div>
+          <div class="schema-description">Product recommendations and orders</div>
+        </div>
+        <div class="schema-card">
+          <div class="schema-icon">📅</div>
+          <div class="schema-name">Scheduling</div>
+          <div class="schema-description">Book appointments and manage calendar</div>
+        </div>
+        <div class="schema-card">
+          <div class="schema-icon">📰</div>
+          <div class="schema-name">Content</div>
+          <div class="schema-description">Deliver personalized content to users</div>
+        </div>
+        <div class="schema-card">
+          <div class="schema-icon">➕</div>
+          <div class="schema-name">Custom Bot</div>
+          <div class="schema-description">Start from scratch with custom workflows</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top: 30px;">
+        <h2>Your Bots</h2>
+        <span>4 bots</span>
+      </div>
+
+      <!-- Bot List -->
+      <div class="bot-list">
+        <div class="bot-card">
+          <div class="bot-header">
+            <div class="bot-icon">CS</div>
+            <div class="bot-info">
+              <div class="bot-name">Help Desk Assistant</div>
+              <div class="bot-type">Customer Support</div>
+            </div>
+            <div class="bot-actions">
+              <div class="bot-action">⋮</div>
+            </div>
+          </div>
+          <div class="bot-details">
+            Handles customer inquiries about products, returns, and technical support.
+          </div>
+          <div class="bot-footer">
+            <div class="bot-status">
+              <div class="status-dot status-active"></div>
+              Active
+            </div>
+            <div>Last edited: 2 days ago</div>
+          </div>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-header">
+            <div class="bot-icon">EC</div>
+            <div class="bot-info">
+              <div class="bot-name">Product Finder</div>
+              <div class="bot-type">E-Commerce</div>
+            </div>
+            <div class="bot-actions">
+              <div class="bot-action">⋮</div>
+            </div>
+          </div>
+          <div class="bot-details">
+            Helps customers find products based on their preferences and needs.
+          </div>
+          <div class="bot-footer">
+            <div class="bot-status">
+              <div class="status-dot status-active"></div>
+              Active
+            </div>
+            <div>Last edited: 1 week ago</div>
+          </div>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-header">
+            <div class="bot-icon">SC</div>
+            <div class="bot-info">
+              <div class="bot-name">Meeting Scheduler</div>
+              <div class="bot-type">Scheduling</div>
+            </div>
+            <div class="bot-actions">
+              <div class="bot-action">⋮</div>
+            </div>
+          </div>
+          <div class="bot-details">
+            Books appointments and sends reminders to clients about upcoming meetings.
+          </div>
+          <div class="bot-footer">
+            <div class="bot-status">
+              <div class="status-dot status-offline"></div>
+              Offline
+            </div>
+            <div>Last edited: 3 weeks ago</div>
+          </div>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-header">
+            <div class="bot-icon">CT</div>
+            <div class="bot-info">
+              <div class="bot-name">News Aggregator</div>
+              <div class="bot-type">Content</div>
+            </div>
+            <div class="bot-actions">
+              <div class="bot-action">⋮</div>
+            </div>
+          </div>
+          <div class="bot-details">
+            Delivers personalized news content based on user preferences.
+          </div>
+          <div class="bot-footer">
+            <div class="bot-status">
+              <div class="status-dot status-active"></div>
+              Active
+            </div>
+            <div>Last edited: Yesterday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State (Hidden by default) -->
+      <div class="empty-state">
+        <div class="empty-icon">🤖</div>
+        <div class="empty-message">You haven't created any bots yet</div>
+        <button class="btn btn-primary">Create Your First Bot</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="js/index.js"></script>
+</body>
+</html>

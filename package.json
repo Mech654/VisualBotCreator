@@ -1,0 +1,22 @@
+{
+  "name": "visualbotcrafter",
+  "version": "1.0.0",
+  "description": "An awesome software to create and manage your own bots.",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --watch app --exec \"npm start\""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^35.1.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "electron": "^35.1.5",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.3"
+  }
+}
