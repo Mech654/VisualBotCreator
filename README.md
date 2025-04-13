@@ -9,7 +9,7 @@ An awesome software to create and manage your own bots.
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/VisualBotCrafter.git
+    git clone https://github.com/Mech654/VisualBotCrafter.git
     ```
 2. Navigate to the project directory:
     ```bash
