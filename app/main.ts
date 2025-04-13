@@ -1,31 +1,45 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const { Node, Port, Connection, NodeFactory } = require('./core/nodeSystem');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { Node, NodeProperties } from './core/base.js';
+import { NodeFactory } from './core/nodeSystem.js';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Get the project root directory (two levels up from __dirname)
+const projectRoot = path.resolve(__dirname, '..');
 
 // Store created nodes for reference
-const nodeInstances = new Map();
+const nodeInstances = new Map<string, Node>();
 
-function createWindow() {
-  const win = new BrowserWindow({
+function createWindow(): void {
+  const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: false, // For security, disable nodeIntegration
-      contextIsolation: true, // Enable context isolation for security
-      preload: path.join(__dirname, 'preload.js') // Use our preload script
+      nodeIntegration: false,
+      contextIsolation: true,
+      // Use ES module preload script with .mjs extension
+      preload: path.resolve(projectRoot, 'dist', 'preload-esm.mjs'),
+      webSecurity: true, 
+      sandbox: false
     }
   });
 
-  win.loadFile('app/src/index.html');
+  // Updated to use path.join for proper cross-platform path resolution
+  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   
   // Open DevTools in development mode
-  win.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 // Set up IPC handlers for node system operations
-function setupIpcHandlers() {
+function setupIpcHandlers(): void {
   // Handle node creation requests
-  ipcMain.handle('node:create', async (event, { type, id, properties }) => {
+  ipcMain.handle('node:create', async (event, { type, id, properties }: { type: string, id: string, properties: NodeProperties }) => {
     try {
       const node = NodeFactory.createNode(type, id, properties);
       // Store node instance for future reference
@@ -49,24 +63,17 @@ function setupIpcHandlers() {
       };
     } catch (error) {
       console.error('Error creating node:', error);
-      throw new Error(`Failed to create node: ${error.message}`);
+      throw new Error(`Failed to create node: ${error instanceof Error ? error.message : String(error)}`);
     }
   });
   
   // Get all available node types
   ipcMain.handle('node:getTypes', async () => {
-    return [
-      { type: 'start', name: 'Start', category: 'Conversation Flow' },
-      { type: 'message', name: 'Message', category: 'Conversation Flow' },
-      { type: 'options', name: 'Options', category: 'Conversation Flow' },
-      { type: 'input', name: 'User Input', category: 'Conversation Flow' },
-      { type: 'condition', name: 'Condition', category: 'Logic' },
-      { type: 'math', name: 'Math', category: 'Logic' }
-    ];
+    return NodeFactory.getRegisteredTypes();
   });
   
   // Get node by ID
-  ipcMain.handle('node:getById', async (event, id) => {
+  ipcMain.handle('node:getById', async (event, id: string) => {
     const node = nodeInstances.get(id);
     if (!node) {
       throw new Error(`Node not found with id: ${id}`);
@@ -90,7 +97,7 @@ function setupIpcHandlers() {
   });
   
   // Process a node with inputs
-  ipcMain.handle('node:process', async (event, { id, inputs }) => {
+  ipcMain.handle('node:process', async (event, { id, inputs }: { id: string, inputs: Record<string, any> }) => {
     const node = nodeInstances.get(id);
     if (!node) {
       throw new Error(`Node not found with id: ${id}`);
@@ -101,7 +108,7 @@ function setupIpcHandlers() {
       return result;
     } catch (error) {
       console.error(`Error processing node ${id}:`, error);
-      throw new Error(`Failed to process node: ${error.message}`);
+      throw new Error(`Failed to process node: ${error instanceof Error ? error.message : String(error)}`);
     }
   });
 }
@@ -111,10 +118,14 @@ app.whenReady().then(() => {
   createWindow();
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
   });
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });

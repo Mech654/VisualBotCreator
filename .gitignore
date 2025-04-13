@@ -1,0 +1,59 @@
+# Node modules
+node_modules/
+
+# Build directories
+dist/
+build/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Electron build folders
+release/
+
+# Package-lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Temp directories
+.tmp/
+.temp/
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Local Netlify folder
+.netlify

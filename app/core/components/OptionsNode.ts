@@ -1,7 +1,17 @@
-const { Node, Port } = require('../base');
+import { Node, Port, NodeProperties } from '../base.js';
 
-class OptionsNode extends Node {
-  constructor(id, properties = {}) {
+export interface Option {
+  text: string;
+  value: string;
+}
+
+export interface OptionsNodeProperties extends NodeProperties {
+  title?: string;
+  options?: Option[];
+}
+
+export class OptionsNode extends Node {
+  constructor(id: string, properties: OptionsNodeProperties = {}) {
     properties.title = properties.title || 'Options';
     
     properties.options = properties.options || [
@@ -22,15 +32,12 @@ class OptionsNode extends Node {
     this.addOutput(new Port('selectedOption', 'Selected Option', 'string'));
   }
   
-  process(inputValues, selectedOptionIndex = null) {
-    console.log(`Processing options node ${this.id}`);
-    
+  process(inputValues: Record<string, any>, selectedOptionIndex: number | null = null): Record<string, any> {
     if (selectedOptionIndex !== null && 
         selectedOptionIndex >= 0 && 
         selectedOptionIndex < this.properties.options.length) {
       
       const selectedOption = this.properties.options[selectedOptionIndex];
-      console.log(`Selected option: ${selectedOption.text}`);
       
       return {
         selectedOption: selectedOption.value
@@ -40,9 +47,7 @@ class OptionsNode extends Node {
     return {};
   }
   
-  getOptionTexts() {
-    return this.properties.options.map(opt => opt.text);
+  getOptionTexts(): string[] {
+    return (this.properties.options as Option[]).map(option => option.text);
   }
 }
-
-module.exports = OptionsNode;

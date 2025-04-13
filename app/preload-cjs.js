@@ -1,4 +1,4 @@
-// Preload script - securely exposes Node.js functionality to the renderer process
+// CommonJS version of the preload script
 const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose nodeSystem API to the renderer process

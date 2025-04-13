@@ -1,8 +1,13 @@
-// MessageNode.js - Handles text messages in bot conversations
-const { Node, Port } = require('../base');
+import { Node, Port, NodeProperties } from '../base.js';
 
-class MessageNode extends Node {
-  constructor(id, properties = {}) {
+export interface MessageNodeProperties extends NodeProperties {
+  title?: string;
+  message?: string;
+  delay?: number;
+}
+
+export class MessageNode extends Node {
+  constructor(id: string, properties: MessageNodeProperties = {}) {
     properties.title = properties.title || 'Message';
     properties.message = properties.message || 'Enter your message here...';
     properties.delay = properties.delay || 500;
@@ -14,8 +19,7 @@ class MessageNode extends Node {
     this.addOutput(new Port('messageText', 'Message Text', 'string'));
   }
   
-  process(inputValues) {
-    console.log(`Processing message node ${this.id}: ${this.properties.message}`);
+  process(inputValues: Record<string, any>): Record<string, any> {
     let processedMessage = this.properties.message;
     
     return { 
@@ -23,5 +27,3 @@ class MessageNode extends Node {
     };
   }
 }
-
-module.exports = MessageNode;

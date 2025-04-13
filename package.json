@@ -2,10 +2,21 @@
   "name": "visualbotcrafter",
   "version": "1.0.0",
   "description": "An awesome software to create and manage your own bots.",
-  "main": "app/main.js",
+  "main": "dist/main.js",
+  "type": "module",
   "scripts": {
     "start": "electron .",
-    "dev": "nodemon --watch app --exec \"npm start\""
+    "dev": "npm run clean && npm run copy-assets && tsc-watch --onSuccess \"electron .\"",
+    "build": "npm run clean && tsc && npm run copy-assets",
+    "watch": "tsc -w",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,html,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,html,css}\"",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
+    "copy-assets": "mkdir -p dist/src && cp -r app/src/styles dist/src/ && cp app/preload-esm.mjs dist/ && npm run copy-html",
+    "copy-html": "cp app/src/builder.html dist/src/builder.html && cp app/src/index.html dist/src/index.html && sed -i 's|src=\"js/index.js\"|src=\"../src/js/index.js\" type=\"module\"|g' dist/src/index.html && sed -i 's|src=\"js/builder.js\"|src=\"../src/js/builder.js\" type=\"module\"|g' dist/src/builder.html"
   },
   "author": "",
   "license": "MIT",
@@ -13,10 +24,21 @@
     "electron": "^35.1.5"
   },
   "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
     "autoprefixer": "^10.4.21",
     "electron": "^35.1.5",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.6",
     "nodemon": "^3.1.9",
     "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.3"
+    "prettier": "^3.5.3",
+    "rimraf": "^5.0.0",
+    "tailwindcss": "^4.1.3",
+    "tsc-watch": "^6.0.0",
+    "typescript": "^5.8.3"
   }
 }
