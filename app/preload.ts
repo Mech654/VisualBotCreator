@@ -8,6 +8,8 @@ interface NodeSystemAPI {
   getNodeById: (id: string) => Promise<any>;
   processNode: (id: string, inputs: Record<string, any>) => Promise<any>;
   createConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => Promise<any>;
+  deleteConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => Promise<any>;
+  getNodeConnections: (nodeId: string) => Promise<any[]>;
 }
 
 interface UtilsAPI {
@@ -20,27 +22,39 @@ contextBridge.exposeInMainWorld('nodeSystem', {
   createNode: (type: string, id: string, properties: any) => {
     return ipcRenderer.invoke('node:create', { type, id, properties });
   },
-  
+
   // Get node types available in the system
   getNodeTypes: () => {
     return ipcRenderer.invoke('node:getTypes');
   },
-  
+
   // Get node by ID
   getNodeById: (id: string) => {
     return ipcRenderer.invoke('node:getById', id);
   },
-  
+
   // Process a node with given inputs
   processNode: (id: string, inputs: Record<string, any>) => {
     return ipcRenderer.invoke('node:process', { id, inputs });
   },
-  
+
   // Create a connection between nodes
   createConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => {
-    return ipcRenderer.invoke('connection:create', { 
-      fromNodeId, fromPortId, toNodeId, toPortId 
+    return ipcRenderer.invoke('connection:create', {
+      fromNodeId, fromPortId, toNodeId, toPortId
     });
+  },
+
+  // Delete a connection between nodes
+  deleteConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => {
+    return ipcRenderer.invoke('connection:delete', {
+      fromNodeId, fromPortId, toNodeId, toPortId
+    });
+  },
+
+  // Get all connections for a node
+  getNodeConnections: (nodeId: string) => {
+    return ipcRenderer.invoke('connection:getForNode', nodeId);
   }
 } as NodeSystemAPI);
 

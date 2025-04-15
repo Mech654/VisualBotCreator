@@ -9,7 +9,12 @@ export interface MathNodeProperties extends NodeProperties {
 export class MathNode extends Node {
   constructor(id: string, operation: MathOperation = 'add') {
     super(id, 'math', { operation });
-    
+
+    // Add control flow ports for previous/next connections
+    this.addInput(new Port('previous', 'Previous', 'control'));
+    this.addOutput(new Port('next', 'Next', 'control'));
+
+    // Add data ports for mathematical operations
     this.addInput(new Port('input1', 'Operand 1', 'number'));
     this.addInput(new Port('input2', 'Operand 2', 'number'));
     this.addOutput(new Port('result', 'Result', 'number'));

@@ -1,3 +1,35 @@
+// Port categories and types
+export enum PortCategory {
+  FLOW = 'flow',
+  DATA = 'data'
+}
+
+export enum PortType {
+  // Flow types
+  CONTROL = 'control',
+
+  // Data types
+  STRING = 'string',
+  NUMBER = 'number',
+  BOOLEAN = 'boolean',
+  OBJECT = 'object',
+  ARRAY = 'array',
+  ANY = 'any'
+}
+
+// Port category to types mapping
+export const PORT_CATEGORIES = {
+  [PortCategory.FLOW]: [PortType.CONTROL],
+  [PortCategory.DATA]: [
+    PortType.STRING,
+    PortType.NUMBER,
+    PortType.BOOLEAN,
+    PortType.OBJECT,
+    PortType.ARRAY,
+    PortType.ANY
+  ]
+};
+
 export interface NodeProperties {
   [key: string]: any;
 }
@@ -6,6 +38,7 @@ export interface PortData {
   id: string;
   label: string;
   dataType: string;
+  category?: PortCategory;
 }
 
 export class Node {
@@ -40,12 +73,17 @@ export class Port {
   id: string;
   label: string;
   dataType: string;
+  category: PortCategory;
   connectedTo: Connection[];
 
   constructor(id: string, label: string, dataType: string) {
     this.id = id;
     this.label = label;
     this.dataType = dataType;
+    // Determine category based on data type
+    this.category = PORT_CATEGORIES[PortCategory.FLOW].includes(dataType as PortType)
+      ? PortCategory.FLOW
+      : PortCategory.DATA;
     this.connectedTo = [];
   }
 }

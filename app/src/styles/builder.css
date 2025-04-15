@@ -10,6 +10,20 @@
   --right-panel-width: 320px;
   --transition-time: 0.3s;
   --toggle-width: 40px; /* New variable for toggle button width */
+  
+  /* Port type colors */
+  --port-control: #e67e22; /* Orange for control flow */
+  --port-string: #3498db; /* Blue for string data */
+  --port-number: #3498db; /* Changed to blue (same as string) for number data */
+  --port-boolean: #8e44ad; /* Purple for boolean data */
+  --port-object: #2c3e50; /* Dark blue for object data */
+  --port-array: #16a085; /* Teal for array data */
+  --port-any: #7f8c8d; /* Gray for any data type */
+  --port-data: #3498db; /* Blue for all data ports */
+  
+  /* Flow type colors */
+  --flow-color: #e67e22;  /* Orange for control flow */
+  --data-color: #3498db;  /* Blue for data flow */
 }
 
 * {
@@ -250,6 +264,18 @@ body {
   background-size: 20px 20px;
 }
 
+.canvas-container.connecting-mode {
+  cursor: crosshair;
+}
+
+.canvas-container.flow-connecting-mode {
+  background-color: rgba(230, 126, 34, 0.05);
+}
+
+.canvas-container.data-connecting-mode {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
 .toolbox {
   padding: 15px;
   display: flex;
@@ -393,13 +419,14 @@ body {
 /* Bot Nodes */
 .node {
   position: absolute;
-  width: 180px;
+  width: 220px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   cursor: move;
   user-select: none;
   transition: box-shadow 0.2s;
+  z-index: 10;
 }
 
 .node:hover {
@@ -410,6 +437,68 @@ body {
   box-shadow: 0 0 0 2px var(--primary);
 }
 
+/* Flow ports styling - positioned at top */
+.flow-ports {
+  position: relative;
+  width: 100%;
+  height: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.flow-input-port {
+  position: absolute;
+  top: -7px;
+  left: 10px;
+}
+
+.flow-output-port {
+  position: absolute;
+  top: -7px;
+  right: 10px;
+}
+
+/* When there are multiple flow outputs, space them evenly */
+.flow-output-port:nth-child(2) {
+  right: 40px; /* Position "True" port */
+}
+
+.flow-output-port:nth-child(3) {
+  right: 70px; /* Position "False" port if exists */
+}
+
+.flow-port {
+  width: 14px;
+  height: 14px;
+  background-color: var(--port-control);
+  border-radius: 50%;
+  cursor: crosshair;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+}
+
+/* Better positioning for condition node output ports */
+.output-port-true {
+  right: 0; 
+  top: 40%;
+  transform: translate(50%, -50%);
+}
+
+.output-port-false {
+  right: 0;
+  top: 60%;
+  transform: translate(50%, -50%);
+}
+
+/* Small labels for condition node ports */
+.port-label-small {
+  font-size: 10px;
+  color: var(--port-control);
+  margin: 0 4px;
+  font-weight: 500;
+}
+
+/* Node header */
 .node-header {
   padding: 10px 15px;
   background-color: var(--primary);
@@ -422,42 +511,277 @@ body {
   align-items: center;
 }
 
+.node[data-flow-type="flow"] .node-header {
+  background-color: var(--flow-color);
+}
+
+.node[data-flow-type="data"] .node-header {
+  background-color: var(--data-color);
+}
+
+/* Node content with proper height to position ports */
 .node-content {
   padding: 12px;
+  min-height: 60px;
+  position: relative;
 }
 
-.node-option {
-  padding: 8px;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.node-option:hover {
-  background-color: #e9ecef;
-}
-
-.node-ports {
+/* Node data ports container - positioned correctly at the bottom */
+.node-data-ports-container {
   display: flex;
   justify-content: space-between;
-  padding: 0 12px 12px;
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 5px;
+}
+
+.data-input-ports, .data-output-ports {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-port-container {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 4px 0;
+}
+
+/* Position data ports and labels appropriately */
+.data-input-ports .data-port-container {
+  flex-direction: row;
+  padding-right: 5px;
+}
+
+.data-output-ports .data-port-container {
+  flex-direction: row-reverse;
+  padding-left: 5px;
+}
+
+/* Keep ports inside node boundaries */
+.data-port-container .port {
+  margin: 0;
+}
+
+.node-content-separator {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border);
+  margin: 8px 0;
+}
+
+.port-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+
+.input-port-container {
+  flex-direction: row;
+}
+
+.output-port-container {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.port-label {
+  font-size: 12px;
+  color: #555;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .port {
-  width: 12px;
-  height: 12px;
-  background-color: var(--primary);
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
+  cursor: crosshair;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 0 2px white;
+}
+
+.port:hover {
+  transform: scale(1.2);
+}
+
+.input-port {
+  margin-left: -7px;
+}
+
+.output-port {
+  margin-right: -7px;
+}
+
+/* Port type specific styles */
+.port-control {
+  background-color: var(--port-control) !important;
+}
+
+.port-string {
+  background-color: var(--port-string);
+}
+
+.port-number {
+  background-color: var(--port-number);
+}
+
+.port-boolean {
+  background-color: var(--port-boolean);
+}
+
+.port-object {
+  background-color: var(--port-object);
+}
+
+.port-array {
+  background-color: var(--port-array);
+}
+
+.port-any {
+  background-color: var(--port-any);
+}
+
+.port-data {
+  background-color: var(--data-color) !important;
+}
+
+/* Node ports layout */
+.node-ports {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.port-container {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.input-port-container {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.output-port-container {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+/* Port styling */
+.port {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--port-control);
+  cursor: crosshair;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 0 2px white;
+}
+
+.port:hover {
+  transform: scale(1.2);
+}
+
+/* Specific styles for input and output ports */
+.input-port {
+  margin-left: 0;
+}
+
+.output-port {
+  margin-right: 0;
+}
+
+/* Connection mode indicators */
+.canvas-container.connecting-mode {
   cursor: crosshair;
 }
 
-.connection {
+.canvas-container.flow-connecting-mode {
+  background-color: rgba(230, 126, 34, 0.05);
+}
+
+.canvas-container.data-connecting-mode {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Connection line customization */
+.leader-line {
+  z-index: 5;
+}
+
+/* Port tooltip */
+.port-tooltip {
+  background-color: var(--dark);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
   position: absolute;
+  white-space: nowrap;
   pointer-events: none;
-  z-index: -1;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Connection feedback styles */
+.node.connecting .port:not(.active-port):hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+.port.active-port {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 6px var(--primary);
+  z-index: 100;
+}
+
+/* Enhanced compatibility indicators */
+.port.incompatible {
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.8);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.port.compatible {
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.8);
+  transform: scale(1.2);
+}
+
+/* Category compatibility indicator */
+.port.category-incompatible {
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.8);
+  opacity: 0.5;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.port.category-incompatible::before {
+  content: '✕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Connection line customization based on type */
+.leader-line.flow-connection {
+  z-index: 5;
+  opacity: 0.9;
+}
+
+.leader-line.data-connection {
+  z-index: 4;
+  opacity: 0.8;
 }
 
 /* Components Panel */
@@ -468,33 +792,116 @@ body {
   gap: 10px;
 }
 
-.component-category {
+/* Search component */
+.component-search {
   margin-bottom: 15px;
+  position: relative;
 }
 
-.category-title {
+.component-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.component-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Favorites section */
+.favorites-section {
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.favorites-header {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 10px;
   color: #555;
 }
 
+.favorites-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.favorite-item {
+  width: calc(33.333% - 7px);
+}
+
+/* Category styling */
+.component-category {
+  margin-bottom: 15px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px;
+  background-color: #f5f7fa;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.category-header:hover {
+  background-color: var(--light);
+}
+
+.category-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.category-title {
+  font-size: 14px;
+  color: #555;
+  flex-grow: 1;
+}
+
+.category-toggle {
+  font-size: 12px;
+  color: #999;
+}
+
 .component-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+  padding-top: 10px;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.component-list.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
 }
 
 .component-item {
   background-color: white;
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 12px;
+  padding: 12px 8px;
   cursor: grab;
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .component-item:hover {
@@ -503,9 +910,26 @@ body {
   border-color: var(--primary);
 }
 
+.flow-type-indicator {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.flow-type {
+  background-color: var(--flow-color);
+}
+
+.data-type {
+  background-color: var(--data-color);
+}
+
 .component-icon {
-  font-size: 24px;
-  margin-bottom: 8px;
+  font-size: 20px;
+  margin-bottom: 6px;
 }
 
 .component-name {
