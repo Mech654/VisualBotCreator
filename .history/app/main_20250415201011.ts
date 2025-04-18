@@ -36,7 +36,7 @@ function createWindow(): void {
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
 
   // Open DevTools in development mode
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 // Set up IPC handlers for node system operations

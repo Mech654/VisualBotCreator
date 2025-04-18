@@ -268,7 +268,7 @@ function setupOutputPort(portElement: HTMLElement, nodeElement: HTMLElement, nod
                         // Update the position of our temporary end point element
                         connectionState.tempEndPoint.style.left = `${e.pageX}px`;
                         connectionState.tempEndPoint.style.top = `${e.pageY}px`;
-
+                        
                         // Update the leader line position
                         if (connectionState.tempLine) {
                             connectionState.tempLine.position();
@@ -284,7 +284,7 @@ function setupOutputPort(portElement: HTMLElement, nodeElement: HTMLElement, nod
                     if (connectionState.tempLine) {
                         connectionState.tempLine.remove();
                     }
-
+                    
                     // Remove the temporary end point
                     if (connectionState.tempEndPoint && connectionState.tempEndPoint.parentNode) {
                         connectionState.tempEndPoint.parentNode.removeChild(connectionState.tempEndPoint);
