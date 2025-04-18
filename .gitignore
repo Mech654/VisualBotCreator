@@ -57,3 +57,6 @@ coverage/
 
 # Local Netlify folder
 .netlify
+
+#Extension created
+.history
