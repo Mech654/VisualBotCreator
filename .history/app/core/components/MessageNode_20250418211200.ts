@@ -1,5 +1,4 @@
 import { Node, Port, NodeProperties } from '../base.js';
-import { ComponentCategory } from '../nodeSystem.js';
 
 export interface MessageNodeProperties extends NodeProperties {
   title?: string;
@@ -10,7 +9,7 @@ export interface MessageNodeProperties extends NodeProperties {
 export class MessageNode extends Node {
   static metadata = {
     name: 'Message',
-    category: ComponentCategory.CONVERSATION_FLOW,
+    category: 'Conversation Flow',
     description: 'Send a message to the user',
     flowType: 'flow',
     icon: '💬'

@@ -19,10 +19,10 @@ export enum ComponentCategory {
 }
 
 export interface NodeComponent {
-  new(id: string, properties?: any): Node;
+  new (id: string, properties?: any): Node;
   metadata?: {
     name?: string;
-    category?: ComponentCategory | string;
+    category?: string;
     description?: string;
     icon?: string;
     flowType?: 'flow' | 'data';
@@ -33,44 +33,44 @@ export class NodeFactory {
   private static nodeTypes: Record<string, NodeComponent> = {};
   private static componentsDir = path.join(__dirname, 'components');
   private static isInitialized = false;
-
+  
   /**
    * Map of keywords to categories - used for auto-categorization of new components
    */
-  private static typeCategoryKeywords: Record<string, ComponentCategory> = {
+  private static typeCategoryKeywords: Record<string, string> = {
     // Conversation Flow
     'start': ComponentCategory.CONVERSATION_FLOW,
     'message': ComponentCategory.CONVERSATION_FLOW,
     'options': ComponentCategory.CONVERSATION_FLOW,
     'dialog': ComponentCategory.CONVERSATION_FLOW,
     'chat': ComponentCategory.CONVERSATION_FLOW,
-
+    
     // Logic
     'condition': ComponentCategory.LOGIC,
     'if': ComponentCategory.LOGIC,
     'switch': ComponentCategory.LOGIC,
     'branch': ComponentCategory.LOGIC,
     'logic': ComponentCategory.LOGIC,
-
+    
     // Data Processing
     'math': ComponentCategory.DATA_PROCESSING,
     'data': ComponentCategory.DATA_PROCESSING,
     'text': ComponentCategory.DATA_PROCESSING,
     'string': ComponentCategory.DATA_PROCESSING,
     'number': ComponentCategory.DATA_PROCESSING,
-
+    
     // Input/Output
     'input': ComponentCategory.INPUT_OUTPUT,
     'output': ComponentCategory.INPUT_OUTPUT,
     'file': ComponentCategory.INPUT_OUTPUT,
     'api': ComponentCategory.INPUT_OUTPUT,
-
+    
     // Media
     'image': ComponentCategory.MEDIA,
     'audio': ComponentCategory.MEDIA,
     'video': ComponentCategory.MEDIA,
     'media': ComponentCategory.MEDIA,
-
+    
     // Variables
     'variable': ComponentCategory.VARIABLES,
     'var': ComponentCategory.VARIABLES,
@@ -103,7 +103,7 @@ export class NodeFactory {
 
           // Load the component module
           const componentModule = await import(`./components/${file}`);
-
+          
           // Get the component class from the module
           const ComponentClass = componentModule[componentName];
 
@@ -119,7 +119,7 @@ export class NodeFactory {
             // Register the component
             this.registerNodeType(type, ComponentClass);
             console.log(`Dynamically registered component: ${componentName} as type "${type}"`);
-
+            
             if (ComponentClass.metadata) {
               console.log(`Component metadata: ${JSON.stringify(ComponentClass.metadata)}`);
             }
@@ -144,14 +144,14 @@ export class NodeFactory {
   private static getTypeFromComponentName(componentName: string): string {
     return componentName.replace(/Node$/, '').toLowerCase();
   }
-
+  
   /**
    * Infer metadata for a component based on its name
    */
   private static inferMetadata(type: string, componentName: string): NodeComponent['metadata'] {
     // Try to auto-categorize the component based on its type
-    let category: ComponentCategory = ComponentCategory.OTHER;
-
+    let category: ComponentCategory | string = ComponentCategory.OTHER;
+    
     // Check each keyword for category matching
     for (const [keyword, matchCategory] of Object.entries(this.typeCategoryKeywords)) {
       if (type.includes(keyword)) {
@@ -159,21 +159,21 @@ export class NodeFactory {
         break;
       }
     }
-
+    
     // Infer flow type based on category
-    const flowType =
-      (category === ComponentCategory.DATA_PROCESSING ||
-        type.includes('data') ||
-        type.includes('math') ||
-        type.includes('number') ||
-        type.includes('string')) ? 'data' : 'flow';
-
+    const flowType = 
+      (category === ComponentCategory.DATA_PROCESSING || 
+       type.includes('data') || 
+       type.includes('math') || 
+       type.includes('number') || 
+       type.includes('string')) ? 'data' : 'flow';
+    
     // Format the name nicely
     const name = componentName.replace(/Node$/, '')
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
       .trim();
-
+    
     return {
       name,
       category,

@@ -1,11 +1,10 @@
 import { Node, Port, NodeProperties } from '../base.js';
-import { ComponentCategory } from '../nodeSystem.js';
 
 export class StartNode extends Node {
-  // Update to use ComponentCategory enum
+  // Add static metadata property to the class itself
   static metadata = {
     name: 'Start',
-    category: ComponentCategory.CONVERSATION_FLOW,
+    category: 'Conversation Flow',
     description: 'Entry point for the bot conversation',
     flowType: 'flow',
     icon: '🚀'

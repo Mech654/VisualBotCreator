@@ -24,15 +24,15 @@ export class InputNode extends Node {
     properties.variableName = properties.variableName || 'userInput';
     properties.inputType = properties.inputType || 'text';
     properties.validation = properties.validation || null;
-
+    
     super(id, 'input', properties);
-
+    
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('inputValue', 'Input Value', 'string'));
     this.addOutput(new Port('isValid', 'Is Valid', 'boolean'));
   }
-
+  
   process(inputValues: Record<string, any>, userInput: string = ''): Record<string, any> {
     let isValid = true;
     if (this.properties.validation && userInput) {
@@ -43,12 +43,12 @@ export class InputNode extends Node {
         isValid = false;
       }
     }
-
+    
     let processedInput: string | number = userInput;
     if (this.properties.inputType === 'number') {
       processedInput = userInput ? parseFloat(userInput) : 0;
     }
-
+    
     return {
       inputValue: processedInput,
       isValid: isValid

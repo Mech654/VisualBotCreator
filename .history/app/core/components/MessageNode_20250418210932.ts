@@ -1,5 +1,4 @@
 import { Node, Port, NodeProperties } from '../base.js';
-import { ComponentCategory } from '../nodeSystem.js';
 
 export interface MessageNodeProperties extends NodeProperties {
   title?: string;
@@ -10,7 +9,7 @@ export interface MessageNodeProperties extends NodeProperties {
 export class MessageNode extends Node {
   static metadata = {
     name: 'Message',
-    category: ComponentCategory.CONVERSATION_FLOW,
+    category: 'Conversation Flow',
     description: 'Send a message to the user',
     flowType: 'flow',
     icon: '💬'
@@ -20,18 +19,18 @@ export class MessageNode extends Node {
     properties.title = properties.title || 'Message';
     properties.message = properties.message || 'Enter your message here...';
     properties.delay = properties.delay || 500;
-
+    
     super(id, 'message', properties);
-
+    
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('messageText', 'Message Text', 'string'));
   }
-
+  
   process(inputValues: Record<string, any>): Record<string, any> {
     let processedMessage = this.properties.message;
-
-    return {
+    
+    return { 
       messageText: processedMessage
     };
   }

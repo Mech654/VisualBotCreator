@@ -22,7 +22,7 @@ export interface NodeComponent {
   new(id: string, properties?: any): Node;
   metadata?: {
     name?: string;
-    category?: ComponentCategory | string;
+    category?: string;
     description?: string;
     icon?: string;
     flowType?: 'flow' | 'data';
@@ -37,7 +37,7 @@ export class NodeFactory {
   /**
    * Map of keywords to categories - used for auto-categorization of new components
    */
-  private static typeCategoryKeywords: Record<string, ComponentCategory> = {
+  private static typeCategoryKeywords: Record<string, string> = {
     // Conversation Flow
     'start': ComponentCategory.CONVERSATION_FLOW,
     'message': ComponentCategory.CONVERSATION_FLOW,
@@ -150,7 +150,7 @@ export class NodeFactory {
    */
   private static inferMetadata(type: string, componentName: string): NodeComponent['metadata'] {
     // Try to auto-categorize the component based on its type
-    let category: ComponentCategory = ComponentCategory.OTHER;
+    let category: ComponentCategory | string = ComponentCategory.OTHER;
 
     // Check each keyword for category matching
     for (const [keyword, matchCategory] of Object.entries(this.typeCategoryKeywords)) {

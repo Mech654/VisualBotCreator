@@ -1,6 +1,5 @@
 import { Node, Port, NodeProperties } from '../base.js';
 import * as math from 'mathjs';
-import { ComponentCategory } from '../nodeSystem.js';
 
 export interface MathNodeProperties extends NodeProperties {
   expression: string;
@@ -8,10 +7,10 @@ export interface MathNodeProperties extends NodeProperties {
 }
 
 export class MathNode extends Node {
-  // Use ComponentCategory enum for consistent categorization
+  // Add static metadata property to the class itself
   static metadata = {
     name: 'Math',
-    category: ComponentCategory.DATA_PROCESSING,
+    category: 'Data Processing',
     description: 'Perform mathematical operations on numerical inputs',
     flowType: 'data',
     icon: '🧮'

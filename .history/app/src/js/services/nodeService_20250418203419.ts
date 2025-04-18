@@ -85,7 +85,7 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
   if (idInput) idInput.value = nodeInstance.id;
 
   // Add node type specific controls based on component type
-  switch (nodeInstance.type) {
+  switch(nodeInstance.type) {
     case 'message':
       addMessageProperties(propertiesPanel, nodeInstance);
       break;
@@ -115,15 +115,15 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
   // Create a content group for this component's properties
   const propertiesGroup = document.createElement('div');
   propertiesGroup.className = 'property-group';
-
+  
   // Add a title for the properties section
   propertiesGroup.innerHTML = `<div class="property-group-title">${nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1)} Properties</div>`;
-
+  
   // Get all properties except internal ones
   const skipProps = ['title', 'id'];
   const properties = Object.entries(nodeInstance.properties)
     .filter(([key]) => !skipProps.includes(key));
-
+  
   if (properties.length === 0) {
     propertiesGroup.innerHTML += `
       <div class="property-item">
@@ -135,8 +135,8 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
     properties.forEach(([key, value]) => {
       const propertyType = typeof value;
       let inputHTML = '';
-
-      switch (propertyType) {
+      
+      switch(propertyType) {
         case 'string':
           // For long text, use textarea
           if (String(value).length > 50) {
@@ -160,7 +160,7 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
             `;
           }
           break;
-
+          
         case 'number':
           inputHTML = `
             <div class="property-item" data-tooltip="Edit ${key}">
@@ -171,7 +171,7 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
             </div>
           `;
           break;
-
+          
         case 'boolean':
           inputHTML = `
             <div class="property-item" data-tooltip="Toggle ${key}">
@@ -185,7 +185,7 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
             </div>
           `;
           break;
-
+          
         case 'object':
           // For objects, display a simplified representation
           const objStr = JSON.stringify(value, null, 2);
@@ -198,7 +198,7 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
             </div>
           `;
           break;
-
+          
         default:
           // For unknown types, show as read-only
           inputHTML = `
@@ -208,24 +208,24 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
             </div>
           `;
       }
-
+      
       propertiesGroup.innerHTML += inputHTML;
     });
   }
-
+  
   // Add the properties group to the panel
   panel.appendChild(propertiesGroup);
-
+  
   // Add event listeners for property changes
   const propertyInputs = panel.querySelectorAll('.dynamic-property');
   propertyInputs.forEach(input => {
     input.addEventListener('change', (e) => {
       const element = e.target as HTMLInputElement | HTMLTextAreaElement;
       const propertyKey = element.dataset.propertyKey;
-
+      
       if (propertyKey) {
         let value: any;
-
+        
         // Get the appropriate value based on input type
         if (element.type === 'checkbox') {
           value = (element as HTMLInputElement).checked;
@@ -241,10 +241,10 @@ function addDynamicComponentProperties(panel: HTMLElement, nodeInstance: NodeIns
         } else {
           value = element.value;
         }
-
+        
         // Update the node instance property
         nodeInstance.properties[propertyKey] = value;
-
+        
         // Update the node in the backend
         window.nodeSystem.createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties)
           .catch(error => console.error('Error updating node:', error));

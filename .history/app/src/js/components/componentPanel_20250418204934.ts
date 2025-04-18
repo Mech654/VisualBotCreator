@@ -3,20 +3,20 @@ async function fetchAvailableComponents() {
   try {
     // Get registered node types from the backend
     const nodeTypes = await window.nodeSystem.getNodeTypes();
-
+    
     // Create a dictionary of categories
-    const categories: Record<string, Array<{ type: string, name: string, category: string, icon: string }>> = {};
-
+    const categories: Record<string, Array<{type: string, name: string, category: string, icon: string}>> = {};
+    
     // For each component, add it to its category
     for (const type of nodeTypes) {
       // Get full component info
       const components = await window.nodeSystem.getRegisteredTypes();
       for (const component of components) {
         const { type, name, category } = component;
-
+        
         // Choose an appropriate icon based on component type
         let icon = '🧩'; // Default icon
-
+        
         switch (type.toLowerCase()) {
           case 'start':
             icon = '🚀';
@@ -50,22 +50,22 @@ async function fetchAvailableComponents() {
               icon = '💾';
             }
         }
-
+        
         // Create category if it doesn't exist
         if (!categories[category]) {
           categories[category] = [];
         }
-
+        
         // Add component to category
-        categories[category].push({
-          type,
-          name,
+        categories[category].push({ 
+          type, 
+          name, 
           category,
           icon
         });
       }
     }
-
+    
     console.log('Fetched components by category:', categories);
     return { categories };
   } catch (error) {
@@ -78,14 +78,14 @@ async function fetchAvailableComponents() {
 export async function populateComponentsPanel(): Promise<void> {
   const componentCategoriesContainer = document.getElementById('component-categories');
   if (!componentCategoriesContainer) return;
-
+  
   // Add search input
   const searchHTML = `<div class="component-search">
     <input type="text" placeholder="Search components..." class="component-search-input">
   </div>`;
-
+  
   componentCategoriesContainer.innerHTML = searchHTML;
-
+  
   // Add favorites section
   const favoritesHTML = `
   <div class="favorites-section">
@@ -103,12 +103,12 @@ export async function populateComponentsPanel(): Promise<void> {
       </div>
     </div>
   </div>`;
-
+  
   componentCategoriesContainer.innerHTML += favoritesHTML;
-
+  
   // Fetch available components
   const { categories } = await fetchAvailableComponents();
-
+  
   // Add each category and its components
   for (const [categoryName, components] of Object.entries(categories)) {
     // Create category container
@@ -132,30 +132,30 @@ export async function populateComponentsPanel(): Promise<void> {
         `).join('')}
       </div>
     </div>`;
-
+    
     componentCategoriesContainer.innerHTML += categoryHTML;
   }
-
+  
   // Add event listeners for search
   const searchInput = document.querySelector('.component-search-input') as HTMLInputElement;
   if (searchInput) {
     searchInput.addEventListener('input', filterComponents);
   }
-
+  
   // Add event listeners for category toggles
   const categoryHeaders = document.querySelectorAll('.category-header');
   categoryHeaders.forEach(header => {
     header.addEventListener('click', () => {
       const componentList = header.nextElementSibling as HTMLElement;
       componentList.classList.toggle('collapsed');
-
+      
       const toggle = header.querySelector('.category-toggle') as HTMLElement;
       if (toggle) {
         toggle.textContent = componentList.classList.contains('collapsed') ? '►' : '▼';
       }
     });
   });
-
+  
   // Initialize draggable components
   initDraggableComponents();
 }
@@ -172,7 +172,7 @@ function getCategoryIcon(category: string): string {
     'Media': '🖼️',
     'Variables': '🔠'
   };
-
+  
   return categoryIcons[category] || '🧩';
 }
 
@@ -180,17 +180,17 @@ function getCategoryIcon(category: string): string {
 function getFlowType(type: string): string {
   // Components that are typically data components
   const dataComponents = [
-    'math', 'variable', 'data', 'text', 'number',
+    'math', 'variable', 'data', 'text', 'number', 
     'boolean', 'array', 'object', 'function'
   ];
-
+  
   // Check if the component type contains any data component keywords
   for (const comp of dataComponents) {
     if (type.toLowerCase().includes(comp)) {
       return 'data';
     }
   }
-
+  
   // Default to flow type
   return 'flow';
 }
@@ -204,17 +204,17 @@ function initDraggableComponents(): void {
       const target = e.target as HTMLElement;
       const type = target.dataset.type;
       const flowType = target.dataset.flowType || 'flow';
-
+      
       // Set the drag data
       if (dragEvent.dataTransfer) {
         dragEvent.dataTransfer.setData('text/plain', type || '');
-
+        
         // Also set JSON data with all attributes
         const data = {
           type,
           flowType
         };
-
+        
         dragEvent.dataTransfer.setData('application/json', JSON.stringify(data));
       }
     });
@@ -225,23 +225,23 @@ function initDraggableComponents(): void {
 function filterComponents(): void {
   const searchInput = document.querySelector('.component-search-input') as HTMLInputElement;
   const query = searchInput.value.toLowerCase();
-
+  
   // Show/hide components based on search
   document.querySelectorAll('.component-item:not(.favorite-item)').forEach(item => {
     const element = item as HTMLElement;
     const searchTerms = element.dataset.searchTerms?.toLowerCase() || '';
-
+    
     if (query === '' || searchTerms.includes(query)) {
       element.style.display = 'flex';
     } else {
       element.style.display = 'none';
     }
   });
-
+  
   // Show/hide categories with no visible components
   document.querySelectorAll('.component-category').forEach(category => {
     const visibleComponents = category.querySelectorAll('.component-item[style="display: flex"]').length;
-
+    
     if (query === '' || visibleComponents > 0) {
       (category as HTMLElement).style.display = 'block';
     } else {

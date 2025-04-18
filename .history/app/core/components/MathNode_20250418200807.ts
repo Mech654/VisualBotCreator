@@ -1,6 +1,5 @@
 import { Node, Port, NodeProperties } from '../base.js';
 import * as math from 'mathjs';
-import { ComponentCategory } from '../nodeSystem.js';
 
 export interface MathNodeProperties extends NodeProperties {
   expression: string;
@@ -8,23 +7,14 @@ export interface MathNodeProperties extends NodeProperties {
 }
 
 export class MathNode extends Node {
-  // Use ComponentCategory enum for consistent categorization
-  static metadata = {
-    name: 'Math',
-    category: ComponentCategory.DATA_PROCESSING,
-    description: 'Perform mathematical operations on numerical inputs',
-    flowType: 'data',
-    icon: '🧮'
-  };
-
   constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }) {
     // Default to a simple expression if none provided
     if (!properties.expression) {
       properties.expression = 'a + b';
     }
-
+    
     properties.variables = properties.variables || {};
-
+    
     super(id, 'math', properties);
 
     // Add control flow ports for previous/next connections
@@ -43,12 +33,12 @@ export class MathNode extends Node {
     try {
       // Get the expression from inputs or properties
       const expression = inputValues['expression'] || this.properties.expression;
-
+      
       // Create a scope with variable values from inputs
       const scope: Record<string, number> = {
         ...this.properties.variables // Default values from properties
       };
-
+      
       // Add inputs to scope
       Object.keys(inputValues).forEach(key => {
         // Only add number inputs to scope (skip control flows and expression input)
@@ -57,18 +47,18 @@ export class MathNode extends Node {
           scope[key] = isNaN(value) ? 0 : value;
         }
       });
-
+      
       // Evaluate the expression with the scope
       const result = math.evaluate(expression, scope);
-
+      
       // Return the result and clear any previous errors
-      return {
+      return { 
         result: result,
         error: null
       };
     } catch (error) {
       // Return an error message if evaluation fails
-      return {
+      return { 
         result: 0,
         error: error instanceof Error ? error.message : String(error)
       };

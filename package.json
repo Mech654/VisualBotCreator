@@ -22,7 +22,8 @@
   "license": "MIT",
   "dependencies": {
     "electron": "^35.1.5",
-    "leader-line-new": "^1.1.9"
+    "leader-line-new": "^1.1.9",
+    "mathjs": "^14.4.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

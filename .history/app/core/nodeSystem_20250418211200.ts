@@ -7,7 +7,15 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define component categories for organization
+// Import all standard components explicitly
+import { StartNode } from './components/StartNode.js';
+import { MessageNode } from './components/MessageNode.js';
+import { OptionsNode } from './components/OptionsNode.js';
+import { ConditionNode } from './components/ConditionNode.js';
+import { InputNode } from './components/InputNode.js';
+import { MathNode } from './components/MathNode.js';
+
+// Define component categories
 export enum ComponentCategory {
   CONVERSATION_FLOW = 'Conversation Flow',
   LOGIC = 'Logic',
@@ -35,22 +43,25 @@ export class NodeFactory {
   private static isInitialized = false;
 
   /**
-   * Map of keywords to categories - used for auto-categorization of new components
+   * Map of type names to categories - used for auto-categorization of new components
    */
-  private static typeCategoryKeywords: Record<string, ComponentCategory> = {
+  private static typeCategories: Record<string, ComponentCategory> = {
     // Conversation Flow
     'start': ComponentCategory.CONVERSATION_FLOW,
     'message': ComponentCategory.CONVERSATION_FLOW,
     'options': ComponentCategory.CONVERSATION_FLOW,
     'dialog': ComponentCategory.CONVERSATION_FLOW,
     'chat': ComponentCategory.CONVERSATION_FLOW,
+    'response': ComponentCategory.CONVERSATION_FLOW,
 
     // Logic
     'condition': ComponentCategory.LOGIC,
     'if': ComponentCategory.LOGIC,
     'switch': ComponentCategory.LOGIC,
     'branch': ComponentCategory.LOGIC,
+    'loop': ComponentCategory.LOGIC,
     'logic': ComponentCategory.LOGIC,
+    'function': ComponentCategory.LOGIC,
 
     // Data Processing
     'math': ComponentCategory.DATA_PROCESSING,
@@ -58,12 +69,19 @@ export class NodeFactory {
     'text': ComponentCategory.DATA_PROCESSING,
     'string': ComponentCategory.DATA_PROCESSING,
     'number': ComponentCategory.DATA_PROCESSING,
+    'array': ComponentCategory.DATA_PROCESSING,
+    'object': ComponentCategory.DATA_PROCESSING,
+    'json': ComponentCategory.DATA_PROCESSING,
+    'transform': ComponentCategory.DATA_PROCESSING,
+    'format': ComponentCategory.DATA_PROCESSING,
 
     // Input/Output
     'input': ComponentCategory.INPUT_OUTPUT,
     'output': ComponentCategory.INPUT_OUTPUT,
     'file': ComponentCategory.INPUT_OUTPUT,
     'api': ComponentCategory.INPUT_OUTPUT,
+    'http': ComponentCategory.INPUT_OUTPUT,
+    'request': ComponentCategory.INPUT_OUTPUT,
 
     // Media
     'image': ComponentCategory.MEDIA,
@@ -74,7 +92,9 @@ export class NodeFactory {
     // Variables
     'variable': ComponentCategory.VARIABLES,
     'var': ComponentCategory.VARIABLES,
-    'store': ComponentCategory.VARIABLES
+    'store': ComponentCategory.VARIABLES,
+    'memory': ComponentCategory.VARIABLES,
+    'context': ComponentCategory.VARIABLES
   };
 
   /**
@@ -83,12 +103,22 @@ export class NodeFactory {
   static async discoverComponents(): Promise<void> {
     if (this.isInitialized) return;
 
+    // First, register our built-in components to ensure they're always available
+    this.registerNodeType('start', StartNode);
+    this.registerNodeType('message', MessageNode);
+    this.registerNodeType('options', OptionsNode);
+    this.registerNodeType('condition', ConditionNode);
+    this.registerNodeType('input', InputNode);
+    this.registerNodeType('math', MathNode);
+
     try {
       // Get all JavaScript files in the components directory (after compilation)
       const files = fs.readdirSync(this.componentsDir)
-        .filter(file => file.endsWith('.js') && !file.includes('index.js'));
-
-      console.log(`Found ${files.length} component files:`, files);
+        .filter(file => file.endsWith('.js') &&
+          !file.includes('index.js') &&
+          // Exclude already registered components to avoid duplicates
+          !['StartNode.js', 'MessageNode.js', 'OptionsNode.js',
+            'ConditionNode.js', 'InputNode.js', 'MathNode.js'].includes(file));
 
       // Import each component dynamically
       for (const file of files) {
@@ -150,23 +180,24 @@ export class NodeFactory {
    */
   private static inferMetadata(type: string, componentName: string): NodeComponent['metadata'] {
     // Try to auto-categorize the component based on its type
-    let category: ComponentCategory = ComponentCategory.OTHER;
+    let category: ComponentCategory | string = ComponentCategory.OTHER;
 
-    // Check each keyword for category matching
-    for (const [keyword, matchCategory] of Object.entries(this.typeCategoryKeywords)) {
-      if (type.includes(keyword)) {
-        category = matchCategory;
-        break;
+    // Check if the type directly maps to a category
+    if (type in this.typeCategories) {
+      category = this.typeCategories[type];
+    } else {
+      // Try to infer category from substring matches
+      for (const [keyword, matchCategory] of Object.entries(this.typeCategories)) {
+        if (type.includes(keyword)) {
+          category = matchCategory;
+          break;
+        }
       }
     }
 
     // Infer flow type based on category
-    const flowType =
-      (category === ComponentCategory.DATA_PROCESSING ||
-        type.includes('data') ||
-        type.includes('math') ||
-        type.includes('number') ||
-        type.includes('string')) ? 'data' : 'flow';
+    // Data processing components are typically data flow nodes
+    const flowType = category === ComponentCategory.DATA_PROCESSING ? 'data' : 'flow';
 
     // Format the name nicely
     const name = componentName.replace(/Node$/, '')
@@ -177,7 +208,6 @@ export class NodeFactory {
     return {
       name,
       category,
-      description: `${name} component`,
       flowType: flowType as 'flow' | 'data'
     };
   }
@@ -219,7 +249,15 @@ export class NodeFactory {
   }
 }
 
-export { Node, Port, Connection };
+// Export all components
+export const Components = {
+  StartNode,
+  MessageNode,
+  OptionsNode,
+  ConditionNode,
+  InputNode,
+  MathNode
+};
 
 // Initialize component discovery
 NodeFactory.discoverComponents().catch(err => {

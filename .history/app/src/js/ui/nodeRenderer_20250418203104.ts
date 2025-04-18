@@ -94,7 +94,7 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
 
   // Generate content based on node type using a more dynamic approach
   let content = '';
-
+  
   // Use component-specific renderer if available, otherwise use generic approach
   switch (type) {
     case 'start':
@@ -182,13 +182,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
 function generateGenericContent(type: string, properties: any): string {
   // First, try to display the most important property if it exists
   const importantProps = ['value', 'text', 'data', 'content', 'expression', 'formula'];
-
+  
   for (const prop of importantProps) {
     if (properties[prop] !== undefined) {
       return `<p>${properties[prop]}</p>`;
     }
   }
-
+  
   // Display component type as fallback
   return `<p>${type.charAt(0).toUpperCase() + type.slice(1)} node</p>`;
 }
