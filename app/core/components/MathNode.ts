@@ -5,6 +5,7 @@ import { ComponentCategory } from '../nodeSystem.js';
 export interface MathNodeProperties extends NodeProperties {
   expression: string;
   variables?: Record<string, number>;
+  nodeContent?: string; // Add nodeContent property
 }
 
 export class MathNode extends Node {
@@ -24,6 +25,9 @@ export class MathNode extends Node {
     }
 
     properties.variables = properties.variables || {};
+    
+    // Generate the node content for display - but without using 'this'
+    properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
 
     super(id, 'math', properties);
 
@@ -37,6 +41,14 @@ export class MathNode extends Node {
     this.addInput(new Port('expression', 'Expression', 'string'));
     this.addOutput(new Port('result', 'Result', 'number'));
     this.addOutput(new Port('error', 'Error', 'string'));
+  }
+
+  /**
+   * Update the node content whenever the expression changes
+   */
+  updateNodeContent() {
+    this.properties.nodeContent = `<p class="math-expression-display">${this.properties.expression}</p>`;
+    return this.properties.nodeContent;
   }
 
   /**
@@ -97,6 +109,9 @@ export class MathNode extends Node {
 
           // Update the expression property
           this.properties.expression = expression;
+          
+          // Update the node content with the new expression
+          this.updateNodeContent();
 
           // Process the expression with the test values
           const result = this.process({
@@ -121,6 +136,8 @@ export class MathNode extends Node {
       // Save expression when it changes
       expressionInput.addEventListener('change', () => {
         this.properties.expression = expressionInput.value;
+        // Update the node content
+        this.updateNodeContent();
       });
     }
   }

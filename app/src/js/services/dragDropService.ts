@@ -44,7 +44,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
         // Natural grabbing - keep the same relative position within the element
         modifiers: [
           interact.modifiers.restrictRect({
-            restriction: '#canvas',
+            restriction: '.canvas-content', // Restrict to canvas-content instead of canvas
             endOnly: true
           })
         ],
@@ -75,10 +75,17 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
           // During drag
           move(event: InteractEvent) {
             const target = event.target;
-
+            const canvas = document.getElementById('canvas');
+            
+            // Apply zoom scaling to dx and dy
+            let scaleFactor = 1;
+            if (canvas && canvas.dataset.zoomLevel) {
+              scaleFactor = parseFloat(canvas.dataset.zoomLevel);
+            }
+            
             // Get current position or default to 0
-            const x = (parseFloat(target.getAttribute('data-x') || '0')) + event.dx;
-            const y = (parseFloat(target.getAttribute('data-y') || '0')) + event.dy;
+            const x = (parseFloat(target.getAttribute('data-x') || '0')) + (event.dx / scaleFactor);
+            const y = (parseFloat(target.getAttribute('data-y') || '0')) + (event.dy / scaleFactor);
 
             // Calculate absolute position
             const absX = parseInt(target.dataset.startLeft || '0') + x;

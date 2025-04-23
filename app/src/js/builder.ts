@@ -6,6 +6,7 @@ import { populateComponentsPanel } from './components/componentPanel.js';
 import { createNodeInstance, showPropertiesPanel, updateNodePosition, checkPositionValidity, deleteNode } from './services/nodeService.js';
 import { initDraggableNodes, setupCanvasDropArea } from './services/dragDropService.js';
 import { updateConnections, clearConnections, exportConnections } from './services/connectionService.js';
+import { initZoomControls } from './utils/zoom.js';
 
 // Add this line to declare the LeaderLine global
 declare const LeaderLine: any;
@@ -16,6 +17,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Add LeaderLine script dynamically
   await loadLeaderLineScript();
+
+  // Setup component panel resizing
+  setupComponentPanelResize();
 
   // Toggle Side Panel
   document.querySelector('.toggle-panel')?.addEventListener('click', () => {
@@ -77,12 +81,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Deselect when clicking canvas
   const canvas = document.getElementById('canvas') as HTMLElement;
+  const canvasContent = canvas?.querySelector('.canvas-content') as HTMLElement;
+
   canvas?.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    if (target.id === 'canvas') {
+    if (target.id === 'canvas' || target.classList.contains('canvas-content')) {
       document.querySelectorAll('.node').forEach(n => n.classList.remove('node-selected'));
     }
   });
+
+  // Initialize zoom controls
+  if (canvas) {
+    initZoomControls(canvas);
+  }
 
   // Set up canvas as drop target for components
   setupCanvasDropArea(canvas);
@@ -117,10 +128,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error parsing component data:', err);
     }
 
-    // Get canvas coordinates
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (!canvasContent) {
+      console.error('Canvas content element not found');
+      return;
+    }
+
+    // Get canvas container coordinates
+    const canvasRect = canvas.getBoundingClientRect();
+
+    // Calculate position relative to the canvas content
+    const currentZoom = parseFloat(canvas.dataset.zoomLevel || '1');
+
+    // Adjust coordinates for scroll position and zoom
+    const x = (e.clientX - canvasRect.left + canvas.scrollLeft) / currentZoom;
+    const y = (e.clientY - canvasRect.top + canvas.scrollTop) / currentZoom;
 
     // Snap the position to the grid
     const snappedX = snapToGrid(x - 90);
@@ -140,11 +161,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       errorMsg.style.borderRadius = '4px';
       errorMsg.style.fontSize = '12px';
       errorMsg.style.zIndex = '100';
-      canvas.appendChild(errorMsg);
+      canvasContent.appendChild(errorMsg);
 
       // Remove after a brief delay
       setTimeout(() => {
-        canvas.removeChild(errorMsg);
+        canvasContent.removeChild(errorMsg);
       }, 2000);
 
       return; // Don't create the node
@@ -157,8 +178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (result && result.nodeElement) {
         const { nodeElement, nodeInstance } = result;
 
-        // Append to canvas
-        canvas.appendChild(nodeElement);
+        // Append to canvas content instead of canvas
+        canvasContent.appendChild(nodeElement);
 
         // Add to the list of all nodes for collision detection
         allNodes.push(nodeElement);
@@ -314,7 +335,8 @@ async function loadProject(file: File): Promise<void> {
 
         // Clear canvas
         const canvas = document.getElementById('canvas');
-        if (!canvas) return;
+        const canvasContent = canvas?.querySelector('.canvas-content') as HTMLElement;
+        if (!canvas || !canvasContent) return;
 
         // Remove all existing nodes
         document.querySelectorAll('.node').forEach(node => node.remove());
@@ -336,8 +358,8 @@ async function loadProject(file: File): Promise<void> {
           );
 
           if (result && result.nodeElement) {
-            // Append to canvas
-            canvas.appendChild(result.nodeElement);
+            // Append to canvas content instead of canvas
+            canvasContent.appendChild(result.nodeElement);
 
             // Add to allNodes
             allNodes.push(result.nodeElement);
@@ -437,4 +459,114 @@ function showNotification(message: string, type: 'success' | 'error' | 'info'): 
       notification.remove();
     }, 300);
   }, 3000);
+}
+
+/**
+ * Setup component panel resizing functionality
+ */
+function setupComponentPanelResize(): void {
+  const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+  const resizeHandle = document.querySelector('.right-panel-resize-handle') as HTMLElement;
+  const workspace = document.querySelector('.workspace') as HTMLElement;
+  const builderContainer = document.querySelector('.builder-container') as HTMLElement;
+  
+  if (!rightPanel || !resizeHandle || !workspace) return;
+  
+  let startX = 0;
+  let startWidth = 0;
+  let isResizing = false;
+  
+  // Get min and max values from CSS variables
+  const styleProps = getComputedStyle(document.documentElement);
+  const minWidth = parseInt(styleProps.getPropertyValue('--right-panel-min-width').trim(), 10) || 250;
+  const maxWidth = parseInt(styleProps.getPropertyValue('--right-panel-max-width').trim(), 10) || 500;
+  
+  // Disable all animations during resize
+  const disableTransitions = () => {
+    document.body.classList.add('disable-transitions');
+    rightPanel.style.willChange = 'width';
+    workspace.style.willChange = 'width';
+  };
+  
+  // Re-enable animations after resize
+  const enableTransitions = () => {
+    document.body.classList.remove('disable-transitions');
+    rightPanel.style.willChange = 'auto';
+    workspace.style.willChange = 'auto';
+  };
+  
+  // Mouse down event - start resizing
+  resizeHandle.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    
+    isResizing = true;
+    startX = e.pageX;
+    startWidth = rightPanel.offsetWidth;
+    
+    // Add resizing class for visual feedback
+    rightPanel.classList.add('right-panel-resizing');
+    disableTransitions();
+    
+    // Use direct style width to avoid any CSS transitions
+    rightPanel.style.width = `${startWidth}px`;
+    
+    // Prevent selection during resizing
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ew-resize';
+  });
+  
+  // Mouse move event - update sizes during resize
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    
+    // Calculate width change (moving left increases width)
+    const deltaX = startX - e.pageX;
+    const newWidth = startWidth + deltaX;
+    
+    // Constrain within min and max values
+    const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+    
+    // Apply the width directly without transitions
+    requestAnimationFrame(() => {
+      // Update panel width directly
+      rightPanel.style.width = `${constrainedWidth}px`;
+      
+      // Calculate workspace width to maintain correct layout
+      const containerWidth = builderContainer.offsetWidth;
+      const workspaceWidth = containerWidth - constrainedWidth;
+      workspace.style.width = `${workspaceWidth}px`;
+    });
+  });
+  
+  // Mouse up event - end resizing
+  document.addEventListener('mouseup', () => {
+    if (!isResizing) return;
+    
+    isResizing = false;
+    rightPanel.classList.remove('right-panel-resizing');
+    enableTransitions();
+    
+    // Reset cursor and selection
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+    
+    // Store the final width in CSS variable for persistence
+    const finalWidth = rightPanel.offsetWidth;
+    document.documentElement.style.setProperty('--right-panel-width', `${finalWidth}px`);
+    
+    // Update connections after resizing is complete
+    updateConnections();
+  });
+  
+  // Handle edge case if mouse is released outside the window
+  window.addEventListener('blur', () => {
+    if (isResizing) {
+      isResizing = false;
+      rightPanel.classList.remove('right-panel-resizing');
+      enableTransitions();
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      updateConnections();
+    }
+  });
 }

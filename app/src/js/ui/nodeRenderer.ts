@@ -92,35 +92,15 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
     `;
   }
 
-  // Generate content based on node type using a more dynamic approach
+  // Get node content from backend
   let content = '';
-
-  // Use component-specific renderer if available, otherwise use generic approach
-  switch (type) {
-    case 'start':
-      content = '<p>Bot conversation starts here.</p>';
-      break;
-    case 'message':
-      content = `<p>${properties.message || 'Enter your message here...'}</p>`;
-      break;
-    case 'options':
-      content = properties.options ? properties.options.map(opt =>
-        `<div class="node-option">${opt.text}</div>`
-      ).join('') : '';
-      break;
-    case 'input':
-      content = `<p>${properties.placeholder || 'Waiting for user input...'}</p>`;
-      break;
-    case 'condition':
-      content = `<p>if (${properties.condition}) { ... }</p>`;
-      break;
-    case 'math':
-      content = `<p>Performing ${properties.expression || 'math'} operation</p>`;
-      break;
-    default:
-      // Generic content renderer for any component
-      content = generateGenericContent(type, properties);
-      break;
+  
+  // Try to get the content from the node instance itself
+  if (properties.nodeContent) {
+    content = properties.nodeContent;
+  } else {
+    // Fall back to simple type-based description
+    content = `<p>${type.charAt(0).toUpperCase() + type.slice(1)} node</p>`;
   }
 
   // Generate data ports HTML
