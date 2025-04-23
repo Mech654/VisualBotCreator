@@ -11,9 +11,6 @@ import { updateConnections, clearConnections, exportConnections } from './servic
 declare const LeaderLine: any;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize side panel to be visible on load
-  document.querySelector('.side-panel')?.classList.add('expanded');
-
   // Store all nodes for collision detection
   let allNodes = Array.from(document.querySelectorAll('.node')) as HTMLElement[];
 

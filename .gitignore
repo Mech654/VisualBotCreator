@@ -1,3 +1,5 @@
+**/.history/**
+
 # Node modules
 node_modules/
 
@@ -60,3 +62,6 @@ coverage/
 
 #Extension created
 .history
+
+#Ai stuff
+.copilotignore

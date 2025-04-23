@@ -15,8 +15,8 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,html,css}\"",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",
-    "copy-assets": "mkdir -p dist/src && cp -r app/src/styles dist/src/ && cp app/preload-esm.mjs dist/ && npm run copy-html",
-    "copy-html": "cp app/src/builder.html dist/src/builder.html && cp app/src/index.html dist/src/index.html && sed -i 's|src=\"js/index.js\"|src=\"../src/js/index.js\" type=\"module\"|g' dist/src/index.html && sed -i 's|src=\"js/builder.js\"|src=\"../src/js/builder.js\" type=\"module\"|g' dist/src/builder.html"
+    "copy-assets": "shx mkdir -p dist/src && shx cp -r app/src/styles dist/src/ && shx cp -r app/src/assets dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
+    "copy-html": "shx cp app/src/builder.html dist/src/builder.html && shx cp app/src/index.html dist/src/index.html && node cross_platform/fix-paths.js"
   },
   "author": "",
   "license": "MIT",
@@ -30,6 +30,7 @@
     "@typescript-eslint/eslint-plugin": "^8.29.1",
     "@typescript-eslint/parser": "^8.29.1",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "electron": "^35.1.5",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
@@ -39,6 +40,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "rimraf": "^5.0.0",
+    "shx": "^0.4.0",
     "tailwindcss": "^4.1.3",
     "tsc-watch": "^6.0.0",
     "typescript": "^5.8.3"

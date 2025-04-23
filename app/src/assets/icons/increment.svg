@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="incrementGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F44336" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#C62828" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <circle cx="12" cy="12" r="10" fill="url(#incrementGradient)"></circle>
+  <path d="M12 8v8M8 12h8" stroke="white" stroke-width="2" stroke-linecap="round"></path>
+  <circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"></circle>
+</svg>

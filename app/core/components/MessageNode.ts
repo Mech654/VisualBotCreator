@@ -28,6 +28,55 @@ export class MessageNode extends Node {
     this.addOutput(new Port('messageText', 'Message Text', 'string'));
   }
 
+  /**
+   * Generate the HTML for the message node's properties panel
+   */
+  generatePropertiesPanel(): string {
+    return `
+      <div class="property-group-title">Content</div>
+      <div class="property-item" data-tooltip="Text message to display in this node">
+        <div class="property-label">Message Text</div>
+        <textarea class="property-input message-text" rows="3" aria-label="Node message content">${this.properties.message || ''}</textarea>
+      </div>
+      <div class="property-item" data-tooltip="Variable name to store the message output">
+        <div class="property-label">Variable</div>
+        <input type="text" class="property-input variable-name" value="${this.properties.variableName || 'message'}" aria-label="Variable name">
+      </div>
+      <div class="property-item" data-tooltip="Delay in milliseconds before showing the message">
+        <div class="property-label">Delay (ms)</div>
+        <input type="number" class="property-input message-delay" min="0" value="${this.properties.delay || 500}" aria-label="Message delay">
+      </div>
+    `;
+  }
+
+  /**
+   * Set up event listeners for the message node property panel
+   */
+  setupPropertyEventListeners(panel: HTMLElement): void {
+    // Add event listeners for message properties
+    const messageInput = panel.querySelector('.message-text') as HTMLTextAreaElement;
+    const variableInput = panel.querySelector('.variable-name') as HTMLInputElement;
+    const delayInput = panel.querySelector('.message-delay') as HTMLInputElement;
+
+    if (messageInput) {
+      messageInput.addEventListener('change', () => {
+        this.properties.message = messageInput.value;
+      });
+    }
+
+    if (variableInput) {
+      variableInput.addEventListener('change', () => {
+        this.properties.variableName = variableInput.value;
+      });
+    }
+
+    if (delayInput) {
+      delayInput.addEventListener('change', () => {
+        this.properties.delay = Number(delayInput.value);
+      });
+    }
+  }
+
   process(inputValues: Record<string, any>): Record<string, any> {
     let processedMessage = this.properties.message;
 

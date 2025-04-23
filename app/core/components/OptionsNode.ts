@@ -1,4 +1,5 @@
 import { Node, Port, NodeProperties } from '../base.js';
+import { ComponentCategory } from '../nodeSystem.js';
 
 export interface Option {
   text: string;
@@ -11,10 +12,10 @@ export interface OptionsNodeProperties extends NodeProperties {
 }
 
 export class OptionsNode extends Node {
-  // Add static metadata property to the class itself
+  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Options',
-    category: 'Conversation Flow',
+    category: ComponentCategory.CONVERSATION_FLOW,
     description: 'Present options to the user',
     flowType: 'flow',
     icon: '📋'

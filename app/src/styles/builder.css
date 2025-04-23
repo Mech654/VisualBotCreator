@@ -433,8 +433,10 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-.node-selected {
-  box-shadow: 0 0 0 2px var(--primary);
+/* Make this selector more specific to override hover state */
+.node.node-selected {
+  box-shadow: 0 0 0 2px var(--primary) !important;
+  z-index: 11; /* Slightly higher than regular node z-index */
 }
 
 /* Flow ports styling - positioned at top */

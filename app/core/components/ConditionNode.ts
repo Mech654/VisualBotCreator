@@ -1,4 +1,5 @@
 import { Node, Port, NodeProperties } from '../base.js';
+import { ComponentCategory } from '../nodeSystem.js';
 
 export interface ConditionNodeProperties extends NodeProperties {
   title?: string;
@@ -6,10 +7,10 @@ export interface ConditionNodeProperties extends NodeProperties {
 }
 
 export class ConditionNode extends Node {
-  // Add static metadata property to the class itself
+  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Condition',
-    category: 'Logic',
+    category: ComponentCategory.LOGIC,
     description: 'Evaluate a condition and branch flow',
     flowType: 'flow',
     icon: '❓'

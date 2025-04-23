@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="randomGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#607D8B" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#37474F" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="7" height="7" rx="1" fill="url(#randomGradient)"></rect>
+  <rect x="13" y="4" width="7" height="7" rx="1" fill="url(#randomGradient)"></rect>
+  <rect x="4" y="13" width="7" height="7" rx="1" fill="url(#randomGradient)"></rect>
+  <rect x="13" y="13" width="7" height="7" rx="1" fill="url(#randomGradient)"></rect>
+  <circle cx="7.5" cy="7.5" r="1" fill="white"></circle>
+  <circle cx="16.5" cy="7.5" r="1" fill="white"></circle>
+  <circle cx="7.5" cy="16.5" r="1" fill="white"></circle>
+  <circle cx="16.5" cy="16.5" r="1" fill="white"></circle>
+  <rect x="4" y="4" width="7" height="7" rx="1" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"></rect>
+  <rect x="13" y="4" width="7" height="7" rx="1" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"></rect>
+  <rect x="4" y="13" width="7" height="7" rx="1" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"></rect>
+  <rect x="13" y="13" width="7" height="7" rx="1" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"></rect>
+</svg>

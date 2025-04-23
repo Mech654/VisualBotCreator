@@ -1,4 +1,5 @@
 import { Node, Port, NodeProperties } from '../base.js';
+import { ComponentCategory } from '../nodeSystem.js';
 
 export interface InputNodeProperties extends NodeProperties {
   title?: string;
@@ -9,10 +10,10 @@ export interface InputNodeProperties extends NodeProperties {
 }
 
 export class InputNode extends Node {
-  // Add static metadata property to the class itself
+  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Input',
-    category: 'Input/Output',
+    category: ComponentCategory.INPUT_OUTPUT,
     description: 'Get input from the user',
     flowType: 'flow',
     icon: '📝'

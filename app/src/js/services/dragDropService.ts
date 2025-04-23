@@ -1,6 +1,6 @@
 import { InteractEvent, NodeRectangle } from '../models/types.js';
 import { showCollisionFeedback, snapToGrid } from '../utils/grid.js';
-import { updateNodePosition } from './nodeService.js';
+import { updateNodePosition, showPropertiesPanel } from './nodeService.js';
 import { updateConnections } from './connectionService.js';
 
 /**
@@ -260,33 +260,4 @@ export function setupCanvasDropArea(canvas: HTMLElement): void {
     // Restore canvas background
     canvas.style.backgroundColor = '#f0f4f8';
   });
-}
-
-/**
- * Show the properties panel with node-specific data
- */
-function showPropertiesPanel(nodeInstance: any): void {
-  const componentsPanel = document.querySelector('.components-container') as HTMLElement;
-  const propertiesPanel = document.getElementById('properties-panel') as HTMLElement;
-
-  if (componentsPanel && propertiesPanel) {
-    componentsPanel.style.display = 'none';
-    propertiesPanel.style.display = 'block';
-
-    const propertiesToggle = document.getElementById('properties-toggle');
-    if (propertiesToggle) propertiesToggle.textContent = '🧩';
-
-    // Populate the properties panel with node-specific data
-    const propertiesContent = propertiesPanel.querySelector('.properties-content');
-    if (propertiesContent) {
-      propertiesContent.innerHTML = ''; // Clear existing content
-
-      for (const [key, value] of Object.entries(nodeInstance)) {
-        const propertyItem = document.createElement('div');
-        propertyItem.className = 'property-item';
-        propertyItem.textContent = `${key}: ${value}`;
-        propertiesContent.appendChild(propertyItem);
-      }
-    }
-  }
 }
