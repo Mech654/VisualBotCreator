@@ -1,0 +1,35 @@
+// Variables
+
+// Colors
+$primary: #3498db;
+$secondary: #2980b9;
+$success: #2ecc71;
+$danger: #e74c3c;
+$dark: #2c3e50;
+$light: #ecf0f1;
+$border: #bdc3c7;
+
+// Sizes
+$panel-width: 250px;
+$right-panel-width: 320px;
+$right-panel-min-width: 250px;
+$right-panel-max-width: 500px;
+$transition-time: 0.3s;
+$toggle-width: 40px;
+
+// Port type colors
+$port-control: #e67e22; // Orange for control flow
+$port-string: #3498db; // Blue for string data
+$port-number: #3498db; // Same as string for number data
+$port-boolean: #8e44ad; // Purple for boolean data
+$port-object: #2c3e50; // Dark blue for object data
+$port-array: #16a085; // Teal for array data
+$port-any: #7f8c8d; // Gray for any data type
+$port-data: #3498db; // Blue for all data ports
+
+// Flow type colors
+$flow-color: #e67e22; // Orange for control flow
+$data-color: #3498db; // Blue for data flow
+
+// Breakpoints
+$mobile: 768px;

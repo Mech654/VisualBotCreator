@@ -1,0 +1,30 @@
+// Top bar styles
+
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  @include flex(row, space-between, center);
+  padding: 15px 25px;
+  background-color: white;
+  @include box-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+  z-index: 200;
+  height: 65px;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 500;
+  @include flex(row, flex-start, center);
+  
+  &-icon {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+}
+
+.action-buttons {
+  @include flex(row);
+  gap: 10px;
+}

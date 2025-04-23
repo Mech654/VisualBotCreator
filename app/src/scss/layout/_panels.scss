@@ -1,0 +1,54 @@
+// Panels styles
+
+.right-panel {
+  width: $right-panel-width;
+  height: 100%;
+  background-color: white;
+  border-left: 1px solid $border;
+  padding-top: 65px;
+  @include flex(column);
+  @include box-shadow(-2px 0 8px rgba(0, 0, 0, 0.05));
+  z-index: 200;
+  min-width: $right-panel-min-width;
+  max-width: $right-panel-max-width;
+  position: relative;
+  
+  @include mobile {
+    position: absolute;
+    right: 0;
+    transform: translateX(100%);
+    z-index: 90;
+    
+    &.visible {
+      transform: translateX(0);
+    }
+  }
+}
+
+.right-panel-resize-handle {
+  position: absolute;
+  top: 65px;
+  left: 0;
+  width: 8px;
+  height: calc(100% - 65px);
+  cursor: ew-resize;
+  background-color: transparent;
+  
+  .right-panel-resizing &,
+  &:hover {
+    background-color: rgba($primary, 0.2);
+  }
+}
+
+.panel-header {
+  padding: 15px;
+  border-bottom: 1px solid $border;
+  font-weight: 500;
+  @include flex(row, space-between, center);
+}
+
+.panel-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+}

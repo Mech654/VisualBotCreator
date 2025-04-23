@@ -1,0 +1,92 @@
+// Side Panel Styles
+
+.side-panel {
+  width: $panel-width;
+  background-color: $dark;
+  color: white;
+  padding: 20px 0;
+  @include flex(column);
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  z-index: 200;
+  @include box-shadow(2px 0 8px rgba(0, 0, 0, 0.1));
+  
+  &.expanded {
+    transform: translateX(0);
+  }
+}
+
+.toggle-panel {
+  position: absolute;
+  right: -40px;
+  top: 75px;
+  width: $toggle-width;
+  height: 40px;
+  background-color: $dark;
+  color: white;
+  @include flex(row, center, center);
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  font-size: 18px;
+  @include box-shadow(2px 0 4px rgba(0, 0, 0, 0.1));
+  z-index: 90;
+  
+  &:hover {
+    background-color: $secondary;
+  }
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  @include flex(row, flex-start, center);
+  
+  &-icon {
+    margin-right: 10px;
+    font-size: 24px;
+  }
+}
+
+.menu {
+  margin-top: 20px;
+  flex-grow: 1;
+  
+  &-item {
+    padding: 12px 20px;
+    @include flex(row, flex-start, center);
+    cursor: pointer;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    &.active {
+      background-color: $primary;
+    }
+  }
+  
+  &-icon {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+}
+
+.user-profile {
+  padding: 15px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  @include flex(row, flex-start, center);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: $primary;
+  @include flex(row, center, center);
+  margin-right: 10px;
+}

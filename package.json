@@ -15,8 +15,11 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,html,css}\"",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",
-    "copy-assets": "shx mkdir -p dist/src && shx cp -r app/src/styles dist/src/ && shx cp -r app/src/assets dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
-    "copy-html": "shx cp app/src/builder.html dist/src/builder.html && shx cp app/src/index.html dist/src/index.html && node cross_platform/fix-paths.js"
+    "copy-assets": "npm run sass && shx mkdir -p dist/src && shx cp -r app/src/styles dist/src/ && shx cp -r app/src/assets dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
+    "copy-html": "shx cp app/src/builder.html dist/src/builder.html && shx cp app/src/index.html dist/src/index.html && node cross_platform/fix-paths.js",
+    "sass": "sass app/src/scss/main.scss:app/src/styles/builder.css --style compressed",
+    "sass:watch": "sass app/src/scss/main.scss:app/src/styles/builder.css --watch",
+    "dev:sass": "npm run sass:watch & npm run dev"
   },
   "author": "",
   "license": "MIT",

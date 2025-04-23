@@ -1,0 +1,15 @@
+// Functions
+
+// Convert pixel values to rem
+@function rem($pixels) {
+  @return $pixels / 16 + rem;
+}
+
+// Darken or lighten color based on percentage
+@function adjust-color($color, $amount) {
+  @if $amount > 0 {
+    @return lighten($color, $amount);
+  } @else {
+    @return darken($color, abs($amount));
+  }
+}

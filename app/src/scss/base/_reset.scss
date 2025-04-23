@@ -1,0 +1,30 @@
+// Reset & base styles
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  height: 100vh;
+  background-color: #f5f7fa;
+  overflow: hidden;
+}
+
+// Disable transitions globally when needed
+.disable-transitions,
+.disable-transitions * {
+  transition: none !important;
+  animation: none !important;
+}
+
+// Keyframes
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

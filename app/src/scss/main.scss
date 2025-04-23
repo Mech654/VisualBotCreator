@@ -1,0 +1,26 @@
+// Main SCSS file for Visual Studio Bot Creator
+// This file imports all other SCSS files
+
+// Abstracts
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+@import 'abstracts/functions';
+
+// Base
+@import 'base/reset';
+@import 'base/typography';
+@import 'base/utilities';
+
+// Layout
+@import 'layout/header';
+@import 'layout/sidebar';
+@import 'layout/workspace';
+@import 'layout/panels';
+
+// Components
+@import 'components/buttons';
+@import 'components/nodes';
+@import 'components/ports';
+@import 'components/properties';
+@import 'components/forms';
+@import 'components/component-panel';

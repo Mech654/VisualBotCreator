@@ -1,0 +1,48 @@
+// Mixins
+
+// Flexbox
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  flex-wrap: $wrap;
+}
+
+// Media queries
+@mixin mobile {
+  @media (max-width: $mobile) {
+    @content;
+  }
+}
+
+// Transitions
+@mixin transition($property: all, $duration: $transition-time, $timing: ease) {
+  transition: $property $duration $timing;
+}
+
+// Box shadow
+@mixin box-shadow($shadow...) {
+  box-shadow: $shadow;
+}
+
+// Node styling
+@mixin node-base {
+  position: absolute;
+  width: 220px;
+  background: white;
+  border-radius: 8px;
+  cursor: move;
+  user-select: none;
+  z-index: 50;
+  @include box-shadow(0 2px 10px rgba(0, 0, 0, 0.1));
+}
+
+// Port styling
+@mixin port-base {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: crosshair;
+  @include box-shadow(0 0 0 2px white);
+}
