@@ -1,11 +1,12 @@
 // Panels styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 .right-panel {
   width: $right-panel-width;
   height: 100%;
   background-color: white;
   border-left: 1px solid $border;
-  padding-top: 65px;
   @include flex(column);
   @include box-shadow(-2px 0 8px rgba(0, 0, 0, 0.05));
   z-index: 200;
@@ -27,10 +28,9 @@
 
 .right-panel-resize-handle {
   position: absolute;
-  top: 65px;
   left: 0;
   width: 8px;
-  height: calc(100% - 65px);
+  height: calc(100%);
   cursor: ew-resize;
   background-color: transparent;
   

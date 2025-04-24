@@ -1,4 +1,6 @@
 // Port styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 // Flow ports styling
 .flow-ports {

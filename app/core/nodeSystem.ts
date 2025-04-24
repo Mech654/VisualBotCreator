@@ -118,7 +118,6 @@ export class NodeFactory {
 
             // Register the component
             this.registerNodeType(type, ComponentClass);
-            console.log(`Dynamically registered component: ${componentName} as type "${type}"`);
 
             if (ComponentClass.metadata) {
               console.log(`Component metadata: ${JSON.stringify(ComponentClass.metadata)}`);
@@ -184,7 +183,6 @@ export class NodeFactory {
 
   static registerNodeType(type: string, componentClass: NodeComponent): void {
     this.nodeTypes[type] = componentClass;
-    console.log(`Registered component type: ${type}`);
   }
 
   static createNode(type: string, id: string, properties: Record<string, any> = {}): Node {

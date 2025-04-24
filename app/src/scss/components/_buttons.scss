@@ -1,4 +1,7 @@
 // Button styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use 'sass:color';
 
 .btn {
   padding: 8px 16px;
@@ -41,7 +44,7 @@
     color: white;
     
     &:hover {
-      background-color: darken($success, 10%);
+      background-color: color.adjust($success, $lightness: -10%);
     }
   }
 }

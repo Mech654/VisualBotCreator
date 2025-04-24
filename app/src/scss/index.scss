@@ -1,0 +1,21 @@
+// Main SCSS file for the Dashboard/Index page
+// This file imports only components needed for the index/dashboard page
+
+// Abstracts
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+@use 'abstracts/functions' as *;
+
+// Base
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/utilities';
+
+// Layout
+@use 'layout/header';
+@use 'layout/sidebar';
+@use 'layout/dashboard';
+
+// Components
+@use 'components/buttons';
+@use 'components/forms';

@@ -21,25 +21,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Setup component panel resizing
   setupComponentPanelResize();
 
-  // Toggle Side Panel
-  document.querySelector('.toggle-panel')?.addEventListener('click', () => {
-    const sidePanel = document.querySelector('.side-panel');
-    const wasExpanded = sidePanel?.classList.contains('expanded');
+  // Show side panel by default when the page loads
+  const sidePanel = document.querySelector('.side-panel') as HTMLElement;
+  sidePanel?.classList.add('expanded');
+  console.log("Side panel initialized with class:", sidePanel?.className);
 
-    sidePanel?.classList.toggle('expanded');
-
-    // Adjust builder content margin based on side panel state
-    if (wasExpanded) {
-      const builderContent = document.querySelector('.builder-content') as HTMLElement;
-      if (builderContent) {
-        builderContent.style.transition = 'margin-left 0.3s ease, width 0.3s ease';
+  // Toggle Side Panel - improved with logging and force rendering
+  const togglePanel = document.querySelector('.toggle-panel');
+  togglePanel?.addEventListener('click', () => {
+    const sidePanel = document.querySelector('.side-panel') as HTMLElement;
+    if (sidePanel) {
+      if (sidePanel.classList.contains('expanded')) {
+        sidePanel.classList.remove('expanded');
+        console.log("Side panel collapsed, classes:", sidePanel.className);
+      } else {
+        sidePanel.classList.add('expanded');
+        console.log("Side panel expanded, classes:", sidePanel.className);
       }
+      
+      // Force reflow to ensure CSS changes take effect
+      void sidePanel.offsetWidth;
+      
+      // Update connections after panel toggle with delay to ensure CSS transition completes
+      setTimeout(() => {
+        updateConnections();
+      }, 300);
     }
-
-    // Update connections after panel toggle
-    setTimeout(() => {
-      updateConnections();
-    }, 300);
   });
 
   // Toggle Properties Panel

@@ -1,4 +1,6 @@
 // Properties styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 .property-group {
   margin-bottom: 20px;

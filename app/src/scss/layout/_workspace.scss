@@ -1,16 +1,14 @@
 // Workspace styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 .builder-content {
-  flex-grow: 1;
   display: flex;
   height: 100vh;
-  margin-left: $toggle-width;
-  width: calc(100% - $toggle-width);
-  
-  .side-panel.expanded ~ & {
-    margin-left: $panel-width;
-    width: calc(100% - $panel-width);
-  }
+  width: 100%;
+  position: relative;
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
 }
 
 .builder-container {
@@ -21,10 +19,16 @@
 
 .workspace {
   flex-grow: 1;
-  padding-top: 65px;
   height: 100%;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+// When side panel is expanded, adjust workspace
+.side-panel.expanded ~ .builder-content {
+  margin-left: $panel-width;
 }
 
 .canvas-container {

@@ -1,4 +1,6 @@
 // Node styles
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 .node {
   @include node-base;
