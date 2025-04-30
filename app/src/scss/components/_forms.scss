@@ -19,13 +19,13 @@
   border: 1px solid $border;
   border-radius: 4px;
   font-size: 14px;
-  
+
   &:focus {
     outline: none;
     border-color: $primary;
     box-shadow: 0 0 0 2px rgba($primary, 0.2);
   }
-  
+
   &.is-invalid {
     border-color: $danger;
   }
@@ -47,11 +47,11 @@
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-  
+
   &-input {
     margin-right: 10px;
   }
-  
+
   &-label {
     font-size: 14px;
   }

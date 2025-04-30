@@ -15,7 +15,7 @@ export class MathNode extends Node {
     category: ComponentCategory.DATA_PROCESSING,
     description: 'Perform mathematical operations on numerical inputs',
     flowType: 'data',
-    icon: '🧮'
+    icon: '🧮',
   };
 
   constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }) {
@@ -25,7 +25,7 @@ export class MathNode extends Node {
     }
 
     properties.variables = properties.variables || {};
-    
+
     // Generate the node content for display - but without using 'this'
     properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
 
@@ -50,7 +50,6 @@ export class MathNode extends Node {
     this.properties.nodeContent = `<p class="math-expression-display">${this.properties.expression}</p>`;
     return this.properties.nodeContent;
   }
-
   /**
    * Override the default property panel with a custom one
    */
@@ -88,38 +87,24 @@ export class MathNode extends Node {
       </div>
     `;
   }
-
   /**
    * Set up event listeners for the math node property panel
    */
   setupPropertyEventListeners(panel: HTMLElement): void {
-    // Add event listener for testing the expression
     const testButton = panel.querySelector('.test-expression') as HTMLButtonElement;
     const expressionInput = panel.querySelector('.math-expression') as HTMLInputElement;
     const varAInput = panel.querySelector('.math-var-a') as HTMLInputElement;
     const varBInput = panel.querySelector('.math-var-b') as HTMLInputElement;
     const resultDisplay = panel.querySelector('.expression-result') as HTMLSpanElement;
-
     if (testButton && expressionInput && varAInput && varBInput && resultDisplay) {
       testButton.addEventListener('click', async () => {
         try {
-          const a = Number(varAInput.value);
-          const b = Number(varBInput.value);
-          const expression = expressionInput.value;
-
-          // Update the expression property
+          const a = Number(varAInput.value ?? 0);
+          const b = Number(varBInput.value ?? 0);
+          const expression = expressionInput.value ?? '';
           this.properties.expression = expression;
-          
-          // Update the node content with the new expression
           this.updateNodeContent();
-
-          // Process the expression with the test values
-          const result = this.process({
-            a,
-            b,
-            expression
-          });
-
+          const result = this.process({ a, b, expression });
           if (result.error) {
             resultDisplay.textContent = `Error: ${result.error}`;
             resultDisplay.style.color = 'red';
@@ -132,11 +117,8 @@ export class MathNode extends Node {
           resultDisplay.style.color = 'red';
         }
       });
-
-      // Save expression when it changes
       expressionInput.addEventListener('change', () => {
         this.properties.expression = expressionInput.value;
-        // Update the node content
         this.updateNodeContent();
       });
     }
@@ -149,7 +131,7 @@ export class MathNode extends Node {
 
       // Create a scope with variable values from inputs
       const scope: Record<string, number> = {
-        ...this.properties.variables // Default values from properties
+        ...this.properties.variables, // Default values from properties
       };
 
       // Add inputs to scope
@@ -167,13 +149,13 @@ export class MathNode extends Node {
       // Return the result and clear any previous errors
       return {
         result: result,
-        error: null
+        error: null,
       };
     } catch (error) {
       // Return an error message if evaluation fails
       return {
         result: 0,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

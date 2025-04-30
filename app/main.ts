@@ -2,7 +2,14 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { Node, NodeProperties, Connection, PortCategory, PortType, PORT_CATEGORIES } from './core/base.js';
+import {
+  Node,
+  NodeProperties,
+  Connection,
+  PortCategory,
+  PortType,
+  PORT_CATEGORIES,
+} from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
 
 // Get __dirname equivalent in ES modules
@@ -19,17 +26,22 @@ const nodeInstances = new Map<string, Node>();
 const connections: Connection[] = [];
 
 function createWindow(): void {
+  // Construct path relative to the application root
+  const iconPath = path.join(app.getAppPath(), 'dist', 'src', 'assets', 'images', 'mascot.png');
+  console.log('Electron app icon path:', iconPath); // Log the icon path for verification
+
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: iconPath, // Use path relative to app root
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       // Use ES module preload script with .mjs extension
       preload: path.resolve(projectRoot, 'dist', 'preload-esm.mjs'),
       webSecurity: true,
-      sandbox: false
-    }
+      sandbox: false,
+    },
   });
 
   // Updated to use path.join for proper cross-platform path resolution
@@ -42,33 +54,41 @@ function createWindow(): void {
 // Set up IPC handlers for node system operations
 function setupIpcHandlers(): void {
   // Handle node creation requests
-  ipcMain.handle('node:create', async (event, { type, id, properties }: { type: string, id: string, properties: NodeProperties }) => {
-    try {
-      const node = NodeFactory.createNode(type, id, properties);
-      // Store node instance for future reference
-      nodeInstances.set(id, node);
+  ipcMain.handle(
+    'node:create',
+    async (
+      event,
+      { type, id, properties }: { type: string; id: string; properties: NodeProperties }
+    ) => {
+      try {
+        const node = NodeFactory.createNode(type, id, properties);
+        // Store node instance for future reference
+        nodeInstances.set(id, node);
 
-      // Return node data (safe to stringify)
-      return {
-        id: node.id,
-        type: node.type,
-        properties: node.properties,
-        inputs: node.inputs.map(input => ({
-          id: input.id,
-          label: input.label,
-          dataType: input.dataType
-        })),
-        outputs: node.outputs.map(output => ({
-          id: output.id,
-          label: output.label,
-          dataType: output.dataType
-        }))
-      };
-    } catch (error) {
-      console.error('Error creating node:', error);
-      throw new Error(`Failed to create node: ${error instanceof Error ? error.message : String(error)}`);
+        // Return node data (safe to stringify)
+        return {
+          id: node.id,
+          type: node.type,
+          properties: node.properties,
+          inputs: node.inputs.map(input => ({
+            id: input.id,
+            label: input.label,
+            dataType: input.dataType,
+          })),
+          outputs: node.outputs.map(output => ({
+            id: output.id,
+            label: output.label,
+            dataType: output.dataType,
+          })),
+        };
+      } catch (error) {
+        console.error('Error creating node:', error);
+        throw new Error(
+          `Failed to create node: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
-  });
+  );
 
   // Get all available node types
   ipcMain.handle('node:getTypes', async () => {
@@ -94,152 +114,180 @@ function setupIpcHandlers(): void {
       inputs: node.inputs.map(input => ({
         id: input.id,
         label: input.label,
-        dataType: input.dataType
+        dataType: input.dataType,
       })),
       outputs: node.outputs.map(output => ({
         id: output.id,
         label: output.label,
-        dataType: output.dataType
-      }))
+        dataType: output.dataType,
+      })),
     };
   });
 
   // Process a node with inputs
-  ipcMain.handle('node:process', async (event, { id, inputs }: { id: string, inputs: Record<string, any> }) => {
-    const node = nodeInstances.get(id);
-    if (!node) {
-      throw new Error(`Node not found with id: ${id}`);
-    }
+  ipcMain.handle(
+    'node:process',
+    async (event, { id, inputs }: { id: string; inputs: Record<string, any> }) => {
+      const node = nodeInstances.get(id);
+      if (!node) {
+        throw new Error(`Node not found with id: ${id}`);
+      }
 
-    try {
-      const result = node.process(inputs);
-      return result;
-    } catch (error) {
-      console.error(`Error processing node ${id}:`, error);
-      throw new Error(`Failed to process node: ${error instanceof Error ? error.message : String(error)}`);
+      try {
+        const result = node.process(inputs);
+        return result;
+      } catch (error) {
+        console.error(`Error processing node ${id}:`, error);
+        throw new Error(
+          `Failed to process node: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
-  });
+  );
 
   // Create a connection between nodes
-  ipcMain.handle('connection:create', async (event, {
-    fromNodeId, fromPortId, toNodeId, toPortId
-  }: {
-    fromNodeId: string,
-    fromPortId: string,
-    toNodeId: string,
-    toPortId: string
-  }) => {
-    try {
-      const sourceNode = nodeInstances.get(fromNodeId);
-      const targetNode = nodeInstances.get(toNodeId);
-
-      if (!sourceNode) {
-        throw new Error(`Source node not found with id: ${fromNodeId}`);
-      }
-
-      if (!targetNode) {
-        throw new Error(`Target node not found with id: ${toNodeId}`);
-      }
-
-      // Find the source port
-      const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
-      if (!sourcePort) {
-        throw new Error(`Output port not found: ${fromPortId}`);
-      }
-
-      // Find the target port
-      const targetPort = targetNode.inputs.find(input => input.id === toPortId);
-      if (!targetPort) {
-        throw new Error(`Input port not found: ${toPortId}`);
-      }
-
-      // Check if connection types are compatible
-      if (!arePortTypesCompatible(sourcePort.dataType, targetPort.dataType)) {
-        throw new Error(`Incompatible port types: ${sourcePort.dataType} -> ${targetPort.dataType}`);
-      }
-
-      // Check for existing connections to the input port
-      const existingConnectionToPort = connections.find(
-        conn => conn.toNodeId === toNodeId && conn.toPortId === toPortId
-      );
-
-      if (existingConnectionToPort) {
-        // Remove the existing connection
-        connections.splice(connections.indexOf(existingConnectionToPort), 1);
-      }
-
-      // Create new connection
-      const connection = new Connection(fromNodeId, fromPortId, toNodeId, toPortId);
-      connections.push(connection);
-
-      // Add connection reference to ports
-      sourcePort.connectedTo.push(connection);
-
-      return {
+  ipcMain.handle(
+    'connection:create',
+    async (
+      event,
+      {
         fromNodeId,
         fromPortId,
         toNodeId,
-        toPortId
-      };
-    } catch (error) {
-      console.error('Error creating connection:', error);
-      throw new Error(`Failed to create connection: ${error instanceof Error ? error.message : String(error)}`);
+        toPortId,
+      }: {
+        fromNodeId: string;
+        fromPortId: string;
+        toNodeId: string;
+        toPortId: string;
+      }
+    ) => {
+      try {
+        const sourceNode = nodeInstances.get(fromNodeId);
+        const targetNode = nodeInstances.get(toNodeId);
+
+        if (!sourceNode) {
+          throw new Error(`Source node not found with id: ${fromNodeId}`);
+        }
+
+        if (!targetNode) {
+          throw new Error(`Target node not found with id: ${toNodeId}`);
+        }
+
+        // Find the source port
+        const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
+        if (!sourcePort) {
+          throw new Error(`Output port not found: ${fromPortId}`);
+        }
+
+        // Find the target port
+        const targetPort = targetNode.inputs.find(input => input.id === toPortId);
+        if (!targetPort) {
+          throw new Error(`Input port not found: ${toPortId}`);
+        }
+
+        // Check if connection types are compatible
+        if (!arePortTypesCompatible(sourcePort.dataType, targetPort.dataType)) {
+          throw new Error(
+            `Incompatible port types: ${sourcePort.dataType} -> ${targetPort.dataType}`
+          );
+        }
+
+        // Check for existing connections to the input port
+        const existingConnectionToPort = connections.find(
+          conn => conn.toNodeId === toNodeId && conn.toPortId === toPortId
+        );
+
+        if (existingConnectionToPort) {
+          // Remove the existing connection
+          connections.splice(connections.indexOf(existingConnectionToPort), 1);
+        }
+
+        // Create new connection
+        const connection = new Connection(fromNodeId, fromPortId, toNodeId, toPortId);
+        connections.push(connection);
+
+        // Add connection reference to ports
+        sourcePort.connectedTo.push(connection);
+
+        return {
+          fromNodeId,
+          fromPortId,
+          toNodeId,
+          toPortId,
+        };
+      } catch (error) {
+        console.error('Error creating connection:', error);
+        throw new Error(
+          `Failed to create connection: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
-  });
+  );
 
   // Delete a connection
-  ipcMain.handle('connection:delete', async (event, {
-    fromNodeId, fromPortId, toNodeId, toPortId
-  }: {
-    fromNodeId: string,
-    fromPortId: string,
-    toNodeId: string,
-    toPortId: string
-  }) => {
-    try {
-      const connectionIndex = connections.findIndex(
-        conn =>
-          conn.fromNodeId === fromNodeId &&
-          conn.fromPortId === fromPortId &&
-          conn.toNodeId === toNodeId &&
-          conn.toPortId === toPortId
-      );
-
-      if (connectionIndex === -1) {
-        throw new Error('Connection not found');
+  ipcMain.handle(
+    'connection:delete',
+    async (
+      event,
+      {
+        fromNodeId,
+        fromPortId,
+        toNodeId,
+        toPortId,
+      }: {
+        fromNodeId: string;
+        fromPortId: string;
+        toNodeId: string;
+        toPortId: string;
       }
+    ) => {
+      try {
+        const connectionIndex = connections.findIndex(
+          conn =>
+            conn.fromNodeId === fromNodeId &&
+            conn.fromPortId === fromPortId &&
+            conn.toNodeId === toNodeId &&
+            conn.toPortId === toPortId
+        );
+        if (connectionIndex === -1) {
+          throw new Error('Connection not found');
+        }
 
-      // Get the connection before removing it
-      const connection = connections[connectionIndex];
+        // Get the connection before removing it
+        const connection = connections[connectionIndex];
 
-      // Remove the connection
-      connections.splice(connectionIndex, 1);
+        // Remove the connection
+        connections.splice(connectionIndex, 1);
 
-      // Also remove from port references
-      const sourceNode = nodeInstances.get(fromNodeId);
-      if (sourceNode) {
-        const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
-        if (sourcePort) {
-          const connIndex = sourcePort.connectedTo.findIndex(
-            conn =>
-              conn.fromNodeId === fromNodeId &&
-              conn.fromPortId === fromPortId &&
-              conn.toNodeId === toNodeId &&
-              conn.toPortId === toPortId
-          );
+        // Also remove from port references
+        const sourceNode = nodeInstances.get(fromNodeId);
+        if (sourceNode) {
+          const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
+          if (sourcePort) {
+            const connIndex = sourcePort.connectedTo.findIndex(
+              conn =>
+                conn.fromNodeId === fromNodeId &&
+                conn.fromPortId === fromPortId &&
+                conn.toNodeId === toNodeId &&
+                conn.toPortId === toPortId
+            );
 
-          if (connIndex !== -1) {
-            sourcePort.connectedTo.splice(connIndex, 1);
+            if (connIndex !== -1) {
+              sourcePort.connectedTo.splice(connIndex, 1);
+            }
           }
         }
-      }
 
-      return { success: true };
-    } catch (error) {
-      console.error('Error deleting connection:', error);
-      throw new Error(`Failed to delete connection: ${error instanceof Error ? error.message : String(error)}`);
+        return { success: true };
+      } catch (error) {
+        console.error('Error deleting connection:', error);
+        throw new Error(
+          `Failed to delete connection: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
-  });
+  );
 
   // Get connections for a node
   ipcMain.handle('connection:getForNode', async (event, nodeId: string) => {
@@ -251,7 +299,9 @@ function setupIpcHandlers(): void {
       return nodeConnections;
     } catch (error) {
       console.error('Error getting connections:', error);
-      throw new Error(`Failed to get connections: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to get connections: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   });
 }
@@ -267,7 +317,7 @@ const PORT_TYPE_COMPATIBILITY: Record<PortType, PortType[]> = {
   [PortType.STRING]: [PortType.NUMBER], // Allow string to number
   [PortType.OBJECT]: [],
   [PortType.ARRAY]: [],
-  [PortType.CONTROL]: []
+  [PortType.CONTROL]: [],
 };
 
 /**

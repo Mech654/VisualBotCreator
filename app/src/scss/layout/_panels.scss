@@ -3,27 +3,63 @@
 @use '../abstracts/mixins' as *;
 
 .right-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
   width: $right-panel-width;
-  height: 100%;
-  background-color: white;
-  border-left: 1px solid $border;
-  @include flex(column);
-  @include box-shadow(-2px 0 8px rgba(0, 0, 0, 0.05));
-  z-index: 200;
   min-width: $right-panel-min-width;
   max-width: $right-panel-max-width;
-  position: relative;
-  
+  background: white;
+  border-left: 1px solid $border;
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   @include mobile {
     position: absolute;
     right: 0;
     transform: translateX(100%);
     z-index: 90;
-    
+
     &.visible {
       transform: translateX(0);
     }
   }
+  .toggle-right-panel {
+    position: absolute;
+    top: 75px;
+    left: -50px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid $primary;
+    background: rgba($primary, 0.05);
+    color: $primary;
+    font-size: 24px;
+    z-index: 3000;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition:
+      background 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      box-shadow 0.2s;
+    outline: none;
+    &:hover,
+    &:focus {
+      background: $primary;
+      color: #fff;
+      border-color: $primary;
+      box-shadow: 0 4px 16px rgba($primary, 0.15);
+    }
+  }
+}
+.right-panel.expanded {
+  transform: translateX(0);
 }
 
 .right-panel-resize-handle {
@@ -33,7 +69,7 @@
   height: calc(100%);
   cursor: ew-resize;
   background-color: transparent;
-  
+
   .right-panel-resizing &,
   &:hover {
     background-color: rgba($primary, 0.2);

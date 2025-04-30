@@ -16,7 +16,7 @@
   margin-bottom: 12px;
   color: $dark;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -31,7 +31,7 @@
 .property-item {
   margin-bottom: 15px;
   position: relative;
-  
+
   &:hover::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -66,7 +66,7 @@
   border: 1px solid $border;
   border-radius: 4px;
   font-size: 14px;
-  
+
   &:focus {
     outline: none;
     border-color: $primary;
@@ -80,21 +80,21 @@
   display: inline-block;
   width: 36px;
   height: 20px;
-  
+
   input {
     opacity: 0;
     width: 0;
     height: 0;
-    
+
     &:checked + .slider {
       background-color: $primary;
     }
-    
+
     &:checked + .slider:before {
       transform: translateX(16px);
     }
   }
-  
+
   .slider {
     position: absolute;
     cursor: pointer;
@@ -103,18 +103,18 @@
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    transition: .3s;
+    transition: 0.3s;
     border-radius: 20px;
-    
+
     &:before {
       position: absolute;
-      content: "";
+      content: '';
       height: 16px;
       width: 16px;
       left: 2px;
       bottom: 2px;
       background-color: white;
-      transition: .3s;
+      transition: 0.3s;
       border-radius: 50%;
     }
   }

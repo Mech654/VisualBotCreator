@@ -15,7 +15,7 @@ export class MessageNode extends Node {
     category: ComponentCategory.CONVERSATION_FLOW,
     description: 'Send a message to the user',
     flowType: 'flow',
-    icon: '💬'
+    icon: '💬',
   };
 
   constructor(id: string, properties: MessageNodeProperties = {}) {
@@ -23,7 +23,7 @@ export class MessageNode extends Node {
     properties.message = properties.message || 'Enter your message here...';
     properties.delay = properties.delay || 500;
     properties.variableName = properties.variableName || 'message';
-    
+
     // Generate the node content for display without using 'this'
     const message = properties.message || '';
     // Truncate long messages
@@ -31,7 +31,7 @@ export class MessageNode extends Node {
     if (displayText.length > 50) {
       displayText = displayText.substring(0, 47) + '...';
     }
-    
+
     // Escape HTML
     displayText = displayText
       .replace(/&/g, '&amp;')
@@ -39,7 +39,7 @@ export class MessageNode extends Node {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-    
+
     properties.nodeContent = `<div class="message-bubble">${displayText}</div>`;
 
     super(id, 'message', properties);
@@ -48,17 +48,15 @@ export class MessageNode extends Node {
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('messageText', 'Message Text', 'string'));
   }
-  
-  /**
-   * Format the message for preview in the node
-   */
+
+  /** Format the message for preview in the node */
   formatMessagePreview(message: string): string {
     // Truncate long messages
     let displayText = message;
     if (displayText.length > 50) {
       displayText = displayText.substring(0, 47) + '...';
     }
-    
+
     // Escape HTML and wrap in message bubble styling
     displayText = displayText
       .replace(/&/g, '&amp;')
@@ -66,21 +64,15 @@ export class MessageNode extends Node {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-    
+
     return `<div class="message-bubble">${displayText}</div>`;
   }
-  
-  /**
-   * Update the node content whenever the message changes
-   */
+  /** Update the node content whenever the message changes */
   updateNodeContent() {
     this.properties.nodeContent = this.formatMessagePreview(this.properties.message || '');
     return this.properties.nodeContent;
   }
-
-  /**
-   * Generate the HTML for the message node's properties panel
-   */
+  /** Generate the HTML for the message node's properties panel */
   generatePropertiesPanel(): string {
     return `
       <div class="property-group-title">Content</div>
@@ -98,10 +90,7 @@ export class MessageNode extends Node {
       </div>
     `;
   }
-
-  /**
-   * Set up event listeners for the message node property panel
-   */
+  /** Set up event listeners for the message node property panel */
   setupPropertyEventListeners(panel: HTMLElement): void {
     // Add event listeners for message properties
     const messageInput = panel.querySelector('.message-text') as HTMLTextAreaElement;
@@ -130,10 +119,10 @@ export class MessageNode extends Node {
   }
 
   process(inputValues: Record<string, any>): Record<string, any> {
-    let processedMessage = this.properties.message;
+    const processedMessage = this.properties.message;
 
     return {
-      messageText: processedMessage
+      messageText: processedMessage,
     };
   }
 }

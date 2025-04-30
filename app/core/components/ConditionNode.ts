@@ -14,7 +14,7 @@ export class ConditionNode extends Node {
     category: ComponentCategory.LOGIC,
     description: 'Evaluate a condition and branch flow',
     flowType: 'flow',
-    icon: '❓'
+    icon: '❓',
   };
 
   constructor(id: string, properties: ConditionNodeProperties = {}) {
@@ -22,7 +22,7 @@ export class ConditionNode extends Node {
 
     properties.title = properties.title || 'Condition';
     properties.condition = properties.condition || 'value == true';
-    
+
     // Generate the node content for display directly in properties
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
 
@@ -33,17 +33,12 @@ export class ConditionNode extends Node {
     this.addOutput(new Port('result', 'Result', 'boolean'));
   }
 
-  /**
-   * Update the node content whenever the condition changes
-   */
+  /** Update the node content whenever the condition changes */
   updateNodeContent() {
     this.properties.nodeContent = `<p class="condition-expression">if (${this.properties.condition}) { ... }</p>`;
     return this.properties.nodeContent;
   }
-  
-  /**
-   * Override the default property panel with a custom one
-   */
+  /** Override the default property panel with a custom one */
   generatePropertiesPanel(): string {
     return `
       <div class="property-group-title">Condition</div>
@@ -67,18 +62,12 @@ export class ConditionNode extends Node {
       </div>
     `;
   }
-  
-  /**
-   * Set up event listeners for the condition node property panel
-   */
+  /** Set up event listeners for the condition node property panel */
   setupPropertyEventListeners(panel: HTMLElement): void {
-    // Add event listener for condition expression changes
     const expressionInput = panel.querySelector('.condition-expression') as HTMLInputElement;
-    
     if (expressionInput) {
       expressionInput.addEventListener('change', () => {
         this.properties.condition = expressionInput.value;
-        // Update the node content
         this.updateNodeContent();
       });
     }

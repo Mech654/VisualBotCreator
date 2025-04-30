@@ -5,22 +5,22 @@
 .node {
   @include node-base;
   @include transition(box-shadow, 0.2s);
-  
+
   &:hover {
     @include box-shadow(0 4px 15px rgba(0, 0, 0, 0.15));
   }
-  
+
   &.node-selected {
     @include box-shadow(0 0 0 2px $primary !important);
     z-index: 51;
   }
-  
+
   // Flow type specific styling
-  &[data-flow-type="flow"] .node-header {
+  &[data-flow-type='flow'] .node-header {
     background-color: $flow-color;
   }
-  
-  &[data-flow-type="data"] .node-header {
+
+  &[data-flow-type='data'] .node-header {
     background-color: $data-color;
   }
 }
@@ -59,11 +59,11 @@
 // Connection line customization
 .leader-line {
   z-index: 5;
-  
+
   &.flow-connection {
     opacity: 0.9;
   }
-  
+
   &.data-connection {
     z-index: 4;
     opacity: 0.8;

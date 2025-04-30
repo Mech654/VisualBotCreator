@@ -1,7 +1,11 @@
 import { NodeInstance, NodePosition } from '../models/types.js';
 import { generateNodeHtml } from '../ui/nodeRenderer.js';
 import { snapToGrid, checkCollision } from '../utils/grid.js';
-import { initNodeConnections, removeNodeConnections, updateConnections } from './connectionService.js';
+import {
+  initNodeConnections,
+  removeNodeConnections,
+  updateConnections,
+} from './connectionService.js';
 
 // Store node positions for collision detection
 const nodePositions = new Map<HTMLElement, NodePosition>();
@@ -12,7 +16,7 @@ const nodePositions = new Map<HTMLElement, NodePosition>();
 export function updateNodePosition(node: HTMLElement): void {
   nodePositions.set(node, {
     x: node.offsetLeft,
-    y: node.offsetTop
+    y: node.offsetTop,
   });
 
   // Update any connections attached to this node
@@ -22,24 +26,35 @@ export function updateNodePosition(node: HTMLElement): void {
 /**
  * Check if adding a node at a position would collide with existing nodes
  */
-export function checkPositionValidity(x: number, y: number, width: number, height: number, allNodes: HTMLElement[]): boolean {
+export function checkPositionValidity(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  allNodes: HTMLElement[]
+): boolean {
   const tempRect = {
     left: x,
     right: x + width,
     top: y,
-    bottom: y + height
+    bottom: y + height,
   };
 
   for (const node of allNodes) {
     const position = nodePositions.get(node);
     if (!position) continue;
 
-    if (checkCollision({
-      left: position.x,
-      right: position.x + node.offsetWidth,
-      top: position.y,
-      bottom: position.y + node.offsetHeight
-    }, tempRect)) {
+    if (
+      checkCollision(
+        {
+          left: position.x,
+          right: position.x + node.offsetWidth,
+          top: position.y,
+          bottom: position.y + node.offsetHeight,
+        },
+        tempRect
+      )
+    ) {
       return false;
     }
   }
@@ -78,8 +93,13 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
   existingGroups.forEach(group => group.remove());
 
   // Set node name/ID in properties
-  const nameInput = propertiesPanel.querySelector('input[aria-label="Node name"]') as HTMLInputElement;
-  if (nameInput) nameInput.value = nodeInstance.properties.title || nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1);
+  const nameInput = propertiesPanel.querySelector(
+    'input[aria-label="Node name"]'
+  ) as HTMLInputElement;
+  if (nameInput)
+    nameInput.value =
+      nodeInstance.properties.title ||
+      nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1);
 
   const idInput = propertiesPanel.querySelector('input[aria-label="Node ID"]') as HTMLInputElement;
   if (idInput) idInput.value = nodeInstance.id;
@@ -90,8 +110,9 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
 
   try {
     // Request the HTML for this node's property panel from the backend
-    window.nodeSystem.getNodeById(nodeInstance.id)
-      .then(node => {
+    window.nodeSystem
+      .getNodeById(nodeInstance.id)
+      .then((node: any) => {
         // If the node exists and has a generatePropertiesPanel method, use it
         if (node) {
           // Generate the HTML content through the Node API
@@ -112,19 +133,20 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
           inputs.forEach(input => {
             input.addEventListener('change', () => {
               // Update the node in the backend
-              window.nodeSystem.createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties)
-                .catch(error => console.error('Error updating node:', error));
+              window.nodeSystem
+                .createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties)
+                .catch((error: unknown) => console.error('Error updating node:', error));
             });
           });
         }
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         console.error('Error fetching node for properties panel:', error);
         // Fallback to generic panel
         propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
         propertiesPanel.appendChild(propertiesGroup);
       });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error generating properties panel:', error);
     // Fallback to generic panel
     propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
@@ -140,8 +162,9 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
 
   // Get all properties except internal ones
   const skipProps = ['title', 'id'];
-  const properties = Object.entries(nodeInstance.properties)
-    .filter(([key]) => !skipProps.includes(key));
+  const properties = Object.entries(nodeInstance.properties).filter(
+    ([key]) => !skipProps.includes(key)
+  );
 
   if (properties.length === 0) {
     html += `
@@ -237,11 +260,13 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
  */
 function formatPropertyName(key: string): string {
   // Convert camelCase to Title Case with spaces
-  return key
-    // Insert a space before all caps
-    .replace(/([A-Z])/g, ' $1')
-    // Uppercase the first character
-    .replace(/^./, str => str.toUpperCase());
+  return (
+    key
+      // Insert a space before all caps
+      .replace(/([A-Z])/g, ' $1')
+      // Uppercase the first character
+      .replace(/^./, str => str.toUpperCase())
+  );
 }
 
 /**
@@ -256,14 +281,14 @@ export async function createNodeInstance(
   x: number,
   y: number,
   flowType: string = 'flow'
-): Promise<{ nodeElement: HTMLElement, nodeInstance: NodeInstance } | null> {
+): Promise<{ nodeElement: HTMLElement; nodeInstance: NodeInstance } | null> {
   // Generate a unique ID for the node
   const id = window.utils.generateNodeId();
 
   try {
     // Create node instance using the IPC bridge
     const nodeInstance = await window.nodeSystem.createNode(type, id, {
-      flowType // Pass flow type to the backend
+      flowType, // Pass flow type to the backend
     });
 
     // Create DOM element for visual representation

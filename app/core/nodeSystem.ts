@@ -15,11 +15,11 @@ export enum ComponentCategory {
   INPUT_OUTPUT = 'Input/Output',
   MEDIA = 'Media',
   VARIABLES = 'Variables',
-  OTHER = 'Other'
+  OTHER = 'Other',
 }
 
 export interface NodeComponent {
-  new(id: string, properties?: any): Node;
+  new (id: string, properties?: any): Node;
   metadata?: {
     name?: string;
     category?: ComponentCategory | string;
@@ -39,42 +39,42 @@ export class NodeFactory {
    */
   private static typeCategoryKeywords: Record<string, ComponentCategory> = {
     // Conversation Flow
-    'start': ComponentCategory.CONVERSATION_FLOW,
-    'message': ComponentCategory.CONVERSATION_FLOW,
-    'options': ComponentCategory.CONVERSATION_FLOW,
-    'dialog': ComponentCategory.CONVERSATION_FLOW,
-    'chat': ComponentCategory.CONVERSATION_FLOW,
+    start: ComponentCategory.CONVERSATION_FLOW,
+    message: ComponentCategory.CONVERSATION_FLOW,
+    options: ComponentCategory.CONVERSATION_FLOW,
+    dialog: ComponentCategory.CONVERSATION_FLOW,
+    chat: ComponentCategory.CONVERSATION_FLOW,
 
     // Logic
-    'condition': ComponentCategory.LOGIC,
-    'if': ComponentCategory.LOGIC,
-    'switch': ComponentCategory.LOGIC,
-    'branch': ComponentCategory.LOGIC,
-    'logic': ComponentCategory.LOGIC,
+    condition: ComponentCategory.LOGIC,
+    if: ComponentCategory.LOGIC,
+    switch: ComponentCategory.LOGIC,
+    branch: ComponentCategory.LOGIC,
+    logic: ComponentCategory.LOGIC,
 
     // Data Processing
-    'math': ComponentCategory.DATA_PROCESSING,
-    'data': ComponentCategory.DATA_PROCESSING,
-    'text': ComponentCategory.DATA_PROCESSING,
-    'string': ComponentCategory.DATA_PROCESSING,
-    'number': ComponentCategory.DATA_PROCESSING,
+    math: ComponentCategory.DATA_PROCESSING,
+    data: ComponentCategory.DATA_PROCESSING,
+    text: ComponentCategory.DATA_PROCESSING,
+    string: ComponentCategory.DATA_PROCESSING,
+    number: ComponentCategory.DATA_PROCESSING,
 
     // Input/Output
-    'input': ComponentCategory.INPUT_OUTPUT,
-    'output': ComponentCategory.INPUT_OUTPUT,
-    'file': ComponentCategory.INPUT_OUTPUT,
-    'api': ComponentCategory.INPUT_OUTPUT,
+    input: ComponentCategory.INPUT_OUTPUT,
+    output: ComponentCategory.INPUT_OUTPUT,
+    file: ComponentCategory.INPUT_OUTPUT,
+    api: ComponentCategory.INPUT_OUTPUT,
 
     // Media
-    'image': ComponentCategory.MEDIA,
-    'audio': ComponentCategory.MEDIA,
-    'video': ComponentCategory.MEDIA,
-    'media': ComponentCategory.MEDIA,
+    image: ComponentCategory.MEDIA,
+    audio: ComponentCategory.MEDIA,
+    video: ComponentCategory.MEDIA,
+    media: ComponentCategory.MEDIA,
 
     // Variables
-    'variable': ComponentCategory.VARIABLES,
-    'var': ComponentCategory.VARIABLES,
-    'store': ComponentCategory.VARIABLES
+    variable: ComponentCategory.VARIABLES,
+    var: ComponentCategory.VARIABLES,
+    store: ComponentCategory.VARIABLES,
   };
 
   /**
@@ -85,7 +85,8 @@ export class NodeFactory {
 
     try {
       // Get all JavaScript files in the components directory (after compilation)
-      const files = fs.readdirSync(this.componentsDir)
+      const files = fs
+        .readdirSync(this.componentsDir)
         .filter(file => file.endsWith('.js') && !file.includes('index.js'));
 
       console.log(`Found ${files.length} component files:`, files);
@@ -118,10 +119,6 @@ export class NodeFactory {
 
             // Register the component
             this.registerNodeType(type, ComponentClass);
-
-            if (ComponentClass.metadata) {
-              console.log(`Component metadata: ${JSON.stringify(ComponentClass.metadata)}`);
-            }
           }
         } catch (err) {
           console.error(`Error loading component ${file}:`, err);
@@ -132,9 +129,6 @@ export class NodeFactory {
     } catch (err) {
       console.error('Error discovering components:', err);
     }
-
-    // Log all registered node types for debugging
-    console.log('All registered node types:', Object.keys(this.nodeTypes));
   }
 
   /**
@@ -161,14 +155,17 @@ export class NodeFactory {
 
     // Infer flow type based on category
     const flowType =
-      (category === ComponentCategory.DATA_PROCESSING ||
-        type.includes('data') ||
-        type.includes('math') ||
-        type.includes('number') ||
-        type.includes('string')) ? 'data' : 'flow';
+      category === ComponentCategory.DATA_PROCESSING ||
+      type.includes('data') ||
+      type.includes('math') ||
+      type.includes('number') ||
+      type.includes('string')
+        ? 'data'
+        : 'flow';
 
     // Format the name nicely
-    const name = componentName.replace(/Node$/, '')
+    const name = componentName
+      .replace(/Node$/, '')
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
       .trim();
@@ -177,7 +174,7 @@ export class NodeFactory {
       name,
       category,
       description: `${name} component`,
-      flowType: flowType as 'flow' | 'data'
+      flowType: flowType,
     };
   }
 
@@ -197,7 +194,12 @@ export class NodeFactory {
     return new NodeClass(id, properties);
   }
 
-  static getRegisteredTypes(): Array<{ type: string, name: string, category: string, flowType?: string }> {
+  static getRegisteredTypes(): Array<{
+    type: string;
+    name: string;
+    category: string;
+    flowType?: string;
+  }> {
     // Dynamically generate the list based on registered components
     return Object.entries(this.nodeTypes).map(([type, Component]) => {
       // Try to get metadata from component if it has static metadata

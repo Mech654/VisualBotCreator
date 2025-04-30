@@ -1,7 +1,7 @@
 // Port categories and types
 export enum PortCategory {
   FLOW = 'flow',
-  DATA = 'data'
+  DATA = 'data',
 }
 
 export enum PortType {
@@ -14,7 +14,7 @@ export enum PortType {
   BOOLEAN = 'boolean',
   OBJECT = 'object',
   ARRAY = 'array',
-  ANY = 'any'
+  ANY = 'any',
 }
 
 // Port category to types mapping
@@ -26,8 +26,8 @@ export const PORT_CATEGORIES = {
     PortType.BOOLEAN,
     PortType.OBJECT,
     PortType.ARRAY,
-    PortType.ANY
-  ]
+    PortType.ANY,
+  ],
 };
 
 export interface NodeProperties {
@@ -70,17 +70,11 @@ export class Node {
 
   /**
    * Generate the HTML for this node's properties panel
-   * Override this in derived classes to provide custom property panels
    */
   generatePropertiesPanel(): string {
-    // Default implementation uses dynamic property reflection
     let html = `<div class="property-group-title">${this.type.charAt(0).toUpperCase() + this.type.slice(1)} Properties</div>`;
-
-    // Get all properties except internal ones
     const skipProps = ['title', 'id'];
-    const properties = Object.entries(this.properties)
-      .filter(([key]) => !skipProps.includes(key));
-
+    const properties = Object.entries(this.properties).filter(([key]) => !skipProps.includes(key));
     if (properties.length === 0) {
       html += `
         <div class="property-item">
@@ -88,13 +82,10 @@ export class Node {
         </div>
       `;
     } else {
-      // For each property, create an appropriate input control
       properties.forEach(([key, value]) => {
         const propertyType = typeof value;
-
         switch (propertyType) {
           case 'string':
-            // For long text, use textarea
             if (String(value).length > 50) {
               html += `
                 <div class="property-item" data-tooltip="Edit ${key}">
@@ -105,7 +96,6 @@ export class Node {
                 </div>
               `;
             } else {
-              // For short text, use input
               html += `
                 <div class="property-item" data-tooltip="Edit ${key}">
                   <div class="property-label">${this.formatPropertyName(key)}</div>
@@ -116,7 +106,6 @@ export class Node {
               `;
             }
             break;
-
           case 'number':
             html += `
               <div class="property-item" data-tooltip="Edit ${key}">
@@ -127,7 +116,6 @@ export class Node {
               </div>
             `;
             break;
-
           case 'boolean':
             html += `
               <div class="property-item" data-tooltip="Toggle ${key}">
@@ -141,9 +129,7 @@ export class Node {
               </div>
             `;
             break;
-
           case 'object':
-            // For objects, display a simplified representation
             const objStr = JSON.stringify(value, null, 2);
             html += `
               <div class="property-item" data-tooltip="Edit ${key} (JSON)">
@@ -154,9 +140,7 @@ export class Node {
               </div>
             `;
             break;
-
           default:
-            // For unknown types, show as read-only
             html += `
               <div class="property-item" data-tooltip="${key}">
                 <div class="property-label">${this.formatPropertyName(key)}</div>
@@ -166,26 +150,20 @@ export class Node {
         }
       });
     }
-
     return html;
   }
 
   /**
    * Hook for adding event listeners to the property panel
-   * Override this in derived classes to provide custom event handling
    */
   setupPropertyEventListeners(panel: HTMLElement): void {
-    // Default implementation adds generic change handlers
     const propertyInputs = panel.querySelectorAll('.dynamic-property');
     propertyInputs.forEach(input => {
-      input.addEventListener('change', (e) => {
+      input.addEventListener('change', e => {
         const element = e.target as HTMLInputElement | HTMLTextAreaElement;
         const propertyKey = element.dataset.propertyKey;
-
         if (propertyKey) {
           let value: any;
-
-          // Get the appropriate value based on input type
           if (element.type === 'checkbox') {
             value = (element as HTMLInputElement).checked;
           } else if (element.type === 'number') {
@@ -195,13 +173,11 @@ export class Node {
               value = JSON.parse(element.value);
             } catch (error) {
               console.error('Invalid JSON:', error);
-              return; // Don't update if JSON is invalid
+              return;
             }
           } else {
             value = element.value;
           }
-
-          // Update the node instance property
           this.properties[propertyKey] = value;
         }
       });
@@ -212,12 +188,11 @@ export class Node {
    * Format a property key into a readable label
    */
   private formatPropertyName(key: string): string {
-    // Convert camelCase to Title Case with spaces
-    return key
-      // Insert a space before all caps
-      .replace(/([A-Z])/g, ' $1')
-      // Uppercase the first character
-      .replace(/^./, str => str.toUpperCase());
+    return (
+      key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase())
+    );
   }
 }
 

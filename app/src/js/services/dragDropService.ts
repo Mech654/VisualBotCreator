@@ -3,6 +3,9 @@ import { showCollisionFeedback, snapToGrid } from '../utils/grid.js';
 import { updateNodePosition, showPropertiesPanel } from './nodeService.js';
 import { updateConnections } from './connectionService.js';
 
+// Declare the global interact object for TypeScript
+declare const interact: any;
+
 /**
  * Initialize Interact.js draggable for nodes
  */
@@ -13,7 +16,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
     updateNodePosition(node);
 
     // Make node selectable
-    node.addEventListener('mousedown', async (e) => {
+    node.addEventListener('mousedown', async e => {
       const target = e.target as HTMLElement;
       if (target.closest('.port')) return; // Don't select when clicking on ports
 
@@ -45,8 +48,8 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
         modifiers: [
           interact.modifiers.restrictRect({
             restriction: '.canvas-content', // Restrict to canvas-content instead of canvas
-            endOnly: true
-          })
+            endOnly: true,
+          }),
         ],
 
         listeners: {
@@ -76,16 +79,16 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
           move(event: InteractEvent) {
             const target = event.target;
             const canvas = document.getElementById('canvas');
-            
+
             // Apply zoom scaling to dx and dy
             let scaleFactor = 1;
             if (canvas && canvas.dataset.zoomLevel) {
               scaleFactor = parseFloat(canvas.dataset.zoomLevel);
             }
-            
+
             // Get current position or default to 0
-            const x = (parseFloat(target.getAttribute('data-x') || '0')) + (event.dx / scaleFactor);
-            const y = (parseFloat(target.getAttribute('data-y') || '0')) + (event.dy / scaleFactor);
+            const x = parseFloat(target.getAttribute('data-x') || '0') + event.dx / scaleFactor;
+            const y = parseFloat(target.getAttribute('data-y') || '0') + event.dy / scaleFactor;
 
             // Calculate absolute position
             const absX = parseInt(target.dataset.startLeft || '0') + x;
@@ -108,7 +111,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
               left: absX,
               right: absX + target.offsetWidth,
               top: absY,
-              bottom: absY + target.offsetHeight
+              bottom: absY + target.offsetHeight,
             };
 
             for (const otherNode of allNodes) {
@@ -116,14 +119,14 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
 
               const position = {
                 x: otherNode.offsetLeft,
-                y: otherNode.offsetTop
+                y: otherNode.offsetTop,
               };
 
               const otherRect: NodeRectangle = {
                 left: position.x,
                 right: position.x + otherNode.offsetWidth,
                 top: position.y,
-                bottom: position.y + otherNode.offsetHeight
+                bottom: position.y + otherNode.offsetHeight,
               };
 
               if (checkCollision(currentRect, otherRect)) {
@@ -158,7 +161,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
               left: snappedX,
               right: snappedX + target.offsetWidth,
               top: snappedY,
-              bottom: snappedY + target.offsetHeight
+              bottom: snappedY + target.offsetHeight,
             };
 
             for (const otherNode of allNodes) {
@@ -166,14 +169,14 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
 
               const position = {
                 x: otherNode.offsetLeft,
-                y: otherNode.offsetTop
+                y: otherNode.offsetTop,
               };
 
               const otherRect: NodeRectangle = {
                 left: position.x,
                 right: position.x + otherNode.offsetWidth,
                 top: position.y,
-                bottom: position.y + otherNode.offsetHeight
+                bottom: position.y + otherNode.offsetHeight,
               };
 
               if (checkCollision(currentRect, otherRect)) {
@@ -193,15 +196,18 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
               target.setAttribute('data-y', '0');
 
               // Show shake animation
-              target.animate([
-                { transform: 'translateX(-5px)' },
-                { transform: 'translateX(5px)' },
-                { transform: 'translateX(-5px)' },
-                { transform: 'translateX(0)' }
-              ], {
-                duration: 300,
-                easing: 'ease-in-out'
-              });
+              target.animate(
+                [
+                  { transform: 'translateX(-5px)' },
+                  { transform: 'translateX(5px)' },
+                  { transform: 'translateX(-5px)' },
+                  { transform: 'translateX(0)' },
+                ],
+                {
+                  duration: 300,
+                  easing: 'ease-in-out',
+                }
+              );
             } else {
               // Apply snapped position
               target.style.left = `${snappedX}px`;
@@ -231,11 +237,11 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
             setTimeout(() => {
               target.style.transition = 'box-shadow 0.2s ease';
             }, 150);
-          }
+          },
         },
         // Prevent default drag behaviors
         autoScroll: true,
-        inertia: false
+        inertia: false,
       });
     }
   });
@@ -244,7 +250,11 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
 /**
  * Check if two node rectangles collide
  */
-function checkCollision(rect1: NodeRectangle, rect2: NodeRectangle, tolerance: number = 5): boolean {
+function checkCollision(
+  rect1: NodeRectangle,
+  rect2: NodeRectangle,
+  tolerance: number = 5
+): boolean {
   return !(
     rect1.right < rect2.left + tolerance ||
     rect1.left > rect2.right - tolerance ||
@@ -257,7 +267,7 @@ function checkCollision(rect1: NodeRectangle, rect2: NodeRectangle, tolerance: n
  * Set up canvas drop area for component drag and drop
  */
 export function setupCanvasDropArea(canvas: HTMLElement): void {
-  canvas.addEventListener('dragover', (e) => {
+  canvas.addEventListener('dragover', e => {
     e.preventDefault();
     // Visual indicator for valid drop target
     canvas.style.backgroundColor = '#e9f5fe';

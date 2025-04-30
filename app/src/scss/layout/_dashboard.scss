@@ -19,7 +19,7 @@
   border-bottom: 1px solid #edf2f7;
   height: 64px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  
+
   .search-box {
     @include flex(row, flex-start, center);
     background-color: #f8fafc;
@@ -28,13 +28,13 @@
     width: 300px;
     border: 1px solid transparent;
     transition: all 0.2s ease;
-    
+
     &:focus-within {
       border-color: $border;
       background-color: white;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-    
+
     input {
       border: none;
       background: transparent;
@@ -42,47 +42,47 @@
       width: 100%;
       outline: none;
       color: $dark;
-      
+
       &::placeholder {
         color: #a0aec0;
       }
     }
   }
-  
+
   .action-buttons {
     @include flex;
     gap: 12px;
-    
+
     .btn {
       padding: 8px 16px;
       border-radius: 6px;
       font-weight: 500;
       transition: all 0.2s ease;
-      
+
       &-primary {
         background-color: $primary;
         color: white;
-        
+
         &:hover {
           background-color: $secondary;
           transform: translateY(-1px);
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
       }
-      
+
       &-outline {
         background-color: transparent;
         border: 1px solid $border;
-        
+
         &:hover {
           background-color: #f8fafc;
         }
       }
-      
+
       &-danger {
         background-color: $danger;
         color: white;
-        
+
         &:hover {
           background-color: darken($danger, 5%);
         }
@@ -103,11 +103,11 @@
   margin-bottom: 20px;
   @include flex(row, space-between, center);
   color: $dark;
-  
+
   h2 {
     font-weight: 600;
   }
-  
+
   .view-options {
     @include flex;
     gap: 10px;
@@ -115,12 +115,12 @@
     padding: 4px;
     border-radius: 6px;
   }
-  
+
   .view-option {
     padding: 5px;
     cursor: pointer;
     opacity: 0.6;
-    
+
     &.active {
       opacity: 1;
     }
@@ -134,16 +134,16 @@
   overflow-x: auto;
   padding-bottom: 15px;
   margin-bottom: 30px;
-  
+
   &::-webkit-scrollbar {
     height: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background-color: #cbd5e1;
     border-radius: 3px;
@@ -158,8 +158,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #edf2f7;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -192,11 +194,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-  
+
   & > * {
     opacity: 0;
     animation: fadeIn 0.3s ease forwards;
-    
+
     @for $i from 1 through 10 {
       &:nth-child(#{$i}) {
         animation-delay: #{$i * 0.05}s;
@@ -206,8 +208,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .bot-card {
@@ -217,13 +223,15 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #edf2f7;
   @include flex(column);
-  transition: transform 0.2s, box-shadow 0.2s;
-  
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   }
-  
+
   &.fade-out {
     opacity: 0.5;
     transform: scale(0.95);
@@ -274,7 +282,7 @@
   color: #64748b;
   cursor: pointer;
   padding: 5px;
-  
+
   &:hover {
     color: $dark;
   }
@@ -305,11 +313,11 @@
   height: 8px;
   border-radius: 50%;
   margin-right: 6px;
-  
+
   &.status-active {
     background-color: $success;
   }
-  
+
   &.status-offline {
     background-color: #94a3b8;
   }
@@ -324,7 +332,7 @@
   height: 300px;
   text-align: center;
   color: #64748b;
-  
+
   &.visible {
     display: flex;
   }
@@ -357,7 +365,7 @@
   @include flex(row, center, center);
   color: white;
   font-size: 24px;
-  
+
   &.active {
     opacity: 0.9;
     visibility: visible;
@@ -365,8 +373,11 @@
 }
 
 .transition-icon {
-  font-size: 36px;
+  width: 48px; // Set specific size for loading icon
+  height: 48px;
+  object-fit: contain; // Ensure image fits without distortion
   margin-right: 15px;
+  // font-size: 36px; // Remove font-size if it's an image
 }
 
 // Bot Actions Dropdown Menu
@@ -386,11 +397,11 @@
   padding: 10px 12px;
   cursor: pointer;
   @include flex(row, flex-start, center);
-  
+
   &:hover {
     background-color: #f1f5f9;
   }
-  
+
   &.danger:hover {
     background-color: #fef2f2;
     color: $danger;
@@ -414,13 +425,15 @@
   @include flex(row, flex-start, center);
   font-size: 14px;
   z-index: 1000;
-  
+
   &.fade-out {
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+      opacity 0.3s,
+      transform 0.3s;
   }
-  
+
   span {
     margin-right: 10px;
   }
@@ -439,11 +452,11 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s;
-  
+
   &.active {
     opacity: 1;
     visibility: visible;
-    
+
     .dialog-content {
       transform: translateY(0);
     }
@@ -459,12 +472,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-20px);
   transition: transform 0.3s;
-  
+
   h3 {
     margin-bottom: 16px;
     color: $dark;
   }
-  
+
   p {
     margin-bottom: 24px;
     color: #64748b;

@@ -1,138 +1,175 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot Creator - Builder</title>
-  <link rel="stylesheet" href="styles/builder.css">
-  <!-- Interact.js for advanced dragging capabilities -->
-  <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.17/dist/interact.min.js"></script>
-</head>
-<body>
-  <!-- Side Panel -->
-  <div class="side-panel">
-    <div class="toggle-panel">≡</div>
-    <div class="logo">
-      <span class="logo-icon">🤖</span>
-      Bot Creator
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bot Creator - Builder</title>
+    <link rel="icon" type="image/png" href="assets/images/mascot.png" />
+    <link rel="stylesheet" href="styles/builder.css" />
+    <!-- Interact.js for advanced dragging capabilities -->
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.17/dist/interact.min.js"></script>
+  </head>
+  <body class="builder-page">
+    <!-- Side Panel -->
+    <div class="side-panel expanded">
+      <div class="toggle-panel">≡</div>
+      <div class="logo">
+        <img src="assets/images/mascot.png" alt="Mascot" class="logo-icon" />
+        Bot Creator
+      </div>
+      <div class="menu">
+        <div class="menu-item" data-page="dashboard">
+          <span class="menu-icon">📊</span>
+          Dashboard
+        </div>
+        <div class="menu-item active" data-page="builder">
+          <span class="menu-icon">🧠</span>
+          Bot Builder
+        </div>
+        <div class="menu-item" data-page="integrations">
+          <span class="menu-icon">🔌</span>
+          Integrations
+        </div>
+        <div class="menu-item" data-page="analytics">
+          <span class="menu-icon">📈</span>
+          Analytics
+        </div>
+        <div class="menu-item" data-page="settings">
+          <span class="menu-icon">⚙️</span>
+          Settings
+        </div>
+      </div>
+      <div class="user-profile">
+        <div class="avatar">U</div>
+        <div>User Name</div>
+      </div>
     </div>
-    <div class="menu">
-      <div class="menu-item" data-page="dashboard">
-        <span class="menu-icon">📊</span>
-        Dashboard
-      </div>
-      <div class="menu-item active" data-page="builder">
-        <span class="menu-icon">🧠</span>
-        Bot Builder
-      </div>
-      <div class="menu-item" data-page="integrations">
-        <span class="menu-icon">🔌</span>
-        Integrations
-      </div>
-      <div class="menu-item" data-page="analytics">
-        <span class="menu-icon">📈</span>
-        Analytics
-      </div>
-      <div class="menu-item" data-page="settings">
-        <span class="menu-icon">⚙️</span>
-        Settings
-      </div>
-    </div>
-    <div class="user-profile">
-      <div class="avatar">U</div>
-      <div>User Name</div>
-    </div>
-  </div>
 
-  <!-- Main Content -->
-  <div class="builder-content">
-    <!-- Builder Container -->
-    <div class="builder-container">
-      <!-- Workspace -->
-      <div class="workspace">
-        <!-- Toolbox -->
-        <div class="toolbox">
-          <div class="tool active" title="Select">👆</div>
-          <div class="tool" title="Connect">🔗</div>
-          <div class="tool" title="Delete">🗑️</div>
-          <div class="tool" title="Zoom In">🔍+</div>
-          <div class="tool" title="Zoom Out">🔍-</div>
-        </div>
-        
-        <!-- Canvas -->
-        <div class="canvas-container" id="canvas">
-          <div class="canvas-content">
-            <!-- Nodes will be dynamically added here -->
+    <!-- Main Content -->
+    <div class="builder-content">
+      <!-- Builder Container -->
+      <div class="builder-container">
+        <!-- Workspace -->
+        <div class="workspace">
+          <!-- Toolbox -->
+          <div class="toolbox">
+            <div class="tool active" title="Select">👆</div>
+            <div class="tool" title="Connect">🔗</div>
+            <div class="tool" title="Delete">🗑️</div>
+            <div class="tool" title="Zoom In">🔍+</div>
+            <div class="tool" title="Zoom Out">🔍-</div>
           </div>
-          <div id="zoom-indicator" class="zoom-indicator">100%</div>
-        </div>
-      </div>
-      
-      <!-- Right Panel -->
-      <div class="right-panel">
-        <div class="right-panel-resize-handle"></div>
-        <div class="panel-header">
-          <span>Components</span>
-          <span id="properties-toggle" style="cursor: pointer;">📝</span>
-        </div>
-        
-        <!-- Components Panel -->
-        <div class="panel-content components-container">
-          <!-- Components will be dynamically loaded from our node components files -->
-          <div id="component-categories">
-            <!-- Component categories will be added here dynamically -->
+
+          <!-- Canvas -->
+          <div class="canvas-container" id="canvas">
+            <div class="canvas-content">
+              <!-- Nodes will be dynamically added here -->
+            </div>
+            <div id="zoom-indicator" class="zoom-indicator">100%</div>
           </div>
         </div>
-        
-        <!-- Properties Panel (Hidden by default) -->
-        <div class="panel-content" id="properties-panel" style="display: none;">
-          <div class="property-group">
-            <div class="property-group-title">General</div>
-            <div class="property-item" data-tooltip="A descriptive name for this node">
-              <div class="property-label">Name</div>
-              <input type="text" class="property-input" value="Message" aria-label="Node name">
-            </div>
-            <div class="property-item" data-tooltip="Unique identifier for the node">
-              <div class="property-label">ID</div>
-              <input type="text" class="property-input" value="node-1234" aria-label="Node ID" readonly>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <div class="toggle-right-panel" title="Toggle right panel">»</div>
+          <div class="panel-header">
+            <span>Components</span>
+            <span id="properties-toggle" style="cursor: pointer">📝</span>
+          </div>
+
+          <!-- Components Panel -->
+          <div class="panel-content components-container">
+            <!-- Components will be dynamically loaded from our node components files -->
+            <div id="component-categories">
+              <!-- Component categories will be added here dynamically -->
             </div>
           </div>
-          
-          <div class="property-group">
-            <div class="property-group-title">Content</div>
-            <div class="property-item" data-tooltip="Text message to display in this node">
-              <div class="property-label">Message Text</div>
-              <textarea class="property-input" rows="3" aria-label="Node message content">Hello! How can I help you today?</textarea>
+
+          <!-- Properties Panel (Hidden by default) -->
+          <div class="panel-content" id="properties-panel" style="display: none">
+            <div class="property-group">
+              <div class="property-group-title">General</div>
+              <div class="property-item" data-tooltip="A descriptive name for this node">
+                <div class="property-label">Name</div>
+                <input type="text" class="property-input" value="Message" aria-label="Node name" />
+              </div>
+              <div class="property-item" data-tooltip="Unique identifier for the node">
+                <div class="property-label">ID</div>
+                <input
+                  type="text"
+                  class="property-input"
+                  value="node-1234"
+                  aria-label="Node ID"
+                  readonly
+                />
+              </div>
             </div>
-            <div class="property-item" data-tooltip="Variable name to store the message output">
-              <div class="property-label">Variable</div>
-              <input type="text" class="property-input" value="greeting" aria-label="Variable name">
+
+            <div class="property-group">
+              <div class="property-group-title">Content</div>
+              <div class="property-item" data-tooltip="Text message to display in this node">
+                <div class="property-label">Message Text</div>
+                <textarea class="property-input" rows="3" aria-label="Node message content">
+Hello! How can I help you today?</textarea
+                >
+              </div>
+              <div class="property-item" data-tooltip="Variable name to store the message output">
+                <div class="property-label">Variable</div>
+                <input
+                  type="text"
+                  class="property-input"
+                  value="greeting"
+                  aria-label="Variable name"
+                />
+              </div>
             </div>
-          </div>
-          
-          <div class="property-group">
-            <div class="property-group-title">Advanced</div>
-            <div class="property-item" data-tooltip="Conditions that determine if this node is executed">
-              <div class="property-label">Conditions</div>
-              <input type="text" class="property-input" value="" placeholder="e.g. user.isNewUser == true" aria-label="Node conditions">
-            </div>
-            <div class="property-item" data-tooltip="Delay in milliseconds before this node executes">
-              <div class="property-label">Delay (ms)</div>
-              <input type="number" class="property-input" value="500" min="0" max="10000" step="100" aria-label="Node delay">
-            </div>
-            <div class="property-item" data-tooltip="Preview this node in the chatbot conversation">
-              <button class="btn btn-outline" style="margin-top: 10px;">
-                <span class="btn-icon">👁️</span>
-                Preview Node
-              </button>
+
+            <div class="property-group">
+              <div class="property-group-title">Advanced</div>
+              <div
+                class="property-item"
+                data-tooltip="Conditions that determine if this node is executed"
+              >
+                <div class="property-label">Conditions</div>
+                <input
+                  type="text"
+                  class="property-input"
+                  value=""
+                  placeholder="e.g. user.isNewUser == true"
+                  aria-label="Node conditions"
+                />
+              </div>
+              <div
+                class="property-item"
+                data-tooltip="Delay in milliseconds before this node executes"
+              >
+                <div class="property-label">Delay (ms)</div>
+                <input
+                  type="number"
+                  class="property-input"
+                  value="500"
+                  min="0"
+                  max="10000"
+                  step="100"
+                  aria-label="Node delay"
+                />
+              </div>
+              <div
+                class="property-item"
+                data-tooltip="Preview this node in the chatbot conversation"
+              >
+                <button class="btn btn-outline" style="margin-top: 10px">
+                  <span class="btn-icon">👁️</span>
+                  Preview Node
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Script with type="module" attribute to use ES modules -->
-  <script type="module" src="js/builder.js"></script>
-</body>
+    <!-- Script with type="module" attribute to use ES modules -->
+    <script type="module" src="js/builder.js"></script>
+  </body>
 </html>

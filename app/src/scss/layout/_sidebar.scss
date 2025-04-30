@@ -15,40 +15,43 @@
   left: 0;
   top: 0;
   bottom: 0;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-100%); // Hidden by default
 }
 
-// Special handling for builder page where sidebar is collapsible
-.builder-content .side-panel {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  transform: translateX(-100%); 
-  z-index: 500;
-  
-  &.expanded {
-    transform: translateX(0) !important;
-  }
+.side-panel.expanded {
+  transform: translateX(0); // Slide in when expanded
 }
 
 .toggle-panel {
   position: absolute;
-  right: -40px;
   top: 75px;
-  width: $toggle-width;
-  height: 40px;
-  background-color: $dark;
-  color: white;
-  @include flex(row, center, center);
+  right: -50px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid $primary;
+  background: rgba($primary, 0.05);
+  color: $primary;
+  font-size: 24px;
+  z-index: 3000;
   cursor: pointer;
-  border-radius: 0 4px 4px 0;
-  font-size: 18px;
-  @include box-shadow(2px 0 8px rgba(0, 0, 0, 0.1));
-  z-index: 1000; /* Increased z-index to ensure visibility */
-  
-  &:hover {
-    background-color: $primary;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+  outline: none;
+  &:hover,
+  &:focus {
+    background: $primary;
+    color: #fff;
+    border-color: $primary;
+    box-shadow: 0 4px 16px rgba($primary, 0.15);
   }
 }
 
@@ -59,10 +62,13 @@
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   @include flex(row, flex-start, center);
-  
+
   &-icon {
-    margin-right: 12px;
-    font-size: 24px;
+    width: 60px; // Increased size again
+    height: 60px; // Increased size again
+    margin-right: 15px; // Slightly more margin
+    border-radius: 8px; // Adjusted radius
+    object-fit: cover; // Ensure the image covers the area
   }
 }
 
@@ -70,7 +76,7 @@
   margin-top: 15px;
   flex-grow: 1;
   padding: 0 10px;
-  
+
   &-item {
     padding: 12px 15px;
     margin-bottom: 5px;
@@ -79,16 +85,16 @@
     border-radius: 6px;
     transition: background-color 0.2s;
     font-weight: 500;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
-    
+
     &.active {
       background-color: $primary;
     }
   }
-  
+
   &-icon {
     margin-right: 12px;
     font-size: 18px;
@@ -108,4 +114,17 @@
   background-color: $primary;
   @include flex(row, center, center);
   margin-right: 12px;
+}
+
+// Only allow expand/collapse on builder page
+body.builder-page .side-panel {
+  transform: translateX(-100%);
+}
+body.builder-page .side-panel.expanded {
+  transform: translateX(0);
+}
+
+// Prevent sliding on other pages
+body:not(.builder-page) .side-panel {
+  transform: none !important;
 }

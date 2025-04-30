@@ -17,7 +17,7 @@ export class InputNode extends Node {
     category: ComponentCategory.INPUT_OUTPUT,
     description: 'Get input from the user',
     flowType: 'flow',
-    icon: '📝'
+    icon: '📝',
   };
 
   constructor(id: string, properties: InputNodeProperties = {}) {
@@ -27,11 +27,11 @@ export class InputNode extends Node {
     properties.variableName = properties.variableName || 'userInput';
     properties.inputType = properties.inputType || 'text';
     properties.validation = properties.validation || null;
-    
+
     // Generate the node content without using 'this'
     const inputType = properties.inputType || 'text';
     const placeholder = properties.placeholder || 'Type your response...';
-    
+
     properties.nodeContent = `
       <div class="input-preview">
         <div class="input-field-${inputType}">${placeholder}</div>
@@ -46,15 +46,11 @@ export class InputNode extends Node {
     this.addOutput(new Port('inputValue', 'Input Value', 'string'));
     this.addOutput(new Port('isValid', 'Is Valid', 'boolean'));
   }
-  
-  /**
-   * Generate preview content for the input node
-   */
+
+  /** Generate preview content for the input node */
   generateInputPreview(props: InputNodeProperties): string {
     const inputType = props.inputType || 'text';
     const placeholder = props.placeholder || 'Type your response...';
-    
-    // Create a visual representation of the input field
     return `
       <div class="input-preview">
         <div class="input-field-${inputType}">${placeholder}</div>
@@ -62,18 +58,14 @@ export class InputNode extends Node {
       </div>
     `;
   }
-  
-  /**
-   * Update the node content when properties change
-   */
+
+  /** Update the node content when properties change */
   updateNodeContent() {
     this.properties.nodeContent = this.generateInputPreview(this.properties);
     return this.properties.nodeContent;
   }
-  
-  /**
-   * Generate the HTML for the input node's properties panel
-   */
+
+  /** Generate the HTML for the input node's properties panel */
   generatePropertiesPanel(): string {
     return `
       <div class="property-group-title">Input Settings</div>
@@ -101,36 +93,34 @@ export class InputNode extends Node {
       </div>
     `;
   }
-  
-  /**
-   * Set up event listeners for the input node property panel
-   */
+
+  /** Set up event listeners for the input node property panel */
   setupPropertyEventListeners(panel: HTMLElement): void {
     const placeholderInput = panel.querySelector('.input-placeholder') as HTMLInputElement;
     const variableInput = panel.querySelector('.input-variable') as HTMLInputElement;
     const typeSelect = panel.querySelector('.input-type') as HTMLSelectElement;
     const validationInput = panel.querySelector('.input-validation') as HTMLInputElement;
-    
+
     if (placeholderInput) {
       placeholderInput.addEventListener('change', () => {
         this.properties.placeholder = placeholderInput.value;
         this.updateNodeContent();
       });
     }
-    
+
     if (variableInput) {
       variableInput.addEventListener('change', () => {
         this.properties.variableName = variableInput.value;
       });
     }
-    
+
     if (typeSelect) {
       typeSelect.addEventListener('change', () => {
         this.properties.inputType = typeSelect.value as any;
         this.updateNodeContent();
       });
     }
-    
+
     if (validationInput) {
       validationInput.addEventListener('change', () => {
         this.properties.validation = validationInput.value || null;
@@ -142,7 +132,7 @@ export class InputNode extends Node {
     let isValid = true;
     if (this.properties.validation && userInput) {
       try {
-        const regex = new RegExp(this.properties.validation as string);
+        const regex = new RegExp(String(this.properties.validation));
         isValid = regex.test(userInput);
       } catch (error) {
         isValid = false;
@@ -156,7 +146,7 @@ export class InputNode extends Node {
 
     return {
       inputValue: processedInput,
-      isValid: isValid
+      isValid: isValid,
     };
   }
 }

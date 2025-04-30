@@ -1,5 +1,3 @@
-// Node and component related interfaces
-
 export interface NodeInstance {
   id: string;
   type: string;
@@ -9,7 +7,7 @@ export interface NodeInstance {
     condition?: string;
     operation?: string;
     placeholder?: string;
-    options?: Array<{ text: string, value: string }>;
+    options?: Array<{ text: string; value: string }>;
     [key: string]: any;
   };
   inputs: PortInstance[];
@@ -67,7 +65,7 @@ export interface ConnectionInstance {
 
 export enum ConnectionMode {
   NONE = 'none',
-  CONNECTING = 'connecting'
+  CONNECTING = 'connecting',
 }
 
 export interface ConnectionState {

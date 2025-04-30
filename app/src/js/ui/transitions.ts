@@ -1,27 +1,18 @@
-/**
- * Handles UI transition effects between pages
- */
-
-/**
- * Show page transition effect and navigate to another page
- */
 export function showPageTransition(destination: string): void {
-  // Create transition overlay if it doesn't exist in builder
   let pageTransition = document.querySelector('.page-transition') as HTMLElement;
   if (!pageTransition) {
     pageTransition = document.createElement('div');
     pageTransition.className = 'page-transition';
-    
+
     const icon = document.createElement('span');
     icon.className = 'transition-icon';
     icon.textContent = '🤖';
-    
+
     pageTransition.appendChild(icon);
     pageTransition.appendChild(document.createTextNode('Loading...'));
-    
+
     document.body.appendChild(pageTransition);
-    
-    // Add necessary styles if they don't exist
+
     if (!document.getElementById('transition-styles')) {
       const style = document.createElement('style');
       style.id = 'transition-styles';
@@ -64,10 +55,9 @@ export function showPageTransition(destination: string): void {
       document.head.appendChild(style);
     }
   }
-  
+
   pageTransition.classList.add('active');
-  
-  // Wait for animation before navigating
+
   setTimeout(() => {
     window.location.href = destination;
   }, 400);

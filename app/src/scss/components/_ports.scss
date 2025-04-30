@@ -20,11 +20,11 @@
   position: absolute;
   top: -7px;
   right: 10px;
-  
+
   &:nth-child(2) {
     right: 40px;
   }
-  
+
   &:nth-child(3) {
     right: 70px;
   }
@@ -41,7 +41,8 @@
 }
 
 // Data ports containers
-.data-input-ports, .data-output-ports {
+.data-input-ports,
+.data-output-ports {
   @include flex(column);
   gap: 8px;
 }
@@ -99,23 +100,23 @@
 .port {
   @include port-base;
   @include transition(transform, 0.2s);
-  
+
   &:hover {
     transform: scale(1.2);
   }
-  
+
   &.active-port {
     transform: scale(1.3);
     @include box-shadow(0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 6px $primary);
     z-index: 100;
   }
-  
+
   &.incompatible {
     @include box-shadow(0 0 0 4px rgba($danger, 0.8));
     opacity: 0.6;
     cursor: not-allowed;
   }
-  
+
   &.compatible {
     @include box-shadow(0 0 0 4px rgba($success, 0.8));
     transform: scale(1.2);

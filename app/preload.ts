@@ -4,12 +4,22 @@ import { contextBridge, ipcRenderer } from 'electron';
 // Define types for the APIs exposed to the renderer
 interface NodeSystemAPI {
   createNode: (type: string, id: string, properties: any) => Promise<any>;
-  getNodeTypes: () => Promise<Array<{ type: string, name: string, category: string }>>;
-  getRegisteredTypes: () => Promise<Array<{ type: string, name: string, category: string }>>;
+  getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
+  getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getNodeById: (id: string) => Promise<any>;
   processNode: (id: string, inputs: Record<string, any>) => Promise<any>;
-  createConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => Promise<any>;
-  deleteConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => Promise<any>;
+  createConnection: (
+    fromNodeId: string,
+    fromPortId: string,
+    toNodeId: string,
+    toPortId: string
+  ) => Promise<any>;
+  deleteConnection: (
+    fromNodeId: string,
+    fromPortId: string,
+    toNodeId: string,
+    toPortId: string
+  ) => Promise<any>;
   getNodeConnections: (nodeId: string) => Promise<any[]>;
 }
 
@@ -45,23 +55,39 @@ contextBridge.exposeInMainWorld('nodeSystem', {
   },
 
   // Create a connection between nodes
-  createConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => {
+  createConnection: (
+    fromNodeId: string,
+    fromPortId: string,
+    toNodeId: string,
+    toPortId: string
+  ) => {
     return ipcRenderer.invoke('connection:create', {
-      fromNodeId, fromPortId, toNodeId, toPortId
+      fromNodeId,
+      fromPortId,
+      toNodeId,
+      toPortId,
     });
   },
 
   // Delete a connection between nodes
-  deleteConnection: (fromNodeId: string, fromPortId: string, toNodeId: string, toPortId: string) => {
+  deleteConnection: (
+    fromNodeId: string,
+    fromPortId: string,
+    toNodeId: string,
+    toPortId: string
+  ) => {
     return ipcRenderer.invoke('connection:delete', {
-      fromNodeId, fromPortId, toNodeId, toPortId
+      fromNodeId,
+      fromPortId,
+      toNodeId,
+      toPortId,
     });
   },
 
   // Get all connections for a node
   getNodeConnections: (nodeId: string) => {
     return ipcRenderer.invoke('connection:getForNode', nodeId);
-  }
+  },
 } as NodeSystemAPI);
 
 // Expose utility functions
@@ -69,7 +95,7 @@ contextBridge.exposeInMainWorld('utils', {
   // Generate a random node ID
   generateNodeId: () => {
     return `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  }
+  },
 } as UtilsAPI);
 
 // TypeScript declaration file to augment the Window interface is in global.d.ts

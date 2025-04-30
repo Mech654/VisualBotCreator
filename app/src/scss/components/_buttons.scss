@@ -11,38 +11,38 @@
   @include flex(row, flex-start, center);
   font-weight: 500;
   @include transition(background-color, 0.2s);
-  
+
   &:active {
     transform: translateY(1px);
   }
-  
+
   &-icon {
     margin-right: 5px;
   }
-  
+
   // Button variants
   &-primary {
     background-color: $primary;
     color: white;
-    
+
     &:hover {
       background-color: $secondary;
     }
   }
-  
+
   &-outline {
     background-color: transparent;
     border: 1px solid $border;
-    
+
     &:hover {
       background-color: $light;
     }
   }
-  
+
   &-success {
     background-color: $success;
     color: white;
-    
+
     &:hover {
       background-color: color.adjust($success, $lightness: -10%);
     }
@@ -56,11 +56,11 @@
   border-radius: 4px;
   cursor: pointer;
   margin-right: 5px;
-  
+
   &:hover {
     background-color: $light;
   }
-  
+
   &.active {
     background-color: $primary;
     color: white;

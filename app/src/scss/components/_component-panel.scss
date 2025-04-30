@@ -12,7 +12,7 @@
 .component-search {
   margin-bottom: 15px;
   position: relative;
-  
+
   &-input {
     width: 100%;
     padding: 8px 12px;
@@ -20,7 +20,7 @@
     border-radius: 6px;
     font-size: 14px;
     background-color: rgba(255, 255, 255, 0.8);
-    
+
     &:focus {
       outline: none;
       border-color: $primary;
@@ -67,7 +67,7 @@
   padding: 8px;
   background-color: #f5f7fa;
   border-radius: 6px;
-  
+
   &:hover {
     background-color: $light;
   }
@@ -96,7 +96,7 @@
   padding-top: 10px;
   max-height: 500px;
   overflow: hidden;
-  
+
   &.collapsed {
     max-height: 0;
     opacity: 0;
@@ -112,7 +112,7 @@
   cursor: grab;
   @include flex(column, flex-start, center);
   position: relative;
-  
+
   &:hover {
     transform: translateY(-2px);
     @include box-shadow(0 4px 8px rgba(0, 0, 0, 0.05));
@@ -127,11 +127,11 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  
+
   &.flow-type {
     background-color: $flow-color;
   }
-  
+
   &.data-type {
     background-color: $data-color;
   }

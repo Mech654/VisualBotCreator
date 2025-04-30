@@ -3,17 +3,39 @@ import { NodeInstance } from './models/types.js';
 import { snapToGrid } from './utils/grid.js';
 import { showPageTransition } from './ui/transitions.js';
 import { populateComponentsPanel } from './components/componentPanel.js';
-import { createNodeInstance, showPropertiesPanel, updateNodePosition, checkPositionValidity, deleteNode } from './services/nodeService.js';
+import {
+  createNodeInstance,
+  showPropertiesPanel,
+  updateNodePosition,
+  checkPositionValidity,
+  deleteNode,
+} from './services/nodeService.js';
 import { initDraggableNodes, setupCanvasDropArea } from './services/dragDropService.js';
-import { updateConnections, clearConnections, exportConnections } from './services/connectionService.js';
+import {
+  updateConnections,
+  clearConnections,
+  exportConnections,
+} from './services/connectionService.js';
 import { initZoomControls } from './utils/zoom.js';
 
 // Add this line to declare the LeaderLine global
 declare const LeaderLine: any;
 
+// Extend the Window interface to include nodeSystem
+interface Window {
+  nodeSystem: {
+    createConnection: (
+      fromNodeId: string,
+      fromPortId: string,
+      toNodeId: string,
+      toPortId: string
+    ) => Promise<void>;
+  };
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Store all nodes for collision detection
-  let allNodes = Array.from(document.querySelectorAll('.node')) as HTMLElement[];
+  let allNodes = Array.from(document.querySelectorAll('.node')) as HTMLElement[]; // Cast to HTMLElement[]
 
   // Add LeaderLine script dynamically
   await loadLeaderLineScript();
@@ -21,33 +43,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Setup component panel resizing
   setupComponentPanelResize();
 
-  // Show side panel by default when the page loads
-  const sidePanel = document.querySelector('.side-panel') as HTMLElement;
-  sidePanel?.classList.add('expanded');
-  console.log("Side panel initialized with class:", sidePanel?.className);
+  // Ensure side panel is expanded by default
+  const sidePanel = document.querySelector('.side-panel');
+  if (sidePanel) sidePanel.classList.add('expanded');
 
-  // Toggle Side Panel - improved with logging and force rendering
+  // Toggle Side Panel
   const togglePanel = document.querySelector('.toggle-panel');
   togglePanel?.addEventListener('click', () => {
-    const sidePanel = document.querySelector('.side-panel') as HTMLElement;
+    const sidePanel = document.querySelector('.side-panel');
     if (sidePanel) {
-      if (sidePanel.classList.contains('expanded')) {
-        sidePanel.classList.remove('expanded');
-        console.log("Side panel collapsed, classes:", sidePanel.className);
-      } else {
-        sidePanel.classList.add('expanded');
-        console.log("Side panel expanded, classes:", sidePanel.className);
-      }
-      
-      // Force reflow to ensure CSS changes take effect
-      void sidePanel.offsetWidth;
-      
-      // Update connections after panel toggle with delay to ensure CSS transition completes
-      setTimeout(() => {
-        updateConnections();
-      }, 300);
+      sidePanel.classList.toggle('expanded');
+      // Optionally update connections or layout if needed
     }
   });
+
+  // Toggle Right Panel
+  const rightPanel = document.querySelector('.right-panel');
+  const rightToggle = rightPanel?.querySelector('.toggle-right-panel');
+  if (rightPanel && rightToggle) {
+    rightToggle.addEventListener('click', () => {
+      rightPanel.classList.toggle('expanded');
+      rightToggle.textContent = rightPanel.classList.contains('expanded') ? '»' : '«';
+    });
+    // Set initial icon and ensure panel starts expanded
+    rightPanel.classList.add('expanded'); // Start expanded
+    rightToggle.textContent = '»'; // Set initial icon for expanded state
+  }
 
   // Toggle Properties Panel
   document.getElementById('properties-toggle')?.addEventListener('click', () => {
@@ -73,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Navigation between pages with transition effect
   document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', (e) => {
+    item.addEventListener('click', e => {
       const target = e.currentTarget as HTMLElement;
       const page = target.getAttribute('data-page');
       if (page === 'dashboard') {
@@ -90,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const canvas = document.getElementById('canvas') as HTMLElement;
   const canvasContent = canvas?.querySelector('.canvas-content') as HTMLElement;
 
-  canvas?.addEventListener('click', (e) => {
+  canvas?.addEventListener('click', e => {
     const target = e.target as HTMLElement;
     if (target.id === 'canvas' || target.classList.contains('canvas-content')) {
       document.querySelectorAll('.node').forEach(n => n.classList.remove('node-selected'));
@@ -106,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupCanvasDropArea(canvas);
 
   // Setup handling of dropping components on canvas
-  canvas.addEventListener('drop', async (e) => {
+  canvas.addEventListener('drop', async e => {
     e.preventDefault();
 
     // Restore canvas background
@@ -219,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Setup keyboard shortcut for deleting nodes
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       const selectedNode = document.querySelector('.node-selected') as HTMLElement;
       if (selectedNode) {
@@ -254,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (e) => {
+    input.onchange = e => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         loadProject(file);
@@ -280,7 +301,7 @@ async function loadLeaderLineScript(): Promise<void> {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js';
     script.onload = () => resolve();
-    script.onerror = (err) => reject(new Error('Failed to load LeaderLine: ' + err));
+    script.onerror = err => reject(new Error('Failed to load LeaderLine: ' + err));
     document.head.appendChild(script);
   });
 }
@@ -291,14 +312,14 @@ async function loadLeaderLineScript(): Promise<void> {
 async function saveProject(): Promise<void> {
   try {
     // Get all nodes - fixed the type casting issue
-    const nodes = Array.from(document.querySelectorAll('.node')).map((element) => {
+    const nodes = Array.from(document.querySelectorAll('.node')).map(element => {
       const node = element as HTMLElement;
       return {
         id: node.dataset.nodeId,
         type: node.dataset.nodeType,
         flowType: node.dataset.flowType || 'flow', // Save the flow type
         x: node.offsetLeft,
-        y: node.offsetTop
+        y: node.offsetTop,
       };
     });
 
@@ -309,14 +330,16 @@ async function saveProject(): Promise<void> {
     const project = {
       nodes,
       connections,
-      version: '1.0.0'
+      version: '1.0.0',
     };
 
     // Create downloadable link
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(project));
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(project));
     const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "bot-project.json");
+    downloadAnchor.setAttribute('href', dataStr);
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().slice(0, 10);
+    downloadAnchor.setAttribute('download', `bot-project-${formattedDate}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -336,7 +359,7 @@ async function loadProject(file: File): Promise<void> {
   try {
     const reader = new FileReader();
 
-    reader.onload = async (e) => {
+    reader.onload = async e => {
       try {
         const project = JSON.parse(e.target?.result as string);
 
@@ -352,7 +375,7 @@ async function loadProject(file: File): Promise<void> {
         clearConnections();
 
         // Reset allNodes array
-        let allNodes: HTMLElement[] = [];
+        const allNodes: HTMLElement[] = [];
 
         // Create each node
         for (const nodeData of project.nodes) {
@@ -402,23 +425,20 @@ async function loadProject(file: File): Promise<void> {
                 if (fromPortElement && toPortElement) {
                   // Get connection color based on flow type
                   const flowType = connection.flowType || 'flow';
-                  const connectionColor = flowType === 'flow' ? 'var(--flow-color)' : 'var(--data-color)';
+                  const connectionColor =
+                    flowType === 'flow' ? 'var(--flow-color)' : 'var(--data-color)';
 
                   // Create a visual connection using LeaderLine
-                  new LeaderLine(
-                    fromPortElement,
-                    toPortElement,
-                    {
-                      path: 'fluid',
-                      startPlug: 'disc',
-                      endPlug: 'arrow3',
-                      color: connectionColor,
-                      size: flowType === 'flow' ? 3 : 2,
-                      startSocketGravity: 20,
-                      endSocketGravity: 20,
-                      dash: flowType === 'data' ? { animation: true } : false
-                    }
-                  );
+                  new LeaderLine(fromPortElement, toPortElement, {
+                    path: 'fluid',
+                    startPlug: 'disc',
+                    endPlug: 'arrow3',
+                    color: connectionColor,
+                    size: flowType === 'flow' ? 3 : 2,
+                    startSocketGravity: 20,
+                    endSocketGravity: 20,
+                    dash: flowType === 'data' ? { animation: true } : false,
+                  });
                 }
               } catch (error) {
                 console.error('Error creating connection:', error);
@@ -472,104 +492,108 @@ function showNotification(message: string, type: 'success' | 'error' | 'info'): 
  * Setup component panel resizing functionality
  */
 function setupComponentPanelResize(): void {
-  const rightPanel = document.querySelector('.right-panel') as HTMLElement;
+  const rightPanelEl = document.querySelector('.right-panel') as HTMLElement;
   const resizeHandle = document.querySelector('.right-panel-resize-handle') as HTMLElement;
   const workspace = document.querySelector('.workspace') as HTMLElement;
   const builderContainer = document.querySelector('.builder-container') as HTMLElement;
-  
-  if (!rightPanel || !resizeHandle || !workspace) return;
-  
+
+  if (!rightPanelEl || !resizeHandle || !workspace) {
+    return;
+  }
+
   let startX = 0;
   let startWidth = 0;
   let isResizing = false;
-  
+
   // Get min and max values from CSS variables
   const styleProps = getComputedStyle(document.documentElement);
-  const minWidth = parseInt(styleProps.getPropertyValue('--right-panel-min-width').trim(), 10) || 250;
-  const maxWidth = parseInt(styleProps.getPropertyValue('--right-panel-max-width').trim(), 10) || 500;
-  
+  const minWidth =
+    parseInt(styleProps.getPropertyValue('--right-panel-min-width').trim(), 10) || 250;
+  const maxWidth =
+    parseInt(styleProps.getPropertyValue('--right-panel-max-width').trim(), 10) || 500;
+
   // Disable all animations during resize
   const disableTransitions = () => {
     document.body.classList.add('disable-transitions');
-    rightPanel.style.willChange = 'width';
+    rightPanelEl.style.willChange = 'width';
     workspace.style.willChange = 'width';
   };
-  
+
   // Re-enable animations after resize
   const enableTransitions = () => {
     document.body.classList.remove('disable-transitions');
-    rightPanel.style.willChange = 'auto';
+    rightPanelEl.style.willChange = 'auto';
     workspace.style.willChange = 'auto';
   };
-  
+
   // Mouse down event - start resizing
-  resizeHandle.addEventListener('mousedown', (e) => {
+  resizeHandle.addEventListener('mousedown', e => {
     e.preventDefault();
-    
+
     isResizing = true;
     startX = e.pageX;
-    startWidth = rightPanel.offsetWidth;
-    
+    startWidth = rightPanelEl.offsetWidth;
+
     // Add resizing class for visual feedback
-    rightPanel.classList.add('right-panel-resizing');
+    rightPanelEl.classList.add('right-panel-resizing');
     disableTransitions();
-    
+
     // Use direct style width to avoid any CSS transitions
-    rightPanel.style.width = `${startWidth}px`;
-    
+    rightPanelEl.style.width = `${startWidth}px`;
+
     // Prevent selection during resizing
     document.body.style.userSelect = 'none';
     document.body.style.cursor = 'ew-resize';
   });
-  
+
   // Mouse move event - update sizes during resize
-  document.addEventListener('mousemove', (e) => {
+  document.addEventListener('mousemove', e => {
     if (!isResizing) return;
-    
+
     // Calculate width change (moving left increases width)
     const deltaX = startX - e.pageX;
     const newWidth = startWidth + deltaX;
-    
+
     // Constrain within min and max values
     const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-    
+
     // Apply the width directly without transitions
     requestAnimationFrame(() => {
       // Update panel width directly
-      rightPanel.style.width = `${constrainedWidth}px`;
-      
+      rightPanelEl.style.width = `${constrainedWidth}px`;
+
       // Calculate workspace width to maintain correct layout
       const containerWidth = builderContainer.offsetWidth;
       const workspaceWidth = containerWidth - constrainedWidth;
       workspace.style.width = `${workspaceWidth}px`;
     });
   });
-  
+
   // Mouse up event - end resizing
   document.addEventListener('mouseup', () => {
     if (!isResizing) return;
-    
+
     isResizing = false;
-    rightPanel.classList.remove('right-panel-resizing');
+    rightPanelEl.classList.remove('right-panel-resizing');
     enableTransitions();
-    
+
     // Reset cursor and selection
     document.body.style.userSelect = '';
     document.body.style.cursor = '';
-    
+
     // Store the final width in CSS variable for persistence
-    const finalWidth = rightPanel.offsetWidth;
+    const finalWidth = rightPanelEl.offsetWidth;
     document.documentElement.style.setProperty('--right-panel-width', `${finalWidth}px`);
-    
+
     // Update connections after resizing is complete
     updateConnections();
   });
-  
+
   // Handle edge case if mouse is released outside the window
   window.addEventListener('blur', () => {
     if (isResizing) {
       isResizing = false;
-      rightPanel.classList.remove('right-panel-resizing');
+      rightPanelEl.classList.remove('right-panel-resizing');
       enableTransitions();
       document.body.style.userSelect = '';
       document.body.style.cursor = '';

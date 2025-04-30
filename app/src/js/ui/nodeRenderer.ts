@@ -27,7 +27,9 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
 
     flowPortsHtml = `
       <div class="node-ports">
-        ${mainInputPort ? `
+        ${
+          mainInputPort
+            ? `
           <div class="port-container input-port-container">
             <div class="${buildPortClassList(['port', 'input-port'], mainInputPort.dataType)}" 
                  data-port-id="${mainInputPort.id}" 
@@ -36,9 +38,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                  title="${mainInputPort.label}">
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
         
-        ${truePort ? `
+        ${
+          truePort
+            ? `
           <div class="port-container output-port-container output-port-true">
             <div class="${buildPortClassList(['port', 'output-port'], truePort.dataType)}" 
                  data-port-id="${truePort.id}" 
@@ -47,9 +53,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                  title="True">
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
         
-        ${falsePort ? `
+        ${
+          falsePort
+            ? `
           <div class="port-container output-port-container output-port-false">
             <div class="${buildPortClassList(['port', 'output-port'], falsePort.dataType)}" 
                  data-port-id="${falsePort.id}" 
@@ -58,7 +68,9 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                  title="False">
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     `;
   } else {
@@ -67,7 +79,9 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
 
     flowPortsHtml = `
       <div class="node-ports">
-        ${mainInputPort ? `
+        ${
+          mainInputPort
+            ? `
           <div class="port-container input-port-container">
             <div class="${buildPortClassList(['port', 'input-port'], mainInputPort.dataType)}" 
                  data-port-id="${mainInputPort.id}" 
@@ -76,9 +90,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                  title="${mainInputPort.label}">
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
         
-        ${mainOutputPort ? `
+        ${
+          mainOutputPort
+            ? `
           <div class="port-container output-port-container">
             <div class="${buildPortClassList(['port', 'output-port'], mainOutputPort.dataType)}" 
                  data-port-id="${mainOutputPort.id}" 
@@ -87,14 +105,16 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                  title="${mainOutputPort.label}">
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     `;
   }
 
   // Get node content from backend
   let content = '';
-  
+
   // Try to get the content from the node instance itself
   if (properties.nodeContent) {
     content = properties.nodeContent;
@@ -104,11 +124,14 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
   }
 
   // Generate data ports HTML
-  const dataPortsHtml = dataInputs.length > 0 || dataOutputs.length > 0 ? `
+  const dataPortsHtml =
+    dataInputs.length > 0 || dataOutputs.length > 0
+      ? `
     <div class="node-data-ports-container">
       <div class="data-input-ports">
-        ${dataInputs.map(input => {
-    return `
+        ${dataInputs
+          .map(input => {
+            return `
             <div class="data-port-container">
               <span class="port-label">${input.label}</span>
               <div class="${buildPortClassList(['port', 'input-port'], input.dataType)}" 
@@ -119,11 +142,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
               </div>
             </div>
           `;
-  }).join('')}
+          })
+          .join('')}
       </div>
       <div class="data-output-ports">
-        ${dataOutputs.map(output => {
-    return `
+        ${dataOutputs
+          .map(output => {
+            return `
             <div class="data-port-container">
               <div class="${buildPortClassList(['port', 'output-port'], output.dataType)}" 
                    data-port-id="${output.id}" 
@@ -134,10 +159,12 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
               <span class="port-label">${output.label}</span>
             </div>
           `;
-  }).join('')}
+          })
+          .join('')}
       </div>
     </div>
-  ` : '';
+  `
+      : '';
 
   // Add a data-flow-type attribute to the node div for styling
   const nodeFlowType = hasFlowPorts(inputs, outputs) ? 'flow' : 'data';
@@ -157,23 +184,6 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
 }
 
 /**
- * Generate generic content for any component type
- */
-function generateGenericContent(type: string, properties: any): string {
-  // First, try to display the most important property if it exists
-  const importantProps = ['value', 'text', 'data', 'content', 'expression', 'formula'];
-
-  for (const prop of importantProps) {
-    if (properties[prop] !== undefined) {
-      return `<p>${properties[prop]}</p>`;
-    }
-  }
-
-  // Display component type as fallback
-  return `<p>${type.charAt(0).toUpperCase() + type.slice(1)} node</p>`;
-}
-
-/**
  * Check if a data type is a flow port
  */
 function isFlowPort(dataType: string): boolean {
@@ -184,8 +194,10 @@ function isFlowPort(dataType: string): boolean {
  * Check if node has flow ports
  */
 function hasFlowPorts(inputs: Array<any>, outputs: Array<any>): boolean {
-  return inputs.some(port => isFlowPort(port.dataType)) ||
-    outputs.some(port => isFlowPort(port.dataType));
+  return (
+    inputs.some(port => isFlowPort(port.dataType)) ||
+    outputs.some(port => isFlowPort(port.dataType))
+  );
 }
 
 /**

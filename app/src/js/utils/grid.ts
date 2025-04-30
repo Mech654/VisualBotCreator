@@ -13,7 +13,11 @@ export function snapToGrid(value: number): number {
 /**
  * Check if two node rectangles collide
  */
-export function checkCollision(node1Rect: NodeRectangle, node2Rect: NodeRectangle, tolerance: number = 5): boolean {
+export function checkCollision(
+  node1Rect: NodeRectangle,
+  node2Rect: NodeRectangle,
+  tolerance: number = 5
+): boolean {
   return !(
     node1Rect.right < node2Rect.left + tolerance ||
     node1Rect.left > node2Rect.right - tolerance ||

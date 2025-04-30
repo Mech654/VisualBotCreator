@@ -12,33 +12,29 @@ export class StartNode extends Node {
     category: ComponentCategory.CONVERSATION_FLOW,
     description: 'Entry point for the bot conversation',
     flowType: 'flow',
-    icon: '🚀'
+    icon: '🚀',
   };
 
   constructor(id: string, properties: StartNodeProperties = {}) {
     properties.title = properties.title || 'Start';
-    
+
     // Generate the node content
     properties.nodeContent = '<div class="start-node-content">Bot conversation starts here</div>';
-    
+
     super(id, 'start', properties);
 
     // Start node only has a next port as it's the beginning of the flow
     this.addOutput(new Port('next', 'Next', 'control'));
   }
 
-  /**
-   * Update the node content - no updates needed for Start node as content is static
-   */
+  /** Update the node content - no updates needed for Start node as content is static */
   updateNodeContent() {
     // StartNode content doesn't change based on properties
-    this.properties.nodeContent = '<div class="start-node-content">Bot conversation starts here</div>';
+    this.properties.nodeContent =
+      '<div class="start-node-content">Bot conversation starts here</div>';
     return this.properties.nodeContent;
   }
-
-  /**
-   * Generate properties panel for the start node
-   */
+  /** Generate properties panel for the start node */
   generatePropertiesPanel(): string {
     return `
       <div class="property-group-title">Start Settings</div>
