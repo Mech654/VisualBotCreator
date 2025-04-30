@@ -7,9 +7,9 @@
   right: 0;
   top: 0;
   bottom: 0;
-  width: $right-panel-width;
-  min-width: $right-panel-min-width;
-  max-width: $right-panel-max-width;
+  width: var(--right-panel-width, $right-panel-width); // Use CSS var with SCSS var as fallback
+  min-width: var(--right-panel-min-width, $right-panel-min-width);
+  max-width: var(--right-panel-max-width, $right-panel-max-width);
   background: white;
   border-left: 1px solid $border;
   z-index: 200;
@@ -64,15 +64,35 @@
 
 .right-panel-resize-handle {
   position: absolute;
-  left: 0;
-  width: 8px;
-  height: calc(100%);
+  top: 0;
+  left: -5px; /* Position it slightly outside the panel */
+  width: 10px; /* Wider clickable area */
+  height: 100%; /* Full height */
   cursor: ew-resize;
   background-color: transparent;
+  z-index: 1000; /* Ensure it's above other elements */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  .right-panel-resizing &,
-  &:hover {
-    background-color: rgba($primary, 0.2);
+  /* Vertical indicator line */
+  .resize-handle-indicator {
+    width: 2px;
+    height: 100%;
+    background-color: rgba($primary, 0.3); /* Always visible but subtle */
+    transition: background-color 0.2s, width 0.2s;
+  }
+
+  /* Show wider indicator on hover */
+  &:hover .resize-handle-indicator {
+    width: 4px;
+    background-color: $primary; /* Full color on hover */
+  }
+
+  /* Visual feedback during resize */
+  .right-panel-resizing & .resize-handle-indicator {
+    width: 4px;
+    background-color: $primary;
   }
 }
 

@@ -492,12 +492,26 @@ function showNotification(message: string, type: 'success' | 'error' | 'info'): 
  * Setup component panel resizing functionality
  */
 function setupComponentPanelResize(): void {
+  console.log("Setting up panel resize functionality...");
+  
   const rightPanelEl = document.querySelector('.right-panel') as HTMLElement;
   const resizeHandle = document.querySelector('.right-panel-resize-handle') as HTMLElement;
   const workspace = document.querySelector('.workspace') as HTMLElement;
   const builderContainer = document.querySelector('.builder-container') as HTMLElement;
 
+  console.log("Elements:", {
+    rightPanel: rightPanelEl,
+    resizeHandle,
+    workspace,
+    builderContainer
+  });
+
   if (!rightPanelEl || !resizeHandle || !workspace) {
+    console.error("Missing required elements for panel resize:", {
+      rightPanel: Boolean(rightPanelEl),
+      resizeHandle: Boolean(resizeHandle),
+      workspace: Boolean(workspace)
+    });
     return;
   }
 
@@ -511,6 +525,8 @@ function setupComponentPanelResize(): void {
     parseInt(styleProps.getPropertyValue('--right-panel-min-width').trim(), 10) || 250;
   const maxWidth =
     parseInt(styleProps.getPropertyValue('--right-panel-max-width').trim(), 10) || 500;
+
+  console.log("Panel width constraints:", { minWidth, maxWidth });
 
   // Disable all animations during resize
   const disableTransitions = () => {
@@ -528,11 +544,14 @@ function setupComponentPanelResize(): void {
 
   // Mouse down event - start resizing
   resizeHandle.addEventListener('mousedown', e => {
+    console.log("Resize handle mousedown");
     e.preventDefault();
 
     isResizing = true;
     startX = e.pageX;
     startWidth = rightPanelEl.offsetWidth;
+    
+    console.log("Starting resize:", { startX, startWidth });
 
     // Add resizing class for visual feedback
     rightPanelEl.classList.add('right-panel-resizing');
@@ -549,6 +568,8 @@ function setupComponentPanelResize(): void {
   // Mouse move event - update sizes during resize
   document.addEventListener('mousemove', e => {
     if (!isResizing) return;
+    
+    console.log("Mouse move during resize", { pageX: e.pageX });
 
     // Calculate width change (moving left increases width)
     const deltaX = startX - e.pageX;
@@ -556,6 +577,8 @@ function setupComponentPanelResize(): void {
 
     // Constrain within min and max values
     const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+
+    console.log("Resizing to width:", constrainedWidth);
 
     // Apply the width directly without transitions
     requestAnimationFrame(() => {
@@ -572,6 +595,8 @@ function setupComponentPanelResize(): void {
   // Mouse up event - end resizing
   document.addEventListener('mouseup', () => {
     if (!isResizing) return;
+    
+    console.log("Mouse up - ending resize");
 
     isResizing = false;
     rightPanelEl.classList.remove('right-panel-resizing');
@@ -584,6 +609,7 @@ function setupComponentPanelResize(): void {
     // Store the final width in CSS variable for persistence
     const finalWidth = rightPanelEl.offsetWidth;
     document.documentElement.style.setProperty('--right-panel-width', `${finalWidth}px`);
+    console.log("Final width set:", finalWidth);
 
     // Update connections after resizing is complete
     updateConnections();

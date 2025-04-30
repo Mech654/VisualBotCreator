@@ -22,7 +22,7 @@
   height: 100%;
   overflow: hidden;
   position: relative;
-  width: 100%;
+  width: calc(100% - var(--right-panel-width, $right-panel-width)); /* Adjust for right panel width */
   transition:
     margin-left 0.3s ease,
     width 0.3s ease;

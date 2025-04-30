@@ -76,11 +76,11 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
   } else {
     // Standard behavior for other nodes
     const mainOutputPort = flowOutputs.length > 0 ? flowOutputs[0] : null;
-
-    flowPortsHtml = `
+    // Generate flow ports HTML for other node types 
+    flowPortsHtml = `  
       <div class="node-ports">
         ${
-          mainInputPort
+          mainInputPort //if exist
             ? `
           <div class="port-container input-port-container">
             <div class="${buildPortClassList(['port', 'input-port'], mainInputPort.dataType)}" 

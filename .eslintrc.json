@@ -27,3 +27,7 @@
   },
   "ignorePatterns": ["dist/**", "node_modules/**", "*.js"]
 }
+
+
+// to run eslint run while ignoring all those in .gitignore:
+// npx eslint . --ignore-path .gitignore
