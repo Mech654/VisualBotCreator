@@ -15,6 +15,8 @@ export class StartNode extends Node {
     icon: '🚀',
   };
 
+  static override shownProperties = [];
+
   constructor(id: string, properties: StartNodeProperties = {}) {
     properties.title = properties.title || 'Start';
 

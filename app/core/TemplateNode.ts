@@ -61,6 +61,13 @@ export class TemplateNode extends Node {
   };
 
   /**
+   * shownProperties controls which properties are displayed on the node component in the UI.
+   * Add property names to this array to make them visible and live-updating on the node.
+   * Example: static override shownProperties = ['customValue', 'someNumber'];
+   */
+  static override shownProperties: string[] = [];
+
+  /**
    * Step 4: Create the constructor
    * PURPOSE: Initialize your node with default values and set its initial appearance
    * This runs when a node is first created or loaded from saved data

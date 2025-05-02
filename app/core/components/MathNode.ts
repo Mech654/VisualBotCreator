@@ -18,6 +18,8 @@ export class MathNode extends Node {
     icon: '🧮',
   };
 
+  static override shownProperties = ['expression'];
+
   constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }) {
     // Default to a simple expression if none provided
     if (!properties.expression) {

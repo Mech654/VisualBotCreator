@@ -20,6 +20,8 @@ export class InputNode extends Node {
     icon: '📝',
   };
 
+  static override shownProperties = ['variableName', 'inputType', 'placeholder'];
+
   constructor(id: string, properties: InputNodeProperties = {}) {
     // Set defaults
     properties.title = properties.title || 'User Input';

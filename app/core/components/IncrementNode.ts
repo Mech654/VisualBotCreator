@@ -15,6 +15,8 @@ export class IncrementNode extends Node {
     icon: '➕',
   };
 
+  static override shownProperties = ['incrementBy'];
+
   constructor(id: string, properties: IncrementNodeProperties = {}) {
     // Set default increment value to 1 if not provided
     properties.incrementBy = properties.incrementBy || 1;

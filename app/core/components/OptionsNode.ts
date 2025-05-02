@@ -22,6 +22,8 @@ export class OptionsNode extends Node {
     icon: '📋',
   };
 
+  static override shownProperties = ['options'];
+
   constructor(id: string, properties: OptionsNodeProperties = {}) {
     properties.title = properties.title || 'Options';
 

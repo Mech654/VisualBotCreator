@@ -42,6 +42,8 @@ export interface PortData {
 }
 
 export class Node {
+  static shownProperties: string[] = [];
+  
   id: string;
   type: string;
   properties: NodeProperties;
@@ -154,6 +156,36 @@ export class Node {
   }
 
   /**
+   * Update the node's visual content in the DOM for all properties when a property changes
+   * This will update any element inside the node DOM with a matching data-property-key attribute
+   */
+  updateNodeElementContent(): void {
+    const nodeElement = document.querySelector(`[data-node-id="${this.id}"]`);
+    if (!nodeElement) return;
+    Object.entries(this.properties).forEach(([key, value]) => {
+      // Find all elements inside the node with data-property-key matching this property
+      const propElements = nodeElement.querySelectorAll(`[data-property-key="${key}"]`);
+      propElements.forEach((el) => {
+        // Update value, textContent, or innerHTML depending on element type
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+          if (el.type === 'checkbox') {
+            (el as HTMLInputElement).checked = Boolean(value);
+          } else {
+            el.value = value ?? '';
+          }
+        } else if (el instanceof HTMLElement) {
+          // For content elements, prefer innerHTML for strings, else textContent
+          if (typeof value === 'string') {
+            el.innerHTML = value;
+          } else {
+            el.textContent = String(value);
+          }
+        }
+      });
+    });
+  }
+
+  /**
    * Hook for adding event listeners to the property panel
    */
   setupPropertyEventListeners(panel: HTMLElement): void {
@@ -179,6 +211,14 @@ export class Node {
             value = element.value;
           }
           this.properties[propertyKey] = value;
+          // If nodeContent is updated, update the DOM
+          if (propertyKey === 'nodeContent' || propertyKey === 'condition') {
+            // Only call updateNodeContent if it exists on the instance
+            if (typeof (this as any).updateNodeContent === 'function') {
+              (this as any).updateNodeContent();
+            }
+            this.updateNodeElementContent();
+          }
         }
       });
     });

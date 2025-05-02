@@ -1,23 +1,17 @@
 import { NodeInstance } from '../models/types.js';
 import { PortCategory, PortType } from '../../../core/base.js';
 
-/**
- * Generates HTML for a node based on its instance data
- */
 export function generateNodeHtml(nodeInstance: NodeInstance): string {
   const { type, properties, inputs, outputs } = nodeInstance;
 
-  // Separate flow and data ports using the port category system
   const flowInputs = inputs.filter(input => isFlowPort(input.dataType));
   const dataInputs = inputs.filter(input => !isFlowPort(input.dataType));
 
   const flowOutputs = outputs.filter(output => isFlowPort(output.dataType));
   const dataOutputs = outputs.filter(output => !isFlowPort(output.dataType));
 
-  // Get the main flow input port
   const mainInputPort = flowInputs.length > 0 ? flowInputs[0] : null;
 
-  // Generate the flow ports HTML for all nodes (including 'condition')
   let flowPortsHtml = '';
 
   if (hasFlowPorts(inputs, outputs)) {
@@ -55,18 +49,28 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
       </div>
     `;
   }
-  // Get node content from backend
+
   let content = '';
 
-  // Try to get the content from the node instance itself
   if (properties.nodeContent) {
     content = properties.nodeContent;
   } else {
-    // Fall back to simple type-based description
     content = `<p>${type.charAt(0).toUpperCase() + type.slice(1)} node</p>`;
   }
 
-  // Generate data ports HTML
+  const NodeClass = window.nodeSystem?.getNodeClass?.(type);
+  let shownProperties: string[] = [];
+  if (NodeClass && Array.isArray(NodeClass.shownProperties)) {
+    shownProperties = NodeClass.shownProperties;
+  }
+
+  let shownPropsHtml = '';
+  shownProperties.forEach(key => {
+    if (key in properties) {
+      shownPropsHtml += `<div class="node-prop" data-property-key="${key}">${properties[key]}</div>`;
+    }
+  });
+
   const dataPortsHtml =
     dataInputs.length > 0 || dataOutputs.length > 0
       ? `
@@ -109,33 +113,26 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
   `
       : '';
 
-  // Add a data-flow-type attribute to the node div for styling
   const nodeFlowType = hasFlowPorts(inputs, outputs) ? 'flow' : 'data';
 
-  // Return the complete node HTML with improved structure
   return `
     <div class="node-header">
-      <span>${properties.title || type.charAt(0).toUpperCase() + type.slice(1)}</span>
+      <span data-property-key="title">${properties.title || type.charAt(0).toUpperCase() + type.slice(1)}</span>
       <span class="node-menu">⋮</span>
     </div>
     ${flowPortsHtml}
-    <div class="node-content">
+    <div class="node-content" data-property-key="nodeContent">
       ${content}
+      ${shownPropsHtml}
     </div>
     ${dataPortsHtml}
   `;
 }
 
-/**
- * Check if a data type is a flow port
- */
 function isFlowPort(dataType: string): boolean {
   return dataType === 'control' || dataType === 'flow';
 }
 
-/**
- * Check if node has flow ports
- */
 function hasFlowPorts(inputs: Array<any>, outputs: Array<any>): boolean {
   return (
     inputs.some(port => isFlowPort(port.dataType)) ||
@@ -143,27 +140,17 @@ function hasFlowPorts(inputs: Array<any>, outputs: Array<any>): boolean {
   );
 }
 
-/**
- * Get the port category (flow or data) for a given data type
- */
 function getPortCategory(dataType: string): string {
   return isFlowPort(dataType) ? PortCategory.FLOW : PortCategory.DATA;
 }
 
-/**
- * Get CSS class for a port based on its data type
- */
 function getPortTypeClass(dataType: string): string {
-  // Only assign one class, never both
   if (dataType === PortType.CONTROL || dataType === 'control' || dataType === 'flow') {
     return 'port-control';
   }
   return 'port-data';
 }
 
-/**
- * Helper to build port class list safely
- */
 function buildPortClassList(base: string[], dataType: string): string {
   const typeClass = getPortTypeClass(dataType);
   return [...base, typeClass].filter(Boolean).join(' ');

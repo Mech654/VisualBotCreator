@@ -17,6 +17,8 @@ export class ConditionNode extends Node {
     icon: '❓',
   };
 
+  static override shownProperties = ['condition'];
+
   constructor(id: string, properties: ConditionNodeProperties = {}) {
     super(id, 'condition', properties);
 

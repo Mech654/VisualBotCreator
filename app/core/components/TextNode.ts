@@ -19,6 +19,8 @@ export class TextNode extends Node {
     icon: '📄',
   };
 
+  static override shownProperties = ['text', 'fontSize', 'bold', 'color'];
+
   constructor(id: string, properties: Partial<TextNodeProperties> = {}) {
     // Set default values
     const textNodeProps: TextNodeProperties = {

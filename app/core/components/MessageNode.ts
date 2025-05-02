@@ -18,6 +18,8 @@ export class MessageNode extends Node {
     icon: '💬',
   };
 
+  static override shownProperties = ['message'];
+
   constructor(id: string, properties: MessageNodeProperties = {}) {
     properties.title = properties.title || 'Message';
     properties.message = properties.message || 'Enter your message here...';

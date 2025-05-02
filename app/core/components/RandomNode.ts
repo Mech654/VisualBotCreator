@@ -19,6 +19,8 @@ export class RandomNode extends Node {
     icon: '🎲',
   };
 
+  static override shownProperties = ['min', 'max', 'type', 'length'];
+
   constructor(id: string, properties: RandomNodeProperties = {}) {
     // Set default values
     properties.min = properties.min ?? 1;
