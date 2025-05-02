@@ -17,101 +17,44 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
   // Get the main flow input port
   const mainInputPort = flowInputs.length > 0 ? flowInputs[0] : null;
 
-  // Generate the flow ports HTML based on node type
+  // Generate the flow ports HTML for all nodes (including 'condition')
   let flowPortsHtml = '';
 
-  if (type === 'condition') {
-    // Special handling for condition node with true/false ports
-    const truePort = flowOutputs.find(p => p.id === 'true');
-    const falsePort = flowOutputs.find(p => p.id === 'false');
-
+  if (hasFlowPorts(inputs, outputs)) {
     flowPortsHtml = `
-      <div class="node-ports">
-        ${
-          mainInputPort
-            ? `
-          <div class="port-container input-port-container">
-            <div class="${buildPortClassList(['port', 'input-port'], mainInputPort.dataType)}" 
-                 data-port-id="${mainInputPort.id}" 
-                 data-port-type="${mainInputPort.dataType}" 
-                 data-port-category="${getPortCategory(mainInputPort.dataType)}"
-                 title="${mainInputPort.label}">
-            </div>
-          </div>
-        `
-            : ''
-        }
-        
-        ${
-          truePort
-            ? `
-          <div class="port-container output-port-container output-port-true">
-            <div class="${buildPortClassList(['port', 'output-port'], truePort.dataType)}" 
-                 data-port-id="${truePort.id}" 
-                 data-port-type="${truePort.dataType}" 
-                 data-port-category="${getPortCategory(truePort.dataType)}"
-                 title="True">
-            </div>
-          </div>
-        `
-            : ''
-        }
-        
-        ${
-          falsePort
-            ? `
-          <div class="port-container output-port-container output-port-false">
-            <div class="${buildPortClassList(['port', 'output-port'], falsePort.dataType)}" 
-                 data-port-id="${falsePort.id}" 
-                 data-port-type="${falsePort.dataType}" 
-                 data-port-category="${getPortCategory(falsePort.dataType)}"
-                 title="False">
-            </div>
-          </div>
-        `
-            : ''
-        }
-      </div>
-    `;
-  } else {
-    // Standard behavior for other nodes
-    const mainOutputPort = flowOutputs.length > 0 ? flowOutputs[0] : null;
-    // Generate flow ports HTML for other node types 
-    flowPortsHtml = `  
-      <div class="node-ports">
-        ${
-          mainInputPort //if exist
-            ? `
-          <div class="port-container input-port-container">
-            <div class="${buildPortClassList(['port', 'input-port'], mainInputPort.dataType)}" 
-                 data-port-id="${mainInputPort.id}" 
-                 data-port-type="${mainInputPort.dataType}" 
-                 data-port-category="${getPortCategory(mainInputPort.dataType)}"
-                 title="${mainInputPort.label}">
-            </div>
-          </div>
-        `
-            : ''
-        }
-        
-        ${
-          mainOutputPort
-            ? `
-          <div class="port-container output-port-container">
-            <div class="${buildPortClassList(['port', 'output-port'], mainOutputPort.dataType)}" 
-                 data-port-id="${mainOutputPort.id}" 
-                 data-port-type="${mainOutputPort.dataType}" 
-                 data-port-category="${getPortCategory(mainOutputPort.dataType)}"
-                 title="${mainOutputPort.label}">
-            </div>
-          </div>
-        `
-            : ''
-        }
+      <div class="flow-ports">
+        <div class="flow-input-ports">
+          ${flowInputs
+            .map(input => `
+              <div class="port-container">
+                <div class="${buildPortClassList(['port', 'input-port', 'flow-port'], input.dataType)}"
+                  data-port-id="${input.id}"
+                  data-port-type="${input.dataType}"
+                  data-port-category="${getPortCategory(input.dataType)}"
+                  title="${input.label}">
+                </div>
+              </div>
+            `)
+            .join('')}
+        </div>
+        <div class="flow-gap"></div>
+        <div class="flow-output-ports">
+          ${flowOutputs
+            .map(output => `
+              <div class="port-container">
+                <div class="${buildPortClassList(['port', 'output-port', 'flow-port'], output.dataType)}"
+                  data-port-id="${output.id}"
+                  data-port-type="${output.dataType}"
+                  data-port-category="${getPortCategory(output.dataType)}"
+                  title="${output.label}">
+                </div>
+              </div>
+            `)
+            .join('')}
+        </div>
       </div>
     `;
   }
-
   // Get node content from backend
   let content = '';
 
@@ -133,13 +76,13 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
           .map(input => {
             return `
             <div class="data-port-container">
-              <span class="port-label">${input.label}</span>
               <div class="${buildPortClassList(['port', 'input-port'], input.dataType)}" 
                    data-port-id="${input.id}" 
                    data-port-type="${input.dataType}" 
                    data-port-category="${getPortCategory(input.dataType)}"
                    title="${input.label}: ${input.dataType}">
               </div>
+              <span class="port-label">${input.label}</span>
             </div>
           `;
           })

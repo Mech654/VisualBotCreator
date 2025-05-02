@@ -4,30 +4,39 @@
 
 // Flow ports styling
 .flow-ports {
-  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   width: 100%;
-  height: 0;
-  @include flex(row, space-between);
+  margin-bottom: 0.5em;
+  position: absolute;
+  left: 0;
+  top: 30px;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.flow-input-port {
-  position: absolute;
-  top: -7px;
-  left: 10px;
+.flow-input-ports,
+.flow-output-ports {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
 }
 
-.flow-output-port {
-  position: absolute;
-  top: -7px;
-  right: 10px;
+.flow-input-ports {
+  align-items: flex-start;
+  min-width: 24px;
+  gap: 3px;
+}
 
-  &:nth-child(2) {
-    right: 40px;
-  }
+.flow-gap {
+  flex-grow: 2;
+  min-width: 40px;
+}
 
-  &:nth-child(3) {
-    right: 70px;
-  }
+.flow-output-ports {
+  align-items: flex-end;
+  min-width: 24px;
 }
 
 .flow-port {
@@ -38,6 +47,7 @@
   cursor: crosshair;
   @include transition(all, 0.2s);
   border: 2px solid white;
+  border: 2x solid $port-control;
 }
 
 // Data ports containers
@@ -51,16 +61,30 @@
   @include flex(row, flex-start, center);
   height: 24px;
   margin: 4px 0;
+  gap: 8px; // Add gap between port and label to prevent overlap
 }
 
 .data-input-ports .data-port-container {
   flex-direction: row;
   padding-right: 5px;
+  margin: 4px 0 !important;
+  
+  // Ensure label is spaced from port
+  .port-label {
+    margin-left: 0px;
+    margin-right: 0;
+  }
 }
 
 .data-output-ports .data-port-container {
   flex-direction: row-reverse;
   padding-left: 5px;
+  
+  // Ensure label is spaced from port
+  .port-label {
+    margin-right: 0px;
+    margin-left: 0;
+  }
 }
 
 // Port containers
@@ -71,10 +95,13 @@
 }
 
 .input-port-container {
+  position: fixed;
   flex-direction: row;
 }
 
 .output-port-container {
+  position: fixed;
+  right: 0;
   flex-direction: row-reverse;
   justify-content: flex-start;
 }
@@ -162,6 +189,7 @@
 
 .port-data {
   background-color: $data-color;
+  margin : 0 !important;
 }
 
 // Port tooltip

@@ -180,25 +180,7 @@ function setupOutputPort(
 
     // If already in connection mode, cancel the current operation
     if (connectionState.mode === ConnectionMode.CONNECTING) {
-      if (connectionState.tempLine) {
-        connectionState.tempLine.remove();
-      }
-
-      // Remove active-port class from the starting port
-      if (connectionState.startPortElement) {
-        connectionState.startPortElement.classList.remove('active-port');
-      }
-
-      connectionState = { mode: ConnectionMode.NONE };
-
-      // Remove connection mode classes from canvas
-      const canvas = document.getElementById('canvas');
-      if (canvas) {
-        canvas.classList.remove('connecting-mode');
-        canvas.classList.remove('flow-connecting-mode');
-        canvas.classList.remove('data-connecting-mode');
-      }
-
+      cancelConnectionDrawing();
       return;
     }
 
@@ -294,26 +276,7 @@ function setupOutputPort(
       const clickHandler = (e: MouseEvent) => {
         // Only handle direct canvas clicks, not bubbled events from ports
         if (e.target === canvas && connectionState.mode === ConnectionMode.CONNECTING) {
-          if (connectionState.tempLine) {
-            connectionState.tempLine.remove();
-          }
-
-          // Remove the temporary end point
-          if (connectionState.tempEndPoint && connectionState.tempEndPoint.parentNode) {
-            connectionState.tempEndPoint.parentNode.removeChild(connectionState.tempEndPoint);
-          }
-
-          // Remove highlighting from starting port
-          if (connectionState.startPortElement) {
-            connectionState.startPortElement.classList.remove('active-port');
-          }
-
-          // Remove connecting-mode classes
-          canvas.classList.remove('connecting-mode');
-          canvas.classList.remove('flow-connecting-mode');
-          canvas.classList.remove('data-connecting-mode');
-
-          connectionState = { mode: ConnectionMode.NONE };
+          cancelConnectionDrawing();
 
           // Clean up event listeners
           canvas.removeEventListener('mousemove', mouseMoveHandler);
@@ -411,6 +374,39 @@ export async function createConnection(
     console.error('Error creating connection:', error);
     return null;
   }
+}
+
+/**
+ * Cancel the current connection operation (used for Escape/canvas click)
+ */
+export function cancelConnectionDrawing(): void {
+  if (connectionState.mode === ConnectionMode.CONNECTING) {
+    if (connectionState.tempLine) {
+      connectionState.tempLine.remove();
+    }
+    if (connectionState.tempEndPoint && connectionState.tempEndPoint.parentNode) {
+      connectionState.tempEndPoint.parentNode.removeChild(connectionState.tempEndPoint);
+    }
+    if (connectionState.startPortElement) {
+      connectionState.startPortElement.classList.remove('active-port');
+    }
+    const canvas = document.getElementById('canvas');
+    if (canvas) {
+      canvas.classList.remove('connecting-mode');
+      canvas.classList.remove('flow-connecting-mode');
+      canvas.classList.remove('data-connecting-mode');
+    }
+    connectionState = { mode: ConnectionMode.NONE };
+  }
+}
+
+// Add global Escape key handler to cancel connection drawing
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      cancelConnectionDrawing();
+    }
+  });
 }
 
 /**

@@ -5,6 +5,8 @@
 .node {
   @include node-base;
   @include transition(box-shadow, 0.2s);
+  position: absolute;
+  z-index: 50;
 
   &:hover {
     @include box-shadow(0 4px 15px rgba(0, 0, 0, 0.15));
@@ -12,7 +14,7 @@
 
   &.node-selected {
     @include box-shadow(0 0 0 2px $primary !important);
-    z-index: 51;
+    z-index: 200;
   }
 
   // Flow type specific styling
@@ -36,8 +38,7 @@
 }
 
 .node-content {
-  padding: 12px;
-  min-height: 60px;
+  padding: 10px;
   position: relative;
 }
 
@@ -58,7 +59,7 @@
 
 // Connection line customization
 .leader-line {
-  z-index: 5;
+  z-index: 100;
 
   &.flow-connection {
     opacity: 0.9;
