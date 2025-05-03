@@ -44,11 +44,14 @@ function createWindow(): void {
     },
   });
 
-  // Updated to use path.join for proper cross-platform path resolution
-  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
-
-  // Open DevTools in development mode
-  //mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Electron is running in development mode, loading from http://localhost:3000');
+    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.webContents.openDevTools();
+  } else {
+    console.log('Electron is running in production mode, loading from file');
+    //mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  }
 }
 
 // Set up IPC handlers for node system operations
@@ -371,3 +374,19 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+if (process.env.NODE_ENV === 'development') {
+  try {
+    // Only reload Electron if main process files change, not renderer files served by webpack-dev-server
+    require('electron-reload')(__dirname, {
+      electron: require('electron'),
+      awaitWriteFinish: true,
+      ignored: [
+        /dist\/src\//, // Ignore renderer output (served by webpack-dev-server)
+        /node_modules/
+      ]
+    });
+  } catch (e) {
+    console.warn('electron-reload not available');
+  }
+}

@@ -1,7 +1,6 @@
 import { NodeRectangle } from '../models/types';
 
-// Grid settings for snapping
-export const GRID_SIZE = 20; // Match the grid size in CSS
+export const GRID_SIZE = 20;
 
 /**
  * Snap a value to the grid

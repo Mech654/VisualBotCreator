@@ -1,30 +1,22 @@
-// Utility function to fetch available components
-import { createIconElement, getIcon, loadComponentIcons } from '../utils/iconLoader.js';
+import { createIconElement, getIcon, loadComponentIcons } from '../utils/iconLoader';
 
 async function fetchAvailableComponents() {
   try {
-    // Get registered node types from the backend
     const nodeTypes: Array<string | { type: string; name: string; category: string }> =
       await window.nodeSystem.getNodeTypes();
 
-    // First, load all component icons by type name
     const componentTypeNames = nodeTypes.map(nt =>
       typeof nt === 'string' ? nt : String(nt.type || '')
     );
 
-    // Load icons for all component types
     await loadComponentIcons(componentTypeNames);
 
-    // Create a dictionary of categories
     const categories: Record<
       string,
       Array<{ type: string; name: string; category: string; icon: string }>
     > = {};
 
-    // Process node types directly since getRegisteredTypes is not working
     for (const nodeType of nodeTypes) {
-      // Extract information from the node type
-      // nodeType could be just a string or an object with metadata
       let type: string;
       let name: string;
       let category: string;
@@ -32,23 +24,19 @@ async function fetchAvailableComponents() {
       if (typeof nodeType === 'string') {
         type = nodeType;
         name = nodeType.charAt(0).toUpperCase() + type.slice(1);
-        category = 'Components'; // Default category
+        category = 'Components';
       } else {
-        // Handle the object case properly
         type = String(nodeType.type || '');
         name = nodeType.name || (type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Unknown');
         category = nodeType.category || 'Components';
       }
 
-      // Get appropriate SVG icon based on component type
-      const iconSvg = getIcon(type.toLowerCase()) || '🧩'; // Default icon
+      const iconSvg = getIcon(type.toLowerCase()) || '🧩';
 
-      // Create category if it doesn't exist
       if (!categories[category]) {
         categories[category] = [];
       }
 
-      // Add component to category with proper types
       categories[category].push({
         type: String(type),
         name,
@@ -64,21 +52,18 @@ async function fetchAvailableComponents() {
   }
 }
 
-// Populate the components panel
 export async function populateComponentsPanel(): Promise<void> {
   const componentCategoriesContainer = document.getElementById('component-categories');
   if (!componentCategoriesContainer) {
     return;
   }
 
-  // Add search input
   const searchHTML = `<div class="component-search">
     <input type="text" placeholder="Search components..." class="component-search-input">
   </div>`;
 
   componentCategoriesContainer.innerHTML = searchHTML;
 
-  // Add favorites section
   const favoritesHTML = `
   <div class="favorites-section">
     <div class="favorites-header">⭐ Quick Access</div>
@@ -98,12 +83,9 @@ export async function populateComponentsPanel(): Promise<void> {
 
   componentCategoriesContainer.innerHTML += favoritesHTML;
 
-  // Fetch available components
   const { categories } = await fetchAvailableComponents();
 
-  // Add each category and its components
   for (const [categoryName, components] of Object.entries(categories)) {
-    // Create category container
     const categoryHTML = `
     <div class="component-category">
       <div class="category-header">
@@ -132,13 +114,11 @@ export async function populateComponentsPanel(): Promise<void> {
     componentCategoriesContainer.innerHTML += categoryHTML;
   }
 
-  // Add event listeners for search
   const searchInput = document.querySelector('.component-search-input') as HTMLInputElement;
   if (searchInput) {
     searchInput.addEventListener('input', filterComponents);
   }
 
-  // Add event listeners for category toggles
   const categoryHeaders = document.querySelectorAll('.category-header');
   categoryHeaders.forEach(header => {
     header.addEventListener('click', () => {
@@ -152,7 +132,6 @@ export async function populateComponentsPanel(): Promise<void> {
     });
   });
 
-  // Update favorites to use SVG icons
   const favoriteItems = document.querySelectorAll('.favorite-item .component-icon');
   favoriteItems.forEach(item => {
     const parentItem = item.closest('.component-item');
@@ -167,11 +146,9 @@ export async function populateComponentsPanel(): Promise<void> {
     }
   });
 
-  // Initialize draggable components
   initDraggableComponents();
 }
 
-// Update to use SVG icons for categories if available
 function getCategoryIcon(category: string): string {
   const categoryIcons: Record<string, string> = {
     'Conversation Flow':
@@ -196,9 +173,7 @@ function getCategoryIcon(category: string): string {
   );
 }
 
-// Determine if a component is a flow or data type
 function getFlowType(type: string): string {
-  // Components that are typically data components
   const dataComponents = [
     'math',
     'variable',
@@ -211,32 +186,26 @@ function getFlowType(type: string): string {
     'function',
   ];
 
-  // Check if the component type contains any data component keywords
   for (const comp of dataComponents) {
     if (type.toLowerCase().includes(comp)) {
       return 'data';
     }
   }
 
-  // Default to flow type
   return 'flow';
 }
 
-// Initialize draggable components
 function initDraggableComponents(): void {
   document.querySelectorAll('.component-item').forEach(item => {
     item.addEventListener('dragstart', (e: Event) => {
-      // Cast the event to DragEvent to access dataTransfer
       const dragEvent = e as DragEvent;
       const target = e.target as HTMLElement;
       const type = target.dataset.type;
       const flowType = target.dataset.flowType || 'flow';
 
-      // Set the drag data
       if (dragEvent.dataTransfer) {
         dragEvent.dataTransfer.setData('text/plain', type || '');
 
-        // Also set JSON data with all attributes
         const data = {
           type,
           flowType,
@@ -248,13 +217,11 @@ function initDraggableComponents(): void {
   });
 }
 
-// Filter components based on search input
 function filterComponents(): void {
   const searchInput = document.querySelector('.component-search-input') as HTMLInputElement;
   if (!searchInput) return;
   const query = searchInput.value ? searchInput.value.toLowerCase() : '';
 
-  // Show/hide components based on search
   document.querySelectorAll('.component-item:not(.favorite-item)').forEach(item => {
     const element = item as HTMLElement;
     const searchTerms = element.dataset.searchTerms?.toLowerCase() || '';
@@ -266,7 +233,6 @@ function filterComponents(): void {
     }
   });
 
-  // Show/hide categories with no visible components
   document.querySelectorAll('.component-category').forEach(category => {
     const visibleComponents = category.querySelectorAll(
       '.component-item[style="display: flex"]'

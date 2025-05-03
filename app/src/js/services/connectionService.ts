@@ -3,8 +3,8 @@ import {
   ConnectionMode,
   ConnectionState,
   NodeInstance,
-} from '../models/types.js';
-import { PortCategory, PortType } from '../../../core/base.js';
+} from '../models/types';
+import { PortCategory, PortType } from '../../../core/base';
 
 // We'll use the leader-line-new library to draw the connections
 declare const LeaderLine: any;

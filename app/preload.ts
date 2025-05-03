@@ -1,4 +1,3 @@
-// Preload script - securely exposes Node.js functionality to the renderer process
 import { contextBridge, ipcRenderer } from 'electron';
 
 // Define types for the APIs exposed to the renderer

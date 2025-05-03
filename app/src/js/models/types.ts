@@ -45,14 +45,12 @@ export interface CategoryDefinition {
   components: ComponentDefinition[];
 }
 
-// Define interact.js event types
 export interface InteractEvent {
   target: HTMLElement;
   dx: number;
   dy: number;
 }
 
-// Connection related interfaces
 export interface ConnectionInstance {
   id: string;
   fromNodeId: string;

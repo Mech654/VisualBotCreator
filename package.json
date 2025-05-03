@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "electron .",
-    "dev": "npm run clean && npm run copy-assets && tsc-watch --onSuccess \"electron .\"",
+    "dev": "concurrently \"tsc -w\" \"npm run dev:preload\" \"cross-env NODE_ENV=development webpack serve --config webpack.config.mjs --mode development\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "build": "npm run clean && tsc && npm run copy-assets",
     "watch": "tsc -w",
     "lint": "eslint . --ext .ts",
@@ -23,12 +23,17 @@
     "sass:watch": "concurrently \"npm run sass:builder:watch\" \"npm run sass:index:watch\"",
     "sass:builder:watch": "sass app/src/scss/builder.scss:dist/src/styles/builder.css --watch",
     "sass:index:watch": "sass app/src/scss/index.scss:dist/src/styles/index.css --watch",
-    "dev:sass": "concurrently \"npm run sass:watch\" \"npm run dev\""
+    "dev:sass": "concurrently \"npm run sass:watch\" \"npm run dev\"",
+    "webpack:build": "webpack --mode production",
+    "webpack:watch": "webpack --watch --mode development",
+    "build:preload": "tsc --project preload.tsconfig.json",
+    "dev:preload": "tsc-watch --project preload.tsconfig.json --onSuccess \"shx mv dist/preload.js dist/preload-esm.mjs\""
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "electron": "^35.1.5",
+    "electron-reload": "^2.0.0-alpha.1",
     "leader-line-new": "^1.1.9",
     "mathjs": "^14.4.0"
   },
@@ -39,19 +44,28 @@
     "autoprefixer": "^10.4.21",
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
     "electron": "^35.1.5",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.6",
+    "mini-css-extract-plugin": "^2.9.2",
     "nodemon": "^3.1.9",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "rimraf": "^5.0.0",
     "sass": "^1.87.0",
+    "sass-loader": "^16.0.5",
     "shx": "^0.4.0",
+    "style-loader": "^4.0.0",
     "tailwindcss": "^4.1.3",
+    "ts-loader": "^9.5.2",
     "tsc-watch": "^6.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wait-on": "^8.0.3",
+    "webpack": "^5.99.7",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.1"
   }
 }

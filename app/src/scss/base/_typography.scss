@@ -1,3 +1,5 @@
+@use '../abstracts/variables' as *;
+
 // Typography styles
 
 // Font sizes
@@ -52,4 +54,12 @@ h4,
 
 .font-regular {
   font-weight: 400;
+}
+
+.text-primary {
+  color: $text !important;
+}
+
+.text-secondary {
+  color: $text-secondary !important;
 }

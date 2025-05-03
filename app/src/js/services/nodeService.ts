@@ -1,11 +1,9 @@
 import { NodeInstance, NodePosition } from '../models/types.js';
-import { generateNodeHtml } from '../ui/nodeRenderer.js';
-import { snapToGrid, checkCollision } from '../utils/grid.js';
-import {
-  initNodeConnections,
-  removeNodeConnections,
-  updateConnections,
-} from './connectionService.js';
+import { generateNodeHtml } from '../ui/nodeRenderer';
+import { snapToGrid } from '../utils/grid';
+import { updateConnections } from './connectionService';
+import { checkCollision } from './dragDropService';
+import { initNodeConnections, removeNodeConnections } from './connectionService';
 
 // Store node positions for collision detection
 const nodePositions = new Map<HTMLElement, NodePosition>();

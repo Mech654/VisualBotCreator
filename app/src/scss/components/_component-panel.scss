@@ -6,6 +6,8 @@
   padding: 15px;
   @include flex(column);
   gap: 10px;
+  background: $light;
+  color: $text;
 }
 
 // Search component
@@ -58,6 +60,7 @@
 // Category styling
 .component-category {
   margin-bottom: 15px;
+  background: transparent;
 }
 
 .category-header {
@@ -65,7 +68,8 @@
   font-weight: 500;
   cursor: pointer;
   padding: 8px;
-  background-color: #f5f7fa;
+  background: $light;
+  color: $text;
   border-radius: 6px;
 
   &:hover {
@@ -105,18 +109,23 @@
 }
 
 .component-item {
-  background-color: white;
+  background: $dark;
+  color: $text;
   border: 1px solid $border;
-  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   padding: 12px 8px;
   cursor: grab;
   @include flex(column, flex-start, center);
   position: relative;
 
   &:hover {
-    transform: translateY(-2px);
-    @include box-shadow(0 4px 8px rgba(0, 0, 0, 0.05));
     border-color: $primary;
+    box-shadow: 0 4px 12px rgba(187, 134, 252, 0.1);
+  }
+
+  &.dark-theme {
+    background-color: $light;
+    color: $text;
   }
 }
 
@@ -145,7 +154,7 @@
 .component-name {
   font-size: 12px;
   text-align: center;
-  color: #555;
+  color: $text-secondary;
 }
 
 // Create a form styles file

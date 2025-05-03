@@ -33,10 +33,10 @@
   height: 100%;
   position: relative;
   overflow: auto;
-  background-color: #f0f4f8;
+  background-color: $light;
   background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px);
   background-size: 20px 20px;
   scroll-behavior: smooth;
   cursor: grab;
@@ -55,6 +55,17 @@
 
   &.data-connecting-mode {
     background-color: rgba($data-color, 0.05);
+  }
+
+  &:focus,
+  &.active {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.25); // subtle purple highlight
+    background-color: $light;
+  }
+
+  &::selection {
+    background: rgba(187, 134, 252, 0.08); // subtle purple selection
   }
 }
 
@@ -88,7 +99,8 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 150;
-  background: white;
+  background: $light;
+  color: $text;
   border-radius: 8px;
   @include box-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
 }

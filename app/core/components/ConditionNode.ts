@@ -35,7 +35,6 @@ export class ConditionNode extends Node {
     this.addOutput(new Port('result', 'Result', 'boolean'));
   }
 
-  /** Update the node content whenever the condition changes */
   updateNodeContent() {
     this.properties.nodeContent = `<p class="condition-expression">if (${this.properties.condition}) { ... }</p>`;
     return this.properties.nodeContent;

@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bot Creator - Builder</title>
-    <link rel="icon" type="image/png" href="assets/images/mascot.png" />
-    <link rel="stylesheet" href="styles/builder.css" />
+    <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
+    <!-- <link rel="stylesheet" href="/styles/builder.css" /> -->
     <!-- Interact.js for advanced dragging capabilities -->
     <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.17/dist/interact.min.js"></script>
   </head>
@@ -14,7 +14,7 @@
     <div class="side-panel">
       <div class="toggle-panel">≡</div>
       <div class="logo">
-        <img src="assets/images/mascot.png" alt="Mascot" class="logo-icon" />
+        <img src="/assets/images/mascot.png" alt="Mascot" class="logo-icon" />
         Bot Creator
       </div>
       <div class="menu">
@@ -73,7 +73,7 @@
         <div class="right-panel">
           <div class="toggle-right-panel" title="Toggle right panel">»</div>
           <div class="panel-header">
-            <span>Components</span>
+            <span class="text-primary">Components</span>
             <span id="properties-toggle" style="cursor: pointer">📝</span>
           </div>
 
@@ -88,13 +88,13 @@
           <!-- Properties Panel (Hidden by default) -->
           <div class="panel-content" id="properties-panel" style="display: none">
             <div class="property-group">
-              <div class="property-group-title">General</div>
+              <div class="property-group-title text-primary">General</div>
               <div class="property-item" data-tooltip="A descriptive name for this node">
-                <div class="property-label">Name</div>
+                <div class="property-label text-secondary">Name</div>
                 <input type="text" class="property-input" value="Message" aria-label="Node name" />
               </div>
               <div class="property-item" data-tooltip="Unique identifier for the node">
-                <div class="property-label">ID</div>
+                <div class="property-label text-secondary">ID</div>
                 <input
                   type="text"
                   class="property-input"
@@ -106,15 +106,15 @@
             </div>
 
             <div class="property-group">
-              <div class="property-group-title">Content</div>
+              <div class="property-group-title text-primary">Content</div>
               <div class="property-item" data-tooltip="Text message to display in this node">
-                <div class="property-label">Message Text</div>
+                <div class="property-label text-secondary">Message Text</div>
                 <textarea class="property-input" rows="3" aria-label="Node message content">
 Hello! How can I help you today?</textarea
                 >
               </div>
               <div class="property-item" data-tooltip="Variable name to store the message output">
-                <div class="property-label">Variable</div>
+                <div class="property-label text-secondary">Variable</div>
                 <input
                   type="text"
                   class="property-input"
@@ -125,12 +125,12 @@ Hello! How can I help you today?</textarea
             </div>
 
             <div class="property-group">
-              <div class="property-group-title">Advanced</div>
+              <div class="property-group-title text-primary">Advanced</div>
               <div
                 class="property-item"
                 data-tooltip="Conditions that determine if this node is executed"
               >
-                <div class="property-label">Conditions</div>
+                <div class="property-label text-secondary">Conditions</div>
                 <input
                   type="text"
                   class="property-input"
@@ -143,7 +143,7 @@ Hello! How can I help you today?</textarea
                 class="property-item"
                 data-tooltip="Delay in milliseconds before this node executes"
               >
-                <div class="property-label">Delay (ms)</div>
+                <div class="property-label text-secondary">Delay (ms)</div>
                 <input
                   type="number"
                   class="property-input"
@@ -174,6 +174,6 @@ Hello! How can I help you today?</textarea
     </div>
 
     <!-- Script with type="module" attribute to use ES modules -->
-    <script type="module" src="js/builder.js"></script>
+    <script type="module" src="/js/builder.js"></script>
   </body>
 </html>

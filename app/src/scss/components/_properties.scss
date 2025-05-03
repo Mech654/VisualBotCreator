@@ -4,7 +4,7 @@
 
 .property-group {
   margin-bottom: 20px;
-  background-color: #f9f9f9;
+  background-color: $light;
   border-radius: 6px;
   padding: 12px;
   border: 1px solid $border;
@@ -56,7 +56,7 @@
 .property-label {
   font-size: 13px;
   margin-bottom: 5px;
-  color: #555;
+  color: $text-secondary;
   font-weight: 500;
 }
 

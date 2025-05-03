@@ -1,3 +1,5 @@
+@use '../abstracts/variables' as *;
+
 // Reset styles
 * {
   margin: 0;
@@ -19,7 +21,7 @@ body {
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f3f4f8;
+  background-color: $dark;
 }
 
 // Override default focus styles

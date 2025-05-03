@@ -4,20 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bot Creator - Dashboard</title>
-    <link rel="icon" type="image/png" href="assets/images/mascot.png" />
-    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
+    <!-- <link rel="stylesheet" href="/styles/index.css" /> -->
   </head>
   <body>
     <!-- Page Transition Overlay -->
     <div class="page-transition">
-      <img src="assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
+      <img src="/assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
       Loading...
     </div>
 
     <!-- Side Panel -->
     <div class="side-panel">
       <div class="logo">
-        <img src="assets/images/mascot.png" alt="Mascot" class="logo-icon" />
+        <img src="/assets/images/mascot.png" alt="Mascot" class="logo-icon" />
         Bot Creator
       </div>
       <div class="menu">
@@ -52,7 +52,7 @@
     <div class="main-content">
       <div class="dashboard">
         <div class="section-title">
-          <h2>Bot Templates</h2>
+          <h2 class="text-primary">Bot Templates</h2>
           <div class="view-options">
             <div class="view-option active">📋</div>
             <div class="view-option">📊</div>
@@ -89,27 +89,27 @@
         </div>
 
         <div class="section-title dark" style="margin-top: 30px">
-          <h2>Your Bots</h2>
-          <span>4 bots</span>
+          <h2 class="text-primary">Your Bots</h2>
+          <span class="text-secondary">4 bots</span>
         </div>
 
-        <!-- Bot List -->
+        <!-- Fake Bot List  -->
         <div class="bot-list">
           <div class="bot-card">
             <div class="bot-header">
               <div class="bot-icon">CS</div>
               <div class="bot-info">
-                <div class="bot-name">Help Desk Assistant</div>
+                <div class="bot-name text-primary">Help Desk Assistant</div>
                 <div class="bot-type">Customer Support</div>
               </div>
               <div class="bot-actions">
                 <div class="bot-action">⋮</div>
               </div>
             </div>
-            <div class="bot-details">
+            <div class="bot-details text-secondary">
               Handles customer inquiries about products, returns, and technical support.
             </div>
-            <div class="bot-footer">
+            <div class="bot-footer text-secondary">
               <div class="bot-status">
                 <div class="status-dot status-active"></div>
                 Active
@@ -129,10 +129,10 @@
                 <div class="bot-action">⋮</div>
               </div>
             </div>
-            <div class="bot-details">
+            <div class="bot-details text-secondary">
               Helps customers find products based on their preferences and needs.
             </div>
-            <div class="bot-footer">
+            <div class="bot-footer text-secondary">
               <div class="bot-status">
                 <div class="status-dot status-active"></div>
                 Active
@@ -152,10 +152,10 @@
                 <div class="bot-action">⋮</div>
               </div>
             </div>
-            <div class="bot-details">
+            <div class="bot-details text-secondary">
               Books appointments and sends reminders to clients about upcoming meetings.
             </div>
-            <div class="bot-footer">
+            <div class="bot-footer text-secondary">
               <div class="bot-status">
                 <div class="status-dot status-offline"></div>
                 Offline
@@ -175,10 +175,10 @@
                 <div class="bot-action">⋮</div>
               </div>
             </div>
-            <div class="bot-details">
+            <div class="bot-details text-secondary">
               Delivers personalized news content based on user preferences.
             </div>
-            <div class="bot-footer">
+            <div class="bot-footer text-secondary">
               <div class="bot-status">
                 <div class="status-dot status-active"></div>
                 Active
@@ -190,13 +190,13 @@
 
         <!-- Empty State (Hidden by default) -->
         <div class="empty-state">
-          <img src="assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
+          <img src="/assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
           <div class="empty-message">You haven't created any bots yet</div>
           <button class="btn btn-primary">Create Your First Bot</button>
         </div>
       </div>
     </div>
 
-    <script type="module" src="js/index.js"></script>
+    <script type="module" src="/js/index.js"></script>
   </body>
 </html>

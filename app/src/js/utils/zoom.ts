@@ -1,4 +1,3 @@
-// Remove excess comments, keep only minimal doc comments or none if obvious
 export const MIN_ZOOM = 0.5;
 export const MAX_ZOOM = 2;
 export const ZOOM_STEP = 0.1;
@@ -6,7 +5,7 @@ export const ZOOM_STEP = 0.1;
 export const DEFAULT_CANVAS_WIDTH = 3000;
 export const DEFAULT_CANVAS_HEIGHT = 2000;
 
-import { updateConnections } from '../services/connectionService.js';
+import { updateConnections } from '../services/connectionService';
 
 export function setupCanvasDimensions(canvasContainer: HTMLElement): void {
   const canvasContent = canvasContainer.querySelector('.canvas-content') as HTMLElement;

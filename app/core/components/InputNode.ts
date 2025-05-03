@@ -49,7 +49,6 @@ export class InputNode extends Node {
     this.addOutput(new Port('isValid', 'Is Valid', 'boolean'));
   }
 
-  /** Generate preview content for the input node */
   generateInputPreview(props: InputNodeProperties): string {
     const inputType = props.inputType || 'text';
     const placeholder = props.placeholder || 'Type your response...';
@@ -61,13 +60,11 @@ export class InputNode extends Node {
     `;
   }
 
-  /** Update the node content when properties change */
   updateNodeContent() {
     this.properties.nodeContent = this.generateInputPreview(this.properties);
     return this.properties.nodeContent;
   }
 
-  /** Generate the HTML for the input node's properties panel */
   generatePropertiesPanel(): string {
     return `
       <div class="property-group-title">Input Settings</div>
@@ -96,7 +93,6 @@ export class InputNode extends Node {
     `;
   }
 
-  /** Set up event listeners for the input node property panel */
   setupPropertyEventListeners(panel: HTMLElement): void {
     const placeholderInput = panel.querySelector('.input-placeholder') as HTMLInputElement;
     const variableInput = panel.querySelector('.input-variable') as HTMLInputElement;

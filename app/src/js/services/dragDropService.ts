@@ -1,7 +1,7 @@
-import { InteractEvent, NodeRectangle } from '../models/types.js';
-import { showCollisionFeedback, snapToGrid } from '../utils/grid.js';
-import { updateNodePosition, showPropertiesPanel } from './nodeService.js';
-import { updateConnections } from './connectionService.js';
+import { InteractEvent, NodeRectangle } from '../models/types';
+import { showCollisionFeedback, snapToGrid } from '../utils/grid';
+import { updateNodePosition, showPropertiesPanel } from './nodeService';
+import { updateConnections } from './connectionService';
 
 // Declare the global interact object for TypeScript
 declare const interact: any;
@@ -250,7 +250,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
 /**
  * Check if two node rectangles collide
  */
-function checkCollision(
+export function checkCollision(
   rect1: NodeRectangle,
   rect2: NodeRectangle,
   tolerance: number = 5

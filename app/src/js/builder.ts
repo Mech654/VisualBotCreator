@@ -1,22 +1,24 @@
-import { NodeInstance } from './models/types.js';
-import { snapToGrid } from './utils/grid.js';
-import { showPageTransition } from './ui/transitions.js';
-import { populateComponentsPanel } from './components/componentPanel.js';
+import '../scss/builder.scss';
+declare const module: any;
+import { NodeInstance } from './models/types';
+import { snapToGrid } from './utils/grid';
+import { showPageTransition } from './ui/transitions';
+import { populateComponentsPanel } from './components/componentPanel';
 import {
   createNodeInstance,
   showPropertiesPanel,
   updateNodePosition,
   checkPositionValidity,
   deleteNode,
-} from './services/nodeService.js';
-import { initDraggableNodes, setupCanvasDropArea } from './services/dragDropService.js';
+} from './services/nodeService';
+import { initDraggableNodes, setupCanvasDropArea } from './services/dragDropService';
 import {
   updateConnections,
   clearConnections,
   exportConnections,
   cancelConnectionDrawing,
-} from './services/connectionService.js';
-import { initZoomControls } from './utils/zoom.js';
+} from './services/connectionService';
+import { initZoomControls } from './utils/zoom';
 declare const LeaderLine: any;
 
 // Type for global node system
@@ -105,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupCanvasDropArea(canvas);
   canvas.addEventListener('drop', async e => {
     e.preventDefault();
-    canvas.style.backgroundColor = '#f0f4f8';
+    canvas.style.backgroundColor = '#1e1e1e'; // Material Dark surface
     const dataTransfer = e.dataTransfer;
     if (!dataTransfer) return;
     let nodeType = dataTransfer.getData('text/plain');
@@ -429,4 +431,8 @@ function setupComponentPanelResize(): void {
       updateConnections();
     }
   });
+}
+
+if (module && module.hot) {
+  module.hot.accept();
 }

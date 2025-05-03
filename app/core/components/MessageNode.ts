@@ -51,7 +51,6 @@ export class MessageNode extends Node {
     this.addOutput(new Port('messageText', 'Message Text', 'string'));
   }
 
-  /** Format the message for preview in the node */
   formatMessagePreview(message: string): string {
     // Truncate long messages
     let displayText = message;

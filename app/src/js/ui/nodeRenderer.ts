@@ -1,5 +1,5 @@
-import { NodeInstance } from '../models/types.js';
-import { PortCategory, PortType } from '../../../core/base.js';
+import { NodeInstance } from '../models/types';
+import { PortCategory, PortType } from '../../../core/base';
 
 export function generateNodeHtml(nodeInstance: NodeInstance): string {
   const { type, properties, inputs, outputs } = nodeInstance;

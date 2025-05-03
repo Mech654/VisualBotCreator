@@ -10,7 +10,8 @@
   width: var(--right-panel-width, $right-panel-width); // Use CSS var with SCSS var as fallback
   min-width: var(--right-panel-min-width, $right-panel-min-width);
   max-width: var(--right-panel-max-width, $right-panel-max-width);
-  background: white;
+  background: $light;
+  color: $text;
   border-left: 1px solid $border;
   z-index: 200;
   transform: translateX(100%);
@@ -97,6 +98,8 @@
 }
 
 .panel-header {
+  background: $light;
+  color: $text;
   padding: 15px;
   border-bottom: 1px solid $border;
   font-weight: 500;

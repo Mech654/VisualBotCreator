@@ -1,7 +1,5 @@
-// Remove excess comments, keep only minimal doc comments or none if obvious
 const iconMap: Record<string, string> = {};
 
-// Use only the path that's known to work
 const ICON_BASE_PATH = './assets/icons/';
 
 /**
