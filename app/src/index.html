@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;">
     <title>Bot Creator - Dashboard</title>
     <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
-    <!-- <link rel="stylesheet" href="/styles/index.css" /> -->
+    <!-- CSS will be injected by webpack in dev mode -->
   </head>
   <body>
     <!-- Page Transition Overlay -->
@@ -197,6 +198,6 @@
       </div>
     </div>
 
-    <script type="module" src="/js/index.js"></script>
+    <script type="module" src="/index.js"></script>
   </body>
 </html>

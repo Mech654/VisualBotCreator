@@ -1,6 +1,5 @@
 import '../scss/index.scss';
 import { showPageTransition } from './ui/transitions';
-
 declare const module: any;
 
 interface ActionItem {

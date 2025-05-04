@@ -10,6 +10,10 @@ const htmlFiles = [
   path.join('dist', 'src', 'index.html'),
 ];
 
+console.log('\n====================');
+console.log('Copying HTML files to dist/src...');
+console.log('====================\n');
+
 // Process each HTML file
 htmlFiles.forEach(htmlFile => {
   console.log(`Processing ${htmlFile}...`);

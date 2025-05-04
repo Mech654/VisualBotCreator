@@ -45,12 +45,41 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    console.log('Electron is running in development mode, loading from http://localhost:3000');
-    mainWindow.loadURL('http://localhost:3000');
+    console.log('Electron is running in development mode, loading from http://localhost:4000');
+
+    // Add retry logic for connecting to webpack dev server
+    let retryCount = 0;
+    const maxRetries = 5;
+    const retryInterval = 1500;
+
+    const loadApp = () => {
+      mainWindow
+        .loadURL('http://localhost:4000/src/index.html')
+        .catch(err => {
+          retryCount++;
+          if (retryCount <= maxRetries) {
+            console.log(
+              `Connection to dev server failed, retrying (${retryCount}/${maxRetries})...`
+            );
+            setTimeout(loadApp, retryInterval);
+          } else {
+            console.error(
+              'Failed to connect to webpack dev server after multiple attempts',
+              err
+            );
+            // Fallback to loading from file system
+            mainWindow
+              .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
+              .catch(e => console.error('Failed to load fallback file:', e));
+          }
+        });
+    };
+
+    loadApp();
     mainWindow.webContents.openDevTools();
   } else {
     console.log('Electron is running in production mode, loading from file');
-    //mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+    mainWindow.loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'));
   }
 }
 
@@ -377,16 +406,16 @@ app.on('window-all-closed', () => {
 
 if (process.env.NODE_ENV === 'development') {
   try {
-    // Only reload Electron if main process files change, not renderer files served by webpack-dev-server
+    require.resolve('electron-reload');
     require('electron-reload')(__dirname, {
       electron: require('electron'),
       awaitWriteFinish: true,
       ignored: [
         /dist\/src\//, // Ignore renderer output (served by webpack-dev-server)
-        /node_modules/
-      ]
+        /node_modules/,
+      ],
     });
   } catch (e) {
-    console.warn('electron-reload not available');
+    console.warn('electron-reload is not installed. To enable auto-reload, run: npm install --save-dev electron-reload');
   }
 }

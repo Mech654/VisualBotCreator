@@ -1,7 +1,10 @@
 import path from 'path';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import CopyPlugin from 'copy-webpack-plugin';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
 
 export default {
@@ -14,23 +17,51 @@ export default {
     builderStyles: './app/src/scss/builder.scss',
   },
   output: {
-    path: path.resolve('./dist/src'),
+    path: path.resolve(__dirname, 'dist/src'),
     filename: '[name].js',
+    publicPath: isDev ? 'http://localhost:4000/' : '/',
+    clean: false,
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    mainFields: ['browser', 'module', 'main'],
+    // Add fallbacks for Node.js built-in modules
+    fallback: {
+      "module": false,
+      "path": false,
+      "os": false,
+      "fs": false,
+      "crypto": false,
+      "stream": false,
+      "buffer": false,
+      "http": false,
+      "https": false,
+      "zlib": false,
+      "util": false,
+      "net": false,
+      "tls": false,
+      "url": false,
+      "querystring": false,
+      "assert": false,
+      "constants": false,
+    }
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: isDev, // Faster builds in development
+          }
+        },
         exclude: /node_modules/,
       },
       {
         test: /\.scss$/,
         use: [
-          isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+          isDev ? 'style-loader' : MiniCssExtractPlugin.loader, // Use style-loader for HMR in dev
           'css-loader',
           'sass-loader',
         ],
@@ -42,25 +73,63 @@ export default {
           filename: 'assets/images/[name][ext]',
         },
       },
+      {
+        test: /\.html$/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[name][ext]',
+        },
+      },
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({ filename: '[name].css' }),
-    new webpack.HotModuleReplacementPlugin(),
-  ],
-  watch: true,
-  devtool: 'source-map',
-  target: 'electron-renderer',
+    new MiniCssExtractPlugin({ 
+      filename: 'styles/[name].css'
+    }),
+    isDev && new webpack.HotModuleReplacementPlugin(),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: './app/src/*.html',
+          to: '[name][ext]',
+        },
+        {
+          from: './app/src/assets',
+          to: 'assets',
+        },
+      ],
+    }),
+  ].filter(Boolean),
+  watch: false,
+  devtool: isDev ? 'eval-source-map' : false,
+  target: isDev ? 'web' : 'electron-renderer',
   devServer: {
+    port: 4000,
+    host: 'localhost',
+    compress: true,
     static: {
-      directory: path.join('./dist/src'),
-      watch: true,
+      directory: path.join(__dirname, 'dist'),
+      publicPath: '/',
     },
-    hot: true,
     devMiddleware: {
       publicPath: '/',
       writeToDisk: true,
     },
-    port: 3000,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/$/, to: '/src/index.html' },
+        { from: /^\/index\.html$/, to: '/index.html' },
+        { from: /^\/builder\.html$/, to: '/builder.html' }
+      ]
+    },
+    hot: true, // Enable HMR
+    liveReload: false, // Disable live reload when using HMR
+    client: {
+      webSocketURL: 'auto://0.0.0.0:0/ws',
+      progress: true,
+    }
+  },
+  experiments: {
+    outputModule: true,
   },
 };

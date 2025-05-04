@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "electron .",
-    "dev": "concurrently \"tsc -w\" \"npm run dev:preload\" \"cross-env NODE_ENV=development webpack serve --config webpack.config.mjs --mode development\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "dev": "npm run clean && npm run dev-setup && concurrently \"npm run sass:watch\" \"npm run watch:js-files\" \"tsc -w\" \"npm run dev:preload\" \"cross-env NODE_ENV=development webpack serve --config webpack.config.mjs --mode development\" \"wait-on -t 30000 http://localhost:4000/src/index.html && node -e \\\"console.log('====================\\\\nStarting Electron...\\\\n====================')\\\" && cross-env NODE_ENV=development electron .\"",
     "build": "npm run clean && tsc && npm run copy-assets",
     "watch": "tsc -w",
     "lint": "eslint . --ext .ts",
@@ -15,8 +15,10 @@
     "format:check": "prettier --check \"**/*.{ts,js,json,html,css}\"",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",
-    "copy-assets": "npm run sass && shx mkdir -p dist/src && shx cp -r app/src/assets dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
-    "copy-html": "shx cp app/src/builder.html dist/src/builder.html && shx cp app/src/index.html dist/src/index.html && node cross_platform/fix-paths.js",
+    "copy-assets": "npm run sass && shx mkdir -p dist/src && shx cp -r app/src/assets dist/src/ && shx cp -r app/src/js dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
+    "dev-setup": "npm run sass && shx mkdir -p dist/src && shx cp -r app/src/assets dist/src/ && shx cp -r app/src/js dist/src/ && shx cp app/preload-esm.mjs dist/ && npm run copy-html",
+    "watch:js-files": "nodemon --watch app/src/js --ext js,ts --ignore *.d.ts --exec \"shx cp -r app/src/js dist/src/\"",
+    "copy-html": "shx mkdir -p dist/src && shx cp app/src/index.html dist/src/index.html && shx cp app/src/builder.html dist/src/builder.html && node cross_platform/fix-paths.js && node cross_platform/sleep.js 1000",
     "sass": "npm run sass:builder && npm run sass:index",
     "sass:builder": "sass app/src/scss/builder.scss:dist/src/styles/builder.css --style compressed --no-source-map",
     "sass:index": "sass app/src/scss/index.scss:dist/src/styles/index.css --style compressed --no-source-map",
@@ -33,7 +35,6 @@
   "license": "MIT",
   "dependencies": {
     "electron": "^35.1.5",
-    "electron-reload": "^2.0.0-alpha.1",
     "leader-line-new": "^1.1.9",
     "mathjs": "^14.4.0"
   },
@@ -43,9 +44,11 @@
     "@typescript-eslint/parser": "^8.29.1",
     "autoprefixer": "^10.4.21",
     "concurrently": "^7.6.0",
+    "copy-webpack-plugin": "^13.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron": "^35.1.5",
+    "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-import": "^2.31.0",
@@ -66,6 +69,7 @@
     "wait-on": "^8.0.3",
     "webpack": "^5.99.7",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.1",
+    "webpack-hot-middleware": "^2.26.1"
   }
 }
