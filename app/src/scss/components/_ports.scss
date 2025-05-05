@@ -1,207 +1,826 @@
 // Port styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
-// Flow ports styling
+// Flow port containers
 .flow-ports {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 0.5em;
   position: absolute;
   left: 0;
-  top: 30px;
-  z-index: 2;
+  top: 40px; // Align with the bottom of the node header
+  z-index: $z-index-port;
   pointer-events: none;
+  padding: 0 $spacing-xs;
 }
 
 .flow-input-ports,
 .flow-output-ports {
   display: flex;
   flex-direction: column;
+  gap: $spacing-sm;
   pointer-events: auto;
 }
 
 .flow-input-ports {
   align-items: flex-start;
-  min-width: 24px;
-  gap: 3px;
+  margin-left: -12px;
 }
 
 .flow-gap {
-  flex-grow: 2;
+  flex-grow: 1;
   min-width: 40px;
 }
 
 .flow-output-ports {
   align-items: flex-end;
-  min-width: 24px;
+  margin-right: -12px;
 }
 
+// Flow port styling
 .flow-port {
-  width: 14px;
-  height: 14px;
-  background-color: $port-control;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, $flow-color, color.adjust($flow-color, $lightness: -15%));
   border-radius: 50%;
   cursor: crosshair;
-  @include transition(all, 0.2s);
-  border: 2px solid white;
-  border: 2x solid $port-control;
+  transition: all $transition-time-fast $transition-function;
+  border: 2px solid $background;
+  box-shadow: 0 0 0 1px rgba($flow-color, 0.5);
+  position: relative;
+  
+  &:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px rgba($flow-color, 0.3), 0 0 5px rgba($flow-color, 0.5);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: color.adjust($flow-color, $lightness: 30%);
+    opacity: 0;
+    transition: opacity $transition-time-fast $transition-function;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
+  
+  &.connecting {
+    animation: flow-port-pulse 1.5s infinite;
+  }
+  
+  // Flow port connection state
+  &.connected {
+    border-color: color.adjust($flow-color, $lightness: 20%);
+    box-shadow: 0 0 0 1px rgba($flow-color, 0.8);
+    
+    &::after {
+      opacity: 1;
+      background-color: white;
+    }
+  }
+  
+  &.incompatible {
+    box-shadow: 0 0 0 2px rgba($danger, 0.8);
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, $danger, color.adjust($danger, $lightness: -15%));
+  }
+  
+  &.compatible {
+    box-shadow: 0 0 0 2px rgba($success, 0.8);
+    transform: scale(1.2);
+    background: linear-gradient(135deg, $success, color.adjust($success, $lightness: -15%));
+  }
+  
+  // Flow port type styles based on conditions, options, etc.
+  &[data-port-function="next"] {
+    background: linear-gradient(135deg, $flow-color, color.adjust($flow-color, $lightness: -15%));
+  }
+  
+  &[data-port-function="true"] {
+    background: linear-gradient(135deg, $success, color.adjust($success, $lightness: -15%));
+  }
+  
+  &[data-port-function="false"] {
+    background: linear-gradient(135deg, $danger, color.adjust($danger, $lightness: -15%));
+  }
+  
+  &[data-port-function="option"] {
+    background: linear-gradient(135deg, $port-options, color.adjust($port-options, $lightness: -15%));
+  }
+  
+  // Port label visibility on hover
+  &:hover + .port-label-hidden {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+  }
 }
 
-// Data ports containers
+@keyframes flow-port-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($flow-color, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba($flow-color, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($flow-color, 0);
+  }
+}
+
+// Data port containers
 .data-input-ports,
 .data-output-ports {
-  @include flex(column);
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  min-width: 30%;
 }
 
 .data-port-container {
-  @include flex(row, flex-start, center);
-  height: 24px;
-  margin: 4px 0;
-  gap: 8px; // Add gap between port and label to prevent overlap
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin: $spacing-xs 0;
+  position: relative;
+  
+  &:hover {
+    .port-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -100%);
+    }
+  }
 }
 
+// Port container positioning
 .data-input-ports .data-port-container {
   flex-direction: row;
-  padding-right: 5px;
-  margin: 4px 0 !important;
+  padding-right: $spacing-xs;
   
   // Ensure label is spaced from port
   .port-label {
-    margin-left: 0px;
+    margin-left: $spacing-xs;
     margin-right: 0;
+    text-align: left;
+  }
+  
+  .port {
+    margin-left: -8px;
   }
 }
 
 .data-output-ports .data-port-container {
   flex-direction: row-reverse;
-  padding-left: 5px;
+  padding-left: $spacing-xs;
+  justify-content: flex-start;
   
   // Ensure label is spaced from port
   .port-label {
-    margin-right: 0px;
+    margin-right: $spacing-xs;
     margin-left: 0;
+    text-align: right;
+  }
+  
+  .port {
+    margin-right: -8px;
   }
 }
 
 // Port containers
 .port-container {
-  @include flex(row, flex-start, center);
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
   min-height: 24px;
-}
-
-.input-port-container {
-  position: fixed;
-  flex-direction: row;
-}
-
-.output-port-container {
-  position: fixed;
-  right: 0;
-  flex-direction: row-reverse;
-  justify-content: flex-start;
 }
 
 // Port labels
 .port-label {
-  font-size: 12px;
-  color: #555;
-  max-width: 80px;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: all $transition-time-fast $transition-function;
+  font-weight: $font-weight-regular;
+  
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.port-label-hidden {
+  position: absolute;
+  background-color: $surface;
+  color: $text-primary;
+  padding: 2px 6px;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-time-fast $transition-function;
+  box-shadow: $shadow-sm;
+  z-index: $z-index-tooltip;
+  white-space: nowrap;
+  border: 1px solid $border-color;
+}
+
+.flow-input-ports .port-label-hidden {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-5px);
+}
+
+.flow-output-ports .port-label-hidden {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%) translateX(5px);
 }
 
 .port-label-small {
-  font-size: 10px;
-  color: $port-control;
-  margin: 0 4px;
-  font-weight: 500;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  margin: 0 $spacing-xs;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-// Port styling
+// Main port styling
 .port {
-  @include port-base;
-  @include transition(transform, 0.2s);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: crosshair;
+  border: 2px solid $background;
+  transition: all $transition-time-fast $transition-function;
+  z-index: $z-index-port;
+  position: relative;
 
   &:hover {
     transform: scale(1.2);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    
+    & + .port-label, & ~ .port-label {
+      color: $text-primary;
+    }
   }
 
   &.active-port {
     transform: scale(1.3);
-    @include box-shadow(0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 6px $primary);
-    z-index: 100;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 4px $primary;
+    z-index: $z-index-port + 100;
+    
+    & + .port-label, & ~ .port-label {
+      color: $primary;
+      font-weight: $font-weight-medium;
+    }
   }
 
   &.incompatible {
-    @include box-shadow(0 0 0 4px rgba($danger, 0.8));
+    box-shadow: 0 0 0 2px rgba($danger, 0.8);
     opacity: 0.6;
     cursor: not-allowed;
+    
+    & + .port-label, & ~ .port-label {
+      color: $danger;
+    }
   }
 
   &.compatible {
-    @include box-shadow(0 0 0 4px rgba($success, 0.8));
+    box-shadow: 0 0 0 2px rgba($success, 0.8), 0 0 8px rgba($success, 0.4);
     transform: scale(1.2);
+    
+    & + .port-label, & ~ .port-label {
+      color: $success;
+    }
+  }
+  
+  &.connecting {
+    animation: data-port-pulse 1.5s infinite;
+  }
+  
+  &.connected {
+    border-width: 1px;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: $background;
+    }
   }
 }
 
-.input-port {
-  margin-left: -7px;
-}
-
-.output-port {
-  margin-right: -7px;
+@keyframes data-port-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($data-color, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba($data-color, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($data-color, 0);
+  }
 }
 
 // Port type specific styles
 .port-control {
-  background-color: $port-control !important;
+  background: linear-gradient(135deg, $port-control, color.adjust($port-control, $lightness: -15%));
+  
+  &.input-port::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 2px;
+    background-color: $port-control;
+    margin-right: 1px;
+  }
+  
+  &.output-port::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 2px;
+    background-color: $port-control;
+    margin-left: 1px;
+  }
 }
 
 .port-string {
-  background-color: $port-string;
+  background: linear-gradient(135deg, $port-string, color.adjust($port-string, $lightness: -15%));
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: $background;
+    border: 1px solid $port-string;
+  }
+  
+  &::after {
+    content: '"';
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    font-size: 8px;
+    color: $port-string;
+    font-weight: bold;
+    z-index: 2;
+  }
 }
 
 .port-number {
-  background-color: $port-number;
+  background: linear-gradient(135deg, $port-number, color.adjust($port-number, $lightness: -15%));
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: $background;
+    border: 1px solid $port-number;
+  }
+  
+  &::after {
+    content: '#';
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    font-size: 8px;
+    color: $port-number;
+    font-weight: bold;
+    z-index: 2;
+  }
 }
 
 .port-boolean {
-  background-color: $port-boolean;
+  background: linear-gradient(135deg, $port-boolean, color.adjust($port-boolean, $lightness: -15%));
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: $background;
+    border: 1px solid $port-boolean;
+  }
+  
+  &::after {
+    content: '?';
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    font-size: 8px;
+    color: $port-boolean;
+    font-weight: bold;
+    z-index: 2;
+  }
 }
 
 .port-object {
-  background-color: $port-object;
+  background: linear-gradient(135deg, $port-object, color.adjust($port-object, $lightness: -15%));
+  border-radius: 2px;
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+  
+  &:hover {
+    transform: rotate(45deg) scale(1.2);
+  }
+  
+  &.active-port {
+    transform: rotate(45deg) scale(1.3);
+  }
+  
+  &.compatible {
+    transform: rotate(45deg) scale(1.2);
+  }
 }
 
 .port-array {
-  background-color: $port-array;
+  background: linear-gradient(135deg, $port-array, color.adjust($port-array, $lightness: -15%));
+  border-radius: 2px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background-color: transparent;
+    border: 1px solid $background;
+  }
 }
 
 .port-any {
-  background-color: $port-any;
+  background: linear-gradient(135deg, $port-any, color.adjust($port-any, $lightness: -15%));
+  border: 2px dashed $background;
 }
 
-.port-data {
-  background-color: $data-color;
-  margin : 0 !important;
+.port-start {
+  background: linear-gradient(135deg, $port-start, color.adjust($port-start, $lightness: -15%));
 }
 
-// Port tooltip
-.port-tooltip {
-  background-color: $dark;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+.port-input {
+  background: linear-gradient(135deg, $port-input, color.adjust($port-input, $lightness: -15%));
+}
+
+.port-text {
+  background: linear-gradient(135deg, $port-text, color.adjust($port-text, $lightness: -15%));
+}
+
+.port-random {
+  background: linear-gradient(135deg, $port-random, color.adjust($port-random, $lightness: -15%));
+}
+
+.port-increment {
+  background: linear-gradient(135deg, $port-increment, color.adjust($port-increment, $lightness: -15%));
+}
+
+// Port type indicators - small decorations showing port type
+.port-type-indicator {
   position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid $background;
+  z-index: 5;
+  box-shadow: $shadow-sm;
+  
+  &.port-type-flow {
+    background-color: $flow-color;
+  }
+  
+  &.port-type-string {
+    background-color: $port-string;
+  }
+  
+  &.port-type-number {
+    background-color: $port-number;
+  }
+  
+  &.port-type-boolean {
+    background-color: $port-boolean;
+  }
+  
+  &.port-type-object {
+    background-color: $port-object;
+  }
+  
+  &.port-type-array {
+    background-color: $port-array;
+  }
+  
+  &.port-type-any {
+    background-color: $port-any;
+  }
+}
+
+// Port tooltip - shows on hover
+.port-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background-color: $surface;
+  color: $text-primary;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
   white-space: nowrap;
   pointer-events: none;
-  z-index: 100;
-  @include box-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-time-fast $transition-function;
+  z-index: $z-index-tooltip;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border-color;
+  max-width: 220px;
+  text-align: center;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: $surface transparent transparent transparent;
+  }
+  
+  .port-tooltip-title {
+    font-weight: $font-weight-medium;
+    margin-bottom: 2px;
+  }
+  
+  .port-tooltip-desc {
+    font-size: 10px;
+    color: $text-secondary;
+    white-space: normal;
+  }
+  
+  .port-tooltip-type {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: $border-radius-sm;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &.type-flow {
+      background-color: rgba($flow-color, 0.2);
+      color: $flow-color;
+    }
+    
+    &.type-string {
+      background-color: rgba($port-string, 0.2);
+      color: $port-string;
+    }
+    
+    &.type-number {
+      background-color: rgba($port-number, 0.2);
+      color: $port-number;
+    }
+    
+    &.type-boolean {
+      background-color: rgba($port-boolean, 0.2);
+      color: $port-boolean;
+    }
+    
+    &.type-object {
+      background-color: rgba($port-object, 0.2);
+      color: $port-object;
+    }
+    
+    &.type-array {
+      background-color: rgba($port-array, 0.2);
+      color: $port-array;
+    }
+    
+    &.type-any {
+      background-color: rgba($port-any, 0.2);
+      color: $port-any;
+    }
+  }
+}
+
+// Port placement based on node types - adjust port positions per node type
+[data-node-type="start"] {
+  .flow-output-ports {
+    margin-top: $spacing-md;
+  }
+}
+
+[data-node-type="condition"] {
+  .flow-output-ports {
+    gap: $spacing-md;
+  }
+}
+
+[data-node-type="options"] {
+  .flow-output-ports {
+    gap: $spacing-xs;
+  }
+}
+
+// Port connection visual cues
+.connection-active {
+  .port:not(.connecting):not(.compatible):not(.incompatible) {
+    opacity: 0.4;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  .port.compatible {
+    animation: compatible-pulse 1.5s infinite;
+  }
+}
+
+@keyframes compatible-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($success, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba($success, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($success, 0);
+  }
+}
+
+// Port connections feedback
+.connection-pending-source .port {
+  cursor: crosshair;
+}
+
+.connection-dragging {
+  cursor: crosshair;
+  
+  .node {
+    pointer-events: auto;
+  }
+}
+
+// Connection lines
+.connection-path {
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+  
+  &.flow-connection {
+    stroke: $flow-color;
+    stroke-linecap: round;
+  }
+  
+  &.data-connection {
+    stroke: $data-color;
+    stroke-linecap: round;
+    stroke-dasharray: 5, 5;
+  }
+  
+  &.connection-highlight {
+    stroke-width: 3;
+    filter: drop-shadow(0 0 3px rgba($primary, 0.5));
+  }
+  
+  &.connection-selected {
+    stroke: $primary;
+    stroke-width: 3;
+  }
+}
+
+// Temporary connection when dragging
+.temp-connection {
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 5, 5;
+  animation: dash 1s linear infinite;
+  
+  &.flow-connection {
+    stroke: $flow-color;
+  }
+  
+  &.data-connection {
+    stroke: $data-color;
+  }
+  
+  &.invalid-connection {
+    stroke: $danger;
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+// Connection markers for arrows
+.connection-marker {
+  fill: $flow-color;
+  
+  &.data-marker {
+    fill: $data-color;
+  }
+}
+
+// Port hover effects with SVG glow
+.port-glow-effect {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-time-fast $transition-function;
+  filter: blur(2px);
+  
+  .port:hover + & {
+    opacity: 0.8;
+  }
+  
+  // Different colors for different port types
+  &.glow-flow {
+    background: radial-gradient(circle, rgba($flow-color, 0.8) 0%, rgba($flow-color, 0) 70%);
+  }
+  
+  &.glow-string {
+    background: radial-gradient(circle, rgba($port-string, 0.8) 0%, rgba($port-string, 0) 70%);
+  }
+  
+  &.glow-number {
+    background: radial-gradient(circle, rgba($port-number, 0.8) 0%, rgba($port-number, 0) 70%);
+  }
+  
+  &.glow-boolean {
+    background: radial-gradient(circle, rgba($port-boolean, 0.8) 0%, rgba($port-boolean, 0) 70%);
+  }
+}
+
+// Port connection counter - small badge showing number of connections
+.port-connection-count {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  min-width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: $primary;
+  color: white;
+  font-size: 8px;
+  font-weight: $font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+  border: 1px solid $background;
+  box-shadow: $shadow-sm;
+  pointer-events: none;
 }

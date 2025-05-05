@@ -1,76 +1,283 @@
 // Properties styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
-.property-group {
-  margin-bottom: 20px;
-  background-color: $light;
-  border-radius: 6px;
-  padding: 12px;
-  border: 1px solid $border;
+// Properties panel container
+.properties-panel {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  background-color: $surface;
+  
+  // Custom scrollbar
+  @include custom-scrollbar;
+  
+  // Properties panel header
+  .properties-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
+    
+    h3 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+      margin: 0;
+    }
+    
+    .properties-close {
+      width: 32px;
+      height: 32px;
+      border-radius: $border-radius-round;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color $transition-time-fast $transition-function;
+      color: $text-secondary;
+      
+      &:hover {
+        background-color: $surface-variant;
+        color: $text-primary;
+      }
+    }
+  }
+  
+  // Empty state
+  .properties-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: $text-hint;
+    text-align: center;
+    padding: $spacing-lg;
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: $spacing-md;
+      opacity: 0.6;
+    }
+    
+    h4 {
+      font-size: $font-size-lg;
+      margin-bottom: $spacing-sm;
+      color: $text-secondary;
+    }
+    
+    p {
+      font-size: $font-size-sm;
+      max-width: 240px;
+    }
+  }
 }
 
-.property-group-title {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  color: $dark;
-  position: relative;
+// Property groups
+.property-group {
+  margin-bottom: $spacing-lg;
+  background-color: $surface-variant;
+  border-radius: $border-radius;
+  padding: $spacing-md;
+  border: 1px solid $border-color;
+  transition: all $transition-time-fast $transition-function;
+  
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
 
+// Property group title
+.property-group-title {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-md;
+  color: $primary;
+  position: relative;
+  padding-bottom: $spacing-xs;
+  
   &::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
-    width: 30px;
+    width: 40px;
     height: 2px;
     background-color: $primary;
+    border-radius: 1px;
   }
 }
 
+// Property items
 .property-item {
-  margin-bottom: 15px;
+  margin-bottom: $spacing-md;
   position: relative;
-
-  &:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 0;
-    top: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 12px;
-    padding: 5px 8px;
-    border-radius: 3px;
-    z-index: 100;
-    width: max-content;
-    max-width: 200px;
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(5px);
-    animation: fadeIn 0.2s forwards;
-    animation-delay: 0.5s;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  // Tooltip implementation
+  &[data-tooltip] {
+    &:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(100% + 10px);
+      background-color: $surface;
+      color: $text-primary;
+      font-size: $font-size-xs;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $border-radius-sm;
+      z-index: $z-index-tooltip;
+      width: max-content;
+      max-width: 250px;
+      pointer-events: none;
+      box-shadow: $shadow-sm;
+      border: 1px solid $border-color;
+      line-height: 1.4;
+    }
+    
+    &:hover::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      bottom: calc(100% + 5px);
+      width: 10px;
+      height: 10px;
+      background-color: $surface;
+      border-right: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+      z-index: $z-index-tooltip - 1;
+    }
   }
 }
 
+// Property labels
 .property-label {
-  font-size: 13px;
-  margin-bottom: 5px;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-xs;
   color: $text-secondary;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  .label-hint {
+    font-size: $font-size-xs;
+    color: $text-hint;
+    font-weight: $font-weight-normal;
+  }
 }
 
+// Property inputs
 .property-input {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid $border;
-  border-radius: 4px;
-  font-size: 14px;
-
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  background-color: $surface;
+  color: $text-primary;
+  transition: all $transition-time-fast $transition-function;
+  
+  &::placeholder {
+    color: $text-hint;
+  }
+  
   &:focus {
     outline: none;
     border-color: $primary;
     box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+  
+  &[readonly], &:disabled {
+    background-color: $surface-variant;
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+  
+  // Special input types
+  &[type="color"] {
+    height: 36px;
+    padding: 3px;
+    cursor: pointer;
+  }
+  
+  &[type="range"] {
+    -webkit-appearance: none;
+    height: 6px;
+    background-color: $surface-variant;
+    border-radius: 3px;
+    margin: $spacing-xs 0;
+    
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: $primary;
+      cursor: pointer;
+      border: 2px solid $surface;
+      box-shadow: 0 0 0 1px rgba($primary, 0.3);
+    }
+    
+    &::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: $primary;
+      cursor: pointer;
+      border: 2px solid $surface;
+      box-shadow: 0 0 0 1px rgba($primary, 0.3);
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: none;
+      
+      &::-webkit-slider-thumb {
+        box-shadow: 0 0 0 2px rgba($primary, 0.3);
+      }
+      
+      &::-moz-range-thumb {
+        box-shadow: 0 0 0 2px rgba($primary, 0.3);
+      }
+    }
+  }
+  
+  textarea& {
+    min-height: 80px;
+    resize: vertical;
+    line-height: $line-height-base;
+    padding: $spacing-sm;
+  }
+}
+
+// Property select
+select.property-input {
+  appearance: none;
+  padding-right: $spacing-xl;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-sm center;
+  background-size: $font-size-lg;
+  
+  &:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bb86fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   }
 }
 
@@ -78,23 +285,34 @@
 .switch {
   position: relative;
   display: inline-block;
-  width: 36px;
-  height: 20px;
-
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  vertical-align: middle;
+  
   input {
     opacity: 0;
     width: 0;
     height: 0;
-
+    
     &:checked + .slider {
       background-color: $primary;
     }
-
+    
+    &:focus + .slider {
+      box-shadow: 0 0 0 2px rgba($primary, 0.2);
+    }
+    
     &:checked + .slider:before {
-      transform: translateX(16px);
+      transform: translateX(18px);
+    }
+    
+    &:disabled + .slider {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
-
+  
   .slider {
     position: absolute;
     cursor: pointer;
@@ -102,20 +320,155 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
-    transition: 0.3s;
-    border-radius: 20px;
-
+    background-color: $surface-variant;
+    transition: $transition-time-fast;
+    border-radius: 22px;
+    
     &:before {
       position: absolute;
-      content: '';
-      height: 16px;
-      width: 16px;
+      content: "";
+      height: 18px;
+      width: 18px;
       left: 2px;
       bottom: 2px;
       background-color: white;
-      transition: 0.3s;
+      transition: $transition-time-fast;
       border-radius: 50%;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// Toggle label container
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  .toggle-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+}
+
+// Property helper text
+.property-help {
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $text-hint;
+  line-height: 1.4;
+}
+
+// Property error message
+.property-error {
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $danger;
+  line-height: 1.4;
+}
+
+// Property actions
+.property-actions {
+  display: flex;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+  
+  .btn {
+    flex: 1;
+  }
+}
+
+// Property tags/badges
+.property-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-xs;
+  
+  .property-tag {
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: $font-size-xs;
+    display: inline-flex;
+    align-items: center;
+    
+    .tag-remove {
+      margin-left: 4px;
+      cursor: pointer;
+      opacity: 0.7;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+  
+  .tag-add {
+    background-color: $surface-variant;
+    color: $text-secondary;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: $font-size-xs;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+    }
+  }
+}
+
+// Property with units
+.property-with-unit {
+  display: flex;
+  gap: $spacing-xs;
+  
+  .property-input {
+    flex: 1;
+  }
+  
+  .property-unit {
+    width: auto;
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+}
+
+// Color picker special styling
+.color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-color;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: $spacing-xs;
+}
+
+// Advanced property toggle
+.advanced-toggle {
+  margin-top: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  padding: $spacing-xs;
+  transition: all $transition-time-fast $transition-function;
+  
+  &:hover {
+    color: $text-primary;
+  }
+  
+  .advanced-icon {
+    margin-left: $spacing-xs;
+    transition: transform $transition-time-fast $transition-function;
+    
+    &.expanded {
+      transform: rotate(180deg);
     }
   }
 }

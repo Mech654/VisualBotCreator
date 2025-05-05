@@ -5,126 +5,319 @@
 // Sidebar base styles
 .side-panel {
   width: $panel-width;
-  background-color: $dark;
-  color: white;
-  padding: 20px 0;
-  @include flex(column);
+  background-color: $surface;
+  color: $text-primary;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  z-index: 200;
+  z-index: $z-index-sidebar;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateX(-100%); // Hidden by default
-}
-
-.side-panel.expanded {
-  transform: translateX(0); // Slide in when expanded
+  transition: all $transition-time $transition-function;
+  box-shadow: $shadow-right;
+  border-right: 1px solid $border-color;
+  
+  &.collapsed {
+    width: $toolbox-width;
+    
+    .logo-text, .menu-text, .user-name {
+      opacity: 0;
+      max-width: 0;
+      visibility: hidden;
+    }
+    
+    .logo {
+      justify-content: center;
+      padding: $spacing-md 0;
+      
+      .logo-icon {
+        margin-right: 0;
+      }
+    }
+    
+    .menu-item {
+      justify-content: center;
+      padding: $spacing-sm;
+      
+      .menu-icon {
+        margin-right: 0;
+      }
+    }
+    
+    .user-profile {
+      justify-content: center;
+      
+      .avatar {
+        margin-right: 0;
+      }
+    }
+    
+    .toggle-panel {
+      transform: rotate(180deg);
+    }
+  }
 }
 
 .toggle-panel {
   position: absolute;
-  top: 75px;
-  right: -50px;
-  width: 44px;
-  height: 44px;
+  top: 50%;
+  right: -16px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 2px solid $primary;
-  background: rgba($primary, 0.05);
-  color: $primary;
-  font-size: 24px;
-  z-index: 3000;
+  background: $surface;
+  color: $text-secondary;
+  font-size: $font-size-lg;
+  z-index: $z-index-sidebar + 10;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
-  outline: none;
-  &:hover,
-  &:focus {
-    background: $primary;
-    color: #fff;
-    border-color: $primary;
-    box-shadow: 0 4px 16px rgba($primary, 0.15);
+  box-shadow: $shadow-sm;
+  transition: all $transition-time-fast $transition-function;
+  border: 1px solid $border-color;
+  transform: translateY(-50%);
+  
+  &:hover {
+    color: $primary;
+    background-color: rgba($primary, 0.1);
   }
 }
 
 .logo {
-  font-size: 22px;
-  font-weight: 600;
-  padding: 0 20px 20px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  @include flex(row, flex-start, center);
-
+  padding: $spacing-md $spacing-md $spacing-lg;
+  margin-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  transition: all $transition-time $transition-function;
+  
   &-icon {
-    width: 60px; // Increased size again
-    height: 60px; // Increased size again
-    margin-right: 15px; // Slightly more margin
-    border-radius: 8px; // Adjusted radius
-    object-fit: cover; // Ensure the image covers the area
+    width: 40px;
+    height: 40px;
+    margin-right: $spacing-sm;
+    border-radius: $border-radius;
+    object-fit: cover;
+    transition: all $transition-time $transition-function;
+  }
+  
+  &-text {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all $transition-time $transition-function;
+    max-width: 180px;
   }
 }
 
 .menu {
-  margin-top: 15px;
+  margin-top: $spacing-sm;
   flex-grow: 1;
-  padding: 0 10px;
-
-  &-item {
-    padding: 12px 15px;
-    margin-bottom: 5px;
-    @include flex(row, flex-start, center);
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-    font-weight: 500;
-
+  padding: 0 $spacing-xs;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($text-secondary, 0.2);
+    border-radius: $border-radius;
+    
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    &.active {
-      background-color: $primary;
+      background-color: rgba($text-secondary, 0.4);
     }
   }
-
+  
+  &-item {
+    padding: $spacing-sm $spacing-md;
+    margin-bottom: $spacing-xs;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-radius: $border-radius;
+    transition: all $transition-time-fast $transition-function;
+    color: $text-secondary;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 0;
+      width: 3px;
+      background-color: $primary;
+      border-radius: 0 $border-radius $border-radius 0;
+      transition: all $transition-time-fast $transition-function;
+    }
+    
+    &:hover {
+      background-color: $surface-variant;
+      color: $text-primary;
+      
+      &::before {
+        height: 16px;
+      }
+    }
+    
+    &.active {
+      background-color: rgba($primary, 0.15);
+      color: $primary;
+      
+      &::before {
+        height: 70%;
+      }
+      
+      .menu-icon {
+        color: $primary;
+      }
+    }
+  }
+  
   &-icon {
-    margin-right: 12px;
-    font-size: 18px;
+    margin-right: $spacing-sm;
+    font-size: $font-size-lg;
+    transition: all $transition-time $transition-function;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  &-text {
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all $transition-time $transition-function;
+    max-width: 180px;
   }
 }
 
 .user-profile {
-  padding: 15px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  @include flex(row, flex-start, center);
+  padding: $spacing-md;
+  border-top: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  transition: all $transition-time $transition-function;
+  margin-top: auto;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: $border-radius;
+  background-color: rgba($primary, 0.2);
+  color: $primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-sm;
+  font-weight: $font-weight-bold;
+  transition: all $transition-time $transition-function;
+  flex-shrink: 0;
+}
+
+.user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all $transition-time $transition-function;
+  max-width: 180px;
+  font-size: $font-size-sm;
+}
+
+// Menu section
+.menu-section {
+  margin: $spacing-sm 0;
+  padding: 0 $spacing-md;
+  
+  &-title {
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    color: $text-hint;
+    margin-bottom: $spacing-xs;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all $transition-time $transition-function;
+    
+    .side-panel.collapsed & {
+      opacity: 0;
+      max-width: 0;
+      visibility: hidden;
+    }
+  }
+}
+
+// Menu item badge
+.menu-badge {
+  margin-left: $spacing-xs;
   background-color: $primary;
-  @include flex(row, center, center);
-  margin-right: 12px;
+  color: white;
+  border-radius: 10px;
+  padding: 2px $spacing-xs;
+  font-size: 10px;
+  font-weight: $font-weight-medium;
+  min-width: 18px;
+  text-align: center;
+  
+  .side-panel.collapsed & {
+    position: absolute;
+    top: $spacing-xs;
+    right: $spacing-xs;
+    margin-left: 0;
+  }
+  
+  &.badge-secondary {
+    background-color: $secondary;
+  }
+  
+  &.badge-warning {
+    background-color: $warning;
+  }
+  
+  &.badge-danger {
+    background-color: $danger;
+  }
 }
 
-// Only allow expand/collapse on builder page
-body.builder-page .side-panel {
-  transform: translateX(-100%);
-}
-body.builder-page .side-panel.expanded {
-  transform: translateX(0);
-}
-
-// Prevent sliding on other pages
-body:not(.builder-page) .side-panel {
-  transform: none !important;
+// Responsive behavior
+@media (max-width: $tablet) {
+  .side-panel {
+    transform: translateX(-100%);
+    
+    &.mobile-visible {
+      transform: translateX(0);
+    }
+  }
+  
+  .side-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba($background, 0.5);
+    z-index: $z-index-sidebar - 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-time $transition-function;
+    
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 }

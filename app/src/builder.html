@@ -16,33 +16,33 @@
       <div class="toggle-panel">≡</div>
       <div class="logo">
         <img src="/assets/images/mascot.png" alt="Mascot" class="logo-icon" />
-        Bot Creator
+        <span class="logo-text">Bot Creator</span>
       </div>
-      <div class="menu">
+      <nav class="menu">
         <div class="menu-item" data-page="dashboard">
           <span class="menu-icon">📊</span>
-          Dashboard
+          <span class="menu-text">Dashboard</span>
         </div>
         <div class="menu-item active" data-page="builder">
           <span class="menu-icon">🧠</span>
-          Bot Builder
+          <span class="menu-text">Bot Builder</span>
         </div>
         <div class="menu-item" data-page="integrations">
           <span class="menu-icon">🔌</span>
-          Integrations
+          <span class="menu-text">Integrations</span>
         </div>
         <div class="menu-item" data-page="analytics">
           <span class="menu-icon">📈</span>
-          Analytics
+          <span class="menu-text">Analytics</span>
         </div>
         <div class="menu-item" data-page="settings">
           <span class="menu-icon">⚙️</span>
-          Settings
+          <span class="menu-text">Settings</span>
         </div>
-      </div>
+      </nav>
       <div class="user-profile">
         <div class="avatar">U</div>
-        <div>User Name</div>
+        <div class="user-name">User Name</div>
       </div>
     </div>
 
@@ -54,11 +54,26 @@
         <div class="workspace">
           <!-- Toolbox -->
           <div class="toolbox">
-            <div class="tool active" title="Select">👆</div>
-            <div class="tool" title="Connect">🔗</div>
-            <div class="tool" title="Delete">🗑️</div>
-            <div class="tool" title="Zoom In">🔍+</div>
-            <div class="tool" title="Zoom Out">🔍-</div>
+            <div class="tool" title="Select">
+              <span class="tool-icon">👆</span>
+              <span class="tool-tooltip">Select</span>
+            </div>
+            <div class="tool" title="Connect">
+              <span class="tool-icon">🔗</span>
+              <span class="tool-tooltip">Connect</span>
+            </div>
+            <div class="tool" title="Delete">
+              <span class="tool-icon">🗑️</span>
+              <span class="tool-tooltip">Delete</span>
+            </div>
+            <div class="tool" title="Zoom In">
+              <span class="tool-icon">🔍+</span>
+              <span class="tool-tooltip">Zoom In</span>
+            </div>
+            <div class="tool" title="Zoom Out">
+              <span class="tool-icon">🔍-</span>
+              <span class="tool-tooltip">Zoom Out</span>
+            </div>
           </div>
 
           <!-- Canvas -->
@@ -74,20 +89,39 @@
         <div class="right-panel">
           <div class="toggle-right-panel" title="Toggle right panel">»</div>
           <div class="panel-header">
-            <span class="text-primary">Components</span>
-            <span id="properties-toggle" style="cursor: pointer">📝</span>
+            <span class="panel-title text-primary">Components</span>
+            <span id="properties-toggle" class="panel-toggle cursor-pointer">📝</span>
           </div>
 
           <!-- Components Panel -->
           <div class="panel-content components-container">
-            <!-- Components will be dynamically loaded from our node components files -->
-            <div id="component-categories">
-              <!-- Component categories will be added here dynamically -->
+            <!-- Component search -->
+            <div class="component-search">
+              <input type="text" class="component-search-input" placeholder="Search components..." aria-label="Search components" />
+            </div>
+            
+            <!-- Component filters -->
+            <div class="component-filters">
+              <div class="filter-pill active">All</div>
+              <div class="filter-pill">Flow</div>
+              <div class="filter-pill">Data</div>
+            </div>
+            
+            <!-- Component categories will be added here dynamically -->
+            <div id="component-categories" class="component-categories-container">
+              <!-- Sample category structure -->
+              <div class="component-category">
+                <div class="category-header">
+                  <div class="category-icon">💬</div>
+                  <div class="category-title">Messages</div>
+                  <div class="category-toggle"></div>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Properties Panel (Hidden by default) -->
-          <div class="panel-content" id="properties-panel" style="display: none">
+          <div class="panel-content properties-container" id="properties-panel" style="display: none">
             <div class="property-group">
               <div class="property-group-title text-primary">General</div>
               <div class="property-item" data-tooltip="A descriptive name for this node">
@@ -110,9 +144,7 @@
               <div class="property-group-title text-primary">Content</div>
               <div class="property-item" data-tooltip="Text message to display in this node">
                 <div class="property-label text-secondary">Message Text</div>
-                <textarea class="property-input" rows="3" aria-label="Node message content">
-Hello! How can I help you today?</textarea
-                >
+                <textarea class="property-input" rows="3" aria-label="Node message content">Hello! How can I help you today?</textarea>
               </div>
               <div class="property-item" data-tooltip="Variable name to store the message output">
                 <div class="property-label text-secondary">Variable</div>
@@ -127,10 +159,7 @@ Hello! How can I help you today?</textarea
 
             <div class="property-group">
               <div class="property-group-title text-primary">Advanced</div>
-              <div
-                class="property-item"
-                data-tooltip="Conditions that determine if this node is executed"
-              >
+              <div class="property-item" data-tooltip="Conditions that determine if this node is executed">
                 <div class="property-label text-secondary">Conditions</div>
                 <input
                   type="text"
@@ -140,10 +169,7 @@ Hello! How can I help you today?</textarea
                   aria-label="Node conditions"
                 />
               </div>
-              <div
-                class="property-item"
-                data-tooltip="Delay in milliseconds before this node executes"
-              >
+              <div class="property-item" data-tooltip="Delay in milliseconds before this node executes">
                 <div class="property-label text-secondary">Delay (ms)</div>
                 <input
                   type="number"
@@ -155,11 +181,8 @@ Hello! How can I help you today?</textarea
                   aria-label="Node delay"
                 />
               </div>
-              <div
-                class="property-item"
-                data-tooltip="Preview this node in the chatbot conversation"
-              >
-                <button class="btn btn-outline" style="margin-top: 10px">
+              <div class="property-item" data-tooltip="Preview this node in the chatbot conversation">
+                <button class="btn btn-outline btn-sm">
                   <span class="btn-icon">👁️</span>
                   Preview Node
                 </button>

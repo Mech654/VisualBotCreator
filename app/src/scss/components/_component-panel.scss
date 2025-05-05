@@ -1,169 +1,646 @@
 // Component panel styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
-.components-container {
-  padding: 15px;
-  @include flex(column);
-  gap: 10px;
-  background: $light;
-  color: $text;
-}
-
-// Search component
-.component-search {
-  margin-bottom: 15px;
+.component-panel {
+  width: 280px;
+  height: 100%;
+  background-color: $surface;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  transition: width $transition-time $transition-function;
+  box-shadow: $shadow-md;
+  z-index: $z-index-panel;
+  overflow: hidden;
   position: relative;
-
-  &-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid $border;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: rgba(255, 255, 255, 0.8);
-
-    &:focus {
-      outline: none;
-      border-color: $primary;
-      box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  
+  &-collapsed {
+    width: 60px;
+    
+    .component-panel-header h2,
+    .component-search,
+    .component-category-title {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .component-item {
+      width: 48px;
+      height: 48px;
+      margin: $spacing-xs 0;
+      
+      .component-item-name,
+      .component-item-description,
+      .component-item-ports {
+        display: none;
+      }
+    }
+    
+    .component-list {
+      align-items: center;
+    }
+    
+    .component-category {
+      align-items: center;
+      padding: $spacing-xs;
+    }
+    
+    .component-toggle {
+      transform: rotate(180deg);
+    }
+  }
+  
+  // Header
+  &-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $spacing-sm;
+    border-bottom: 1px solid $border-color;
+    background-color: $surface-alt;
+    position: relative;
+    z-index: 2;
+    
+    h2 {
+      font-size: $font-size-md;
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity $transition-time-fast $transition-function,
+                  visibility $transition-time-fast $transition-function;
+    }
+  }
+  
+  // Toggle button for collapse/expand
+  &-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: $border-radius-circle;
+    background-color: rgba($primary, 0.1);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all $transition-time-fast $transition-function;
+    
+    &:hover {
+      background-color: rgba($primary, 0.2);
+    }
+    
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: $primary;
+      transition: transform $transition-time $transition-function;
+    }
+  }
+  
+  // Search
+  &-search {
+    padding: $spacing-sm;
+    position: relative;
+    z-index: 1;
+    transition: opacity $transition-time-fast $transition-function,
+                visibility $transition-time-fast $transition-function;
+    
+    input {
+      width: 100%;
+      height: 38px;
+      padding: 0 $spacing-lg 0 $spacing-xl;
+      border-radius: $border-radius-md;
+      border: 1px solid $border-color;
+      background-color: $background;
+      color: $text-primary;
+      font-size: $font-size-sm;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba($primary, 0.3);
+      }
+      
+      &::placeholder {
+        color: $text-tertiary;
+      }
+    }
+    
+    &-icon {
+      position: absolute;
+      left: $spacing-sm + 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-tertiary;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    &-clear {
+      position: absolute;
+      right: $spacing-sm + 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-tertiary;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all $transition-time-fast $transition-function;
+      
+      &.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      &:hover {
+        background-color: rgba($text-primary, 0.1);
+        color: $text-primary;
+      }
+    }
+  }
+  
+  // Content
+  &-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    
+    // Custom scrollbar
+    @include custom-scrollbar;
+  }
+  
+  // No results
+  &-no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+    color: $text-tertiary;
+    text-align: center;
+    min-height: 200px;
+    
+    svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: $spacing-sm;
+      fill: $text-tertiary;
+      opacity: 0.5;
+    }
+    
+    h3 {
+      font-size: $font-size-md;
+      margin-bottom: $spacing-xs;
+      color: $text-secondary;
+    }
+    
+    p {
+      font-size: $font-size-sm;
+      max-width: 200px;
+      margin: 0 auto;
     }
   }
 }
 
-// Favorites section
-.favorites-section {
-  margin-bottom: 20px;
-  padding: 12px;
-  background-color: #f5f7fa;
-  border-radius: 8px;
-  border: 1px solid $border;
-}
-
-.favorites-header {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 10px;
-  color: #555;
-}
-
-.favorites-list {
-  @include flex(row, flex-start, center);
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.favorite-item {
-  width: calc(33.333% - 7px);
-}
-
-// Category styling
+// Component categories
 .component-category {
-  margin-bottom: 15px;
-  background: transparent;
-}
-
-.category-header {
-  @include flex(row, flex-start, center);
-  font-weight: 500;
-  cursor: pointer;
-  padding: 8px;
-  background: $light;
-  color: $text;
-  border-radius: 6px;
-
-  &:hover {
-    background-color: $light;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  flex-direction: column;
+  
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-xs $spacing-sm;
+    cursor: pointer;
+    transition: background-color $transition-time-fast $transition-function;
+    border-radius: $border-radius-sm;
+    
+    &:hover {
+      background-color: rgba($text-primary, 0.05);
+    }
+    
+    &-collapsed {
+      .component-category-arrow {
+        transform: rotate(-90deg);
+      }
+    }
+  }
+  
+  &-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: opacity $transition-time-fast $transition-function,
+                visibility $transition-time-fast $transition-function;
+  }
+  
+  &-arrow {
+    width: 16px;
+    height: 16px;
+    color: $text-tertiary;
+    transition: transform $transition-time-fast $transition-function;
+  }
+  
+  &-content {
+    overflow: hidden;
+    transition: max-height $transition-time-fast $transition-function;
+    
+    &-collapsed {
+      max-height: 0 !important;
+    }
   }
 }
 
-.category-icon {
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-.category-title {
-  font-size: 14px;
-  color: #555;
-  flex-grow: 1;
-}
-
-.category-toggle {
-  font-size: 12px;
-  color: #999;
-}
-
+// Component list
 .component-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  padding-top: 10px;
-  max-height: 500px;
-  overflow: hidden;
-
-  &.collapsed {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 $spacing-xs $spacing-xs;
+  gap: $spacing-xs;
 }
 
+// Component item (draggable)
 .component-item {
-  background: $dark;
-  color: $text;
-  border: 1px solid $border;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  padding: 12px 8px;
+  width: calc(50% - #{$spacing-xs});
+  height: auto;
+  background-color: $background;
+  border-radius: $border-radius-md;
+  padding: $spacing-sm;
   cursor: grab;
-  @include flex(column, flex-start, center);
+  transition: all $transition-time-fast $transition-function;
+  border: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
   position: relative;
-
+  overflow: hidden;
+  
   &:hover {
-    border-color: $primary;
-    box-shadow: 0 4px 12px rgba(187, 134, 252, 0.1);
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+    border-color: rgba($primary, 0.3);
+    
+    .component-item-icon {
+      transform: scale(1.1);
+    }
   }
-
-  &.dark-theme {
-    background-color: $light;
-    color: $text;
+  
+  &:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+  }
+  
+  // Icon
+  &-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    border-radius: $border-radius-circle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-xs;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($accent, 0.1) 100%);
+  }
+  
+  &-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform $transition-time-fast $transition-function;
+    
+    // Node type colors
+    &.start-node {
+      color: $port-start;
+    }
+    
+    &.message-node {
+      color: $port-text;
+    }
+    
+    &.input-node {
+      color: $port-input;
+    }
+    
+    &.condition-node {
+      color: $port-boolean;
+    }
+    
+    &.math-node {
+      color: $port-number;
+    }
+    
+    &.text-node {
+      color: $port-string;
+    }
+    
+    &.random-node {
+      color: $port-random;
+    }
+    
+    &.options-node {
+      color: $port-options;
+    }
+    
+    &.increment-node {
+      color: $port-increment;
+    }
+  }
+  
+  // Content
+  &-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  &-name {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  &-description {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+  }
+  
+  // Ports preview
+  &-ports {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-top: auto;
+    height: 20px;
+    
+    .port-preview {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .port-flow {
+      background-color: $port-control;
+    }
+    
+    .port-string {
+      background-color: $port-string;
+    }
+    
+    .port-number {
+      background-color: $port-number;
+    }
+    
+    .port-boolean {
+      background-color: $port-boolean;
+    }
+    
+    .port-object {
+      background-color: $port-object;
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+    
+    .port-array {
+      background-color: $port-array;
+      border-radius: 2px;
+    }
+    
+    .port-any {
+      background-color: $port-any;
+      border: 1px dashed $background;
+    }
+  }
+  
+  // Item types styling
+  &[data-node-type="start"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-start, 0.2) 0%, rgba($port-start, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-start, 0.5);
+    }
+  }
+  
+  &[data-node-type="message"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-text, 0.2) 0%, rgba($port-text, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-text, 0.5);
+    }
+  }
+  
+  &[data-node-type="input"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-input, 0.2) 0%, rgba($port-input, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-input, 0.5);
+    }
+  }
+  
+  &[data-node-type="condition"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-boolean, 0.2) 0%, rgba($port-boolean, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-boolean, 0.5);
+    }
+  }
+  
+  &[data-node-type="math"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-number, 0.2) 0%, rgba($port-number, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-number, 0.5);
+    }
+  }
+  
+  &[data-node-type="text"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-string, 0.2) 0%, rgba($port-string, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-string, 0.5);
+    }
+  }
+  
+  &[data-node-type="random"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-random, 0.2) 0%, rgba($port-random, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-random, 0.5);
+    }
+  }
+  
+  &[data-node-type="options"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-options, 0.2) 0%, rgba($port-options, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-options, 0.5);
+    }
+  }
+  
+  &[data-node-type="increment"] {
+    .component-item-icon-wrapper {
+      background: linear-gradient(135deg, rgba($port-increment, 0.2) 0%, rgba($port-increment, 0.1) 100%);
+    }
+    
+    &:hover {
+      border-color: rgba($port-increment, 0.5);
+    }
+  }
+  
+  // Drag feedback
+  &.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
   }
 }
 
-.flow-type-indicator {
+// Component drag preview
+.component-drag-preview {
+  position: fixed;
+  z-index: $z-index-drag-preview;
+  pointer-events: none;
+  transform-origin: center;
+  opacity: 0.9;
+  box-shadow: $shadow-lg;
+  transition: transform $transition-time-fast $transition-function;
+  
+  .component-item {
+    box-shadow: $shadow-lg;
+    transform: scale(0.8);
+    background-color: rgba($background, 0.95);
+  }
+}
+
+// Component tooltip
+.component-tooltip {
   position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-
-  &.flow-type {
-    background-color: $flow-color;
+  top: 0;
+  left: calc(100% + #{$spacing-sm});
+  background-color: $surface;
+  padding: $spacing-sm;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-lg;
+  z-index: $z-index-tooltip;
+  width: 220px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all $transition-time-fast $transition-function;
+  pointer-events: none;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent $surface transparent transparent;
   }
-
-  &.data-type {
-    background-color: $data-color;
+  
+  &-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+  }
+  
+  &-description {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    margin-bottom: $spacing-sm;
+    line-height: 1.4;
+  }
+  
+  &-ports {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    .tooltip-port {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .port-preview {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      
+      .port-name {
+        font-size: $font-size-xs;
+        color: $text-secondary;
+      }
+    }
+  }
+  
+  .component-item:hover & {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-.component-icon {
-  font-size: 20px;
-  margin-bottom: 6px;
-}
-
-.component-name {
-  font-size: 12px;
-  text-align: center;
-  color: $text-secondary;
-}
-
-// Create a form styles file
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
+// Responsive
+@media (max-width: 768px) {
+  .component-panel {
+    width: 240px;
+    
+    &-collapsed {
+      width: 0;
+      border-right: none;
+    }
+  }
+  
+  .component-item {
+    width: 100%;
+  }
 }

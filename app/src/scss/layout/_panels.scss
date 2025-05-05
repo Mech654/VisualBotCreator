@@ -1,32 +1,40 @@
 // Panels styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
+// Right panel (properties/components)
 .right-panel {
   position: fixed;
   right: 0;
   top: 0;
   bottom: 0;
-  width: var(--right-panel-width, $right-panel-width); // Use CSS var with SCSS var as fallback
+  width: var(--right-panel-width, $right-panel-width);
   min-width: var(--right-panel-min-width, $right-panel-min-width);
   max-width: var(--right-panel-max-width, $right-panel-max-width);
-  background: $light;
-  color: $text;
-  border-left: 1px solid $border;
-  z-index: 200;
+  background: $surface;
+  color: $text-primary;
+  border-left: 1px solid $border-color;
+  z-index: $z-index-panel;
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
+  transition: transform $transition-time $transition-function;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-lg;
+  
+  // Mobile responsive style
   @include mobile {
     position: absolute;
     right: 0;
     transform: translateX(100%);
-    z-index: 90;
+    z-index: $z-index-panel;
 
     &.visible {
       transform: translateX(0);
     }
   }
+  
+  // Panel toggle button
   .toggle-right-panel {
     position: absolute;
     top: 75px;
@@ -36,78 +44,469 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: $border-radius-round;
     border: 2px solid $primary;
-    background: rgba($primary, 0.05);
+    background: rgba($primary, 0.1);
     color: $primary;
-    font-size: 24px;
-    z-index: 3000;
+    font-size: $font-size-xl;
+    z-index: $z-index-panel + 10;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition:
-      background 0.2s,
-      color 0.2s,
-      border-color 0.2s,
-      box-shadow 0.2s;
+    box-shadow: $shadow;
+    transition: all $transition-time-fast $transition-function;
     outline: none;
-    &:hover,
-    &:focus {
+    
+    &:hover, &:focus {
       background: $primary;
-      color: #fff;
+      color: white;
       border-color: $primary;
-      box-shadow: 0 4px 16px rgba($primary, 0.15);
+      box-shadow: $shadow-lg;
+      transform: translateX(-5px);
+    }
+    
+    // Rotate when panel is expanded
+    .right-panel.expanded & {
+      transform: rotate(180deg);
+      
+      &:hover {
+        transform: rotate(180deg) translateX(5px);
+      }
+    }
+  }
+  
+  // Panel expanded state
+  &.expanded {
+    transform: translateX(0);
+  }
+  
+  // Resize handle
+  &-resize-handle {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color: transparent;
+    z-index: $z-index-panel + 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Vertical indicator line
+    .resize-handle-indicator {
+      width: 2px;
+      height: 100%;
+      background-color: rgba($primary, 0.3);
+      transition: all $transition-time-fast $transition-function;
+    }
+
+    // Hover state
+    &:hover .resize-handle-indicator {
+      width: 4px;
+      background-color: $primary;
+    }
+
+    // Active resizing state
+    .right-panel-resizing & .resize-handle-indicator {
+      width: 4px;
+      background-color: $primary;
+      box-shadow: 0 0 10px rgba($primary, 0.5);
     }
   }
 }
-.right-panel.expanded {
-  transform: translateX(0);
-}
 
-.right-panel-resize-handle {
-  position: absolute;
-  top: 0;
-  left: -5px; /* Position it slightly outside the panel */
-  width: 10px; /* Wider clickable area */
-  height: 100%; /* Full height */
-  cursor: ew-resize;
-  background-color: transparent;
-  z-index: 1000; /* Ensure it's above other elements */
+// Panel header
+.panel-header {
+  background: $surface-variant;
+  color: $text-primary;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-color;
+  font-weight: $font-weight-medium;
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  /* Vertical indicator line */
-  .resize-handle-indicator {
-    width: 2px;
-    height: 100%;
-    background-color: rgba($primary, 0.3); /* Always visible but subtle */
-    transition: background-color 0.2s, width 0.2s;
+  justify-content: space-between;
+  height: 60px;
+  flex-shrink: 0;
+  position: relative;
+  
+  // Title
+  .panel-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $primary;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  /* Show wider indicator on hover */
-  &:hover .resize-handle-indicator {
-    width: 4px;
-    background-color: $primary; /* Full color on hover */
+  
+  // Actions area
+  .panel-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
   }
-
-  /* Visual feedback during resize */
-  .right-panel-resizing & .resize-handle-indicator {
-    width: 4px;
-    background-color: $primary;
+  
+  // Tab navigation in header
+  .panel-tabs {
+    display: flex;
+    align-items: center;
+    margin-top: $spacing-sm;
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 0;
+    margin-bottom: -$spacing-md;
+    
+    .panel-tab {
+      padding: $spacing-xs $spacing-sm;
+      margin-right: $spacing-sm;
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all $transition-time-fast $transition-function;
+      
+      &:hover {
+        color: $text-primary;
+        border-color: $border-color;
+      }
+      
+      &.active {
+        color: $primary;
+        border-color: $primary;
+      }
+    }
   }
 }
 
-.panel-header {
-  background: $light;
-  color: $text;
-  padding: 15px;
-  border-bottom: 1px solid $border;
-  font-weight: 500;
-  @include flex(row, space-between, center);
-}
-
+// Panel content
 .panel-content {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 15px;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  
+  // Custom scrollbar
+  @include custom-scrollbar;
+  
+  // Empty state
+  .panel-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: $text-hint;
+    text-align: center;
+    padding: $spacing-xl;
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: $spacing-md;
+      opacity: 0.6;
+    }
+    
+    h4 {
+      font-size: $font-size-lg;
+      margin-bottom: $spacing-sm;
+      color: $text-secondary;
+    }
+    
+    p {
+      font-size: $font-size-sm;
+      max-width: 240px;
+    }
+  }
+  
+  // Content sections
+  .content-section {
+    margin-bottom: $spacing-lg;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-title {
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+      margin-bottom: $spacing-sm;
+      padding-bottom: $spacing-xs;
+      border-bottom: 1px solid $border-color;
+    }
+  }
+}
+
+// Specific panel types
+.components-container {
+  padding: $spacing-xs;
+  
+  // Stop top padding from collapsing
+  &::before {
+    content: '';
+    display: table;
+  }
+}
+
+// Side panel (left menu)
+.side-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: $panel-width;
+  background: $surface;
+  color: $text-primary;
+  border-right: 1px solid $border-color;
+  z-index: $z-index-panel;
+  display: flex;
+  flex-direction: column;
+  transition: transform $transition-time $transition-function, width $transition-time $transition-function;
+  box-shadow: $shadow;
+  
+  // Collapsed state
+  &.collapsed {
+    width: $toolbox-width;
+    
+    .logo-text, 
+    .menu-label,
+    .user-name {
+      opacity: 0;
+      visibility: hidden;
+      white-space: nowrap;
+    }
+    
+    .toggle-panel {
+      transform: rotate(180deg);
+    }
+    
+    .menu-item {
+      justify-content: center;
+      padding: $spacing-sm;
+    }
+    
+    .menu-icon {
+      margin-right: 0;
+    }
+  }
+  
+  // Side panel toggle button
+  .toggle-panel {
+    position: absolute;
+    top: 15px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-round;
+    border: 1px solid $border-color;
+    background: $surface;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    z-index: 10;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    transition: all $transition-time-fast $transition-function;
+    
+    &:hover {
+      background: $surface-variant;
+      color: $text-primary;
+    }
+  }
+  
+  // Panel content
+  .logo {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: $spacing-md;
+    border-bottom: 1px solid $border-color;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+    color: $primary;
+    
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      margin-right: $spacing-sm;
+      transition: margin $transition-time $transition-function;
+      
+      .side-panel.collapsed & {
+        margin-right: 0;
+      }
+    }
+    
+    .logo-text {
+      transition: opacity $transition-time-fast $transition-function,
+                  visibility $transition-time-fast $transition-function;
+    }
+  }
+  
+  // Navigation menu
+  .menu {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-md 0;
+    
+    // Custom scrollbar
+    @include custom-scrollbar;
+    
+    // Menu items
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: $spacing-sm $spacing-md;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: all $transition-time-fast $transition-function;
+      position: relative;
+      margin-bottom: $spacing-xs;
+      
+      &:hover {
+        background-color: $surface-variant;
+        color: $text-primary;
+      }
+      
+      &.active {
+        color: $primary;
+        background-color: rgba($primary, 0.1);
+        font-weight: $font-weight-medium;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background-color: $primary;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
+        }
+      }
+      
+      .menu-icon {
+        font-size: $font-size-lg;
+        margin-right: $spacing-sm;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: margin $transition-time $transition-function;
+      }
+      
+      .menu-label {
+        transition: opacity $transition-time-fast $transition-function, 
+                    visibility $transition-time-fast $transition-function;
+      }
+      
+      // Badge notification
+      .menu-badge {
+        position: absolute;
+        top: $spacing-sm;
+        right: $spacing-md;
+        background-color: $primary;
+        color: white;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        height: 18px;
+        min-width: 18px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 $spacing-xs;
+        
+        .side-panel.collapsed & {
+          right: $spacing-xs;
+        }
+      }
+    }
+  }
+  
+  // User profile section
+  .user-profile {
+    padding: $spacing-md;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid $border-color;
+    
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: $border-radius-round;
+      background-color: $primary;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-sm;
+      margin-right: $spacing-sm;
+      flex-shrink: 0;
+      transition: margin $transition-time $transition-function;
+      
+      .side-panel.collapsed & {
+        margin-right: 0;
+      }
+    }
+    
+    .user-name {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity $transition-time-fast $transition-function, 
+                  visibility $transition-time-fast $transition-function;
+    }
+  }
+}
+
+// Responsive panels
+@media (max-width: $mobile) {
+  .side-panel {
+    transform: translateX(-100%);
+    
+    &.mobile-visible {
+      transform: translateX(0);
+    }
+  }
+  
+  .right-panel {
+    width: 100%;
+    
+    .toggle-right-panel {
+      top: 15px;
+      left: -45px;
+    }
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+// Panel overlays
+.panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba($background, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-index-panel - 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-time $transition-function;
+  
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
 }

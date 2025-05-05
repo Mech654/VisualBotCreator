@@ -1,107 +1,1167 @@
 // Node styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
+// Base node style
 .node {
-  @include node-base;
-  @include transition(box-shadow, 0.2s);
   position: absolute;
-  z-index: 50;
-  background: $light;
-  color: $text;
-  border: 1px solid $border;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  padding: 12px 16px;
-  min-width: 180px;
-  min-height: 60px;
-  margin-bottom: 10px;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  z-index: $z-index-node;
+  background: $surface;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow;
+  width: 260px;
+  min-height: 100px;
+  transition: all $transition-time-fast $transition-function;
   user-select: none;
-  cursor: pointer;
+  cursor: grab;
+  overflow: hidden;
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &:hover {
-    @include box-shadow(0 4px 15px rgba(0, 0, 0, 0.15));
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
   }
 
   &.node-selected {
-    @include box-shadow(0 0 0 2px $primary !important);
-    z-index: 200;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, 0.3), $shadow-lg;
+    z-index: $z-index-node-selected;
+
+    // Show node content on selection for better UX
+    .node-content {
+      max-height: 500px; // Allow expanding when selected
+    }
   }
 
-  // Flow type specific styling
-  &[data-flow-type='flow'] .node-header {
-    background-color: $flow-color;
+  &.node-dragging {
+    opacity: 0.9;
+    transform: scale(1.02);
+    box-shadow: $shadow-xl;
+    z-index: $z-index-node-dragging;
+
+    // Subtle rotation effect when dragging for better UX
+    &.node-rotate-slight {
+      transform: scale(1.02) rotate(0.5deg);
+    }
   }
 
-  &[data-flow-type='data'] .node-header {
-    background-color: $data-color;
+  &.node-disabled {
+    opacity: 0.6;
+    filter: grayscale(40%);
+    pointer-events: none;
   }
 
-  .node-header {
-    color: $text;
-    background: transparent;
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 8px;
+  &.node-highlight {
+    animation: pulse-highlight 1.5s ease-in-out infinite;
+    border-color: rgba($primary, 0.8);
+  }
+
+  @keyframes pulse-highlight {
+    0% {
+      box-shadow: 0 0 0 0 rgba($primary, 0.7), $shadow-lg;
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba($primary, 0), $shadow-lg;
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba($primary, 0), $shadow-lg;
+    }
+  }
+
+  // Flow node styling
+  &[data-flow-type='flow'] {
+    .node-header {
+      background-color: $flow-color;
+      color: $on-primary;
+
+      &::after {
+        background: linear-gradient(to right, $flow-color, color.adjust($flow-color, $lightness: -15%));
+      }
+    }
+
+    .flow-type-indicator {
+      background-color: $flow-color;
+    }
+  }
+
+  // Data node styling
+  &[data-flow-type='data'] {
+    .node-header {
+      background-color: $data-color;
+      color: $on-primary;
+
+      &::after {
+        background: linear-gradient(to right, $data-color, color.adjust($data-color, $lightness: -15%));
+      }
+    }
+
+    .flow-type-indicator {
+      background-color: $data-color;
+    }
+  }
+
+  // Node type specific styling
+  &[data-node-type="start"] {
+    .node-header {
+      background-color: $port-start;
+
+      &::after {
+        background: linear-gradient(to right, $port-start, color.adjust($port-start, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-start, 0.2);
+      color: $port-start;
+    }
+  }
+
+  &[data-node-type="message"] {
+    .node-header {
+      background-color: $port-string;
+
+      &::after {
+        background: linear-gradient(to right, $port-string, color.adjust($port-string, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-string, 0.2);
+      color: $port-string;
+    }
+  }
+
+  &[data-node-type="input"] {
+    .node-header {
+      background-color: $port-input;
+
+      &::after {
+        background: linear-gradient(to right, $port-input, color.adjust($port-input, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-input, 0.2);
+      color: $port-input;
+    }
+  }
+
+  &[data-node-type="condition"] {
+    .node-header {
+      background-color: $port-condition;
+
+      &::after {
+        background: linear-gradient(to right, $port-condition, color.adjust($port-condition, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-condition, 0.2);
+      color: $port-condition;
+    }
+  }
+
+  &[data-node-type="options"] {
+    .node-header {
+      background-color: $port-options;
+
+      &::after {
+        background: linear-gradient(to right, $port-options, color.adjust($port-options, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-options, 0.2);
+      color: $port-options;
+    }
+  }
+
+  &[data-node-type="math"] {
+    .node-header {
+      background-color: $port-number;
+
+      &::after {
+        background: linear-gradient(to right, $port-number, color.adjust($port-number, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-number, 0.2);
+      color: $port-number;
+    }
+  }
+
+  &[data-node-type="random"] {
+    .node-header {
+      background-color: $port-random;
+
+      &::after {
+        background: linear-gradient(to right, $port-random, color.adjust($port-random, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-random, 0.2);
+      color: $port-random;
+    }
+  }
+
+  &[data-node-type="increment"] {
+    .node-header {
+      background-color: $port-increment;
+
+      &::after {
+        background: linear-gradient(to right, $port-increment, color.adjust($port-increment, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-increment, 0.2);
+      color: $port-increment;
+    }
+  }
+
+  &[data-node-type="text"] {
+    .node-header {
+      background-color: $port-text;
+
+      &::after {
+        background: linear-gradient(to right, $port-text, color.adjust($port-text, $lightness: -15%));
+      }
+    }
+
+    .node-icon {
+      background-color: rgba($port-text, 0.2);
+      color: $port-text;
+    }
+  }
+
+  // Mini resize handle in bottom-right corner
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, transparent 50%, rgba($text-secondary, 0.5) 50%);
+    border-radius: 0 0 $border-radius-sm 0;
+    cursor: se-resize;
+    opacity: 0;
+    transition: opacity $transition-time-fast $transition-function;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+
+  // Collapsed state
+  &.node-collapsed {
+    .node-content {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      overflow: hidden;
+    }
+
+    .node-data-ports-container {
+      border-top: none;
+    }
+
+    .node-collapse-icon {
+      transform: rotate(180deg);
+    }
+
+    &:hover {
+      .node-content-peek {
+        opacity: 1;
+      }
+    }
+  }
+
+  // New feature: Content peek on hover when collapsed
+  .node-content-peek {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    background: $surface;
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm $border-radius-sm 0 0;
+    border: 1px solid $border-color;
+    border-bottom: none;
+    box-shadow: $shadow;
+    z-index: $z-index-tooltip;
+    max-height: 200px;
+    overflow-y: auto;
+    opacity: 0;
+    transition: opacity $transition-time-fast $transition-function;
+    pointer-events: none;
+
+    @include custom-scrollbar;
+  }
+}
+
+// Node header
+.node-header {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius-lg $border-radius-lg 0 0;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  height: 40px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+  }
+
+  &-title {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    line-height: $line-height-tight;
+    font-size: $font-size-sm;
+
+    .node-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: $border-radius-sm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: $spacing-xs;
+      font-size: $font-size-base;
+    }
+  }
+
+  // Header actions
+  .node-header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  // Collapse toggle
+  .node-collapse-toggle {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all $transition-time-fast $transition-function;
+    padding: 2px;
+    border-radius: $border-radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      opacity: 1;
+      background-color: rgba(black, 0.1);
+    }
+
+    .node-collapse-icon {
+      transition: transform $transition-time-fast $transition-function;
+    }
+  }
+}
+
+// Node content
+.node-content {
+  padding: $spacing-md;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  min-height: 40px;
+  transition: max-height $transition-time $transition-function, 
+              padding $transition-time $transition-function;
+
+  p {
+    margin: 0 0 $spacing-xs;
+    line-height: $line-height-base;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Content header
+  &-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: $spacing-sm;
+
+    h4 {
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+      margin: 0;
+      color: $text-primary;
+    }
+
+    .content-actions {
+      display: flex;
+      gap: $spacing-xs;
+    }
   }
 
-  .node-content {
-    color: $text-secondary;
-    font-size: 13px;
-    margin-bottom: 6px;
-  }
+  // Content sections
+  &-section {
+    margin-bottom: $spacing-md;
 
-  .node-menu {
-    color: $text-secondary;
-    font-size: 18px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+      color: $text-secondary;
+      margin-bottom: $spacing-xs;
+      letter-spacing: 0.5px;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// Node menu dropdown
+.node-menu {
+  color: inherit;
+  font-size: $font-size-lg;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all $transition-time-fast $transition-function;
+  padding: $spacing-xs;
+  margin: -$spacing-xs;
+  border-radius: $border-radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 1;
+    background-color: rgba($background, 0.2);
+  }
+}
+
+// Node menu dropdown content
+.node-menu-dropdown {
+  position: absolute;
+  top: calc(100% + #{$spacing-xs});
+  right: $spacing-xs;
+  background-color: $surface;
+  border-radius: $border-radius;
+  box-shadow: $shadow-lg;
+  z-index: $z-index-dropdown;
+  width: 180px;
+  overflow: hidden;
+  animation: scaleIn 0.15s $transition-function;
+  border: 1px solid $border-color;
+
+  .menu-item {
+    padding: $spacing-sm $spacing-md;
+    display: flex;
+    align-items: center;
+    font-size: $font-size-sm;
+    color: $text-primary;
+    transition: all $transition-time-fast $transition-function;
     cursor: pointer;
+
+    &:hover {
+      background-color: $surface-variant;
+    }
+
+    &.danger {
+      color: $danger;
+
+      &:hover {
+        background-color: rgba($danger, 0.1);
+      }
+    }
+
+    .menu-icon {
+      margin-right: $spacing-sm;
+      font-size: $font-size-base;
+      opacity: 0.8;
+      width: 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-shortcut {
+      margin-left: auto;
+      color: $text-hint;
+      font-size: $font-size-xs;
+    }
+  }
+
+  .menu-divider {
+    height: 1px;
+    background-color: $border-color;
+    margin: $spacing-xs 0;
   }
 }
 
-.node-header {
-  padding: 10px 15px;
-  background-color: $primary;
-  color: white;
-  border-radius: 8px 8px 0 0;
-  font-weight: 500;
-  font-size: 14px;
-  @include flex(row, space-between, center);
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.node-content {
-  padding: 10px;
+// Node property display
+.node-prop {
+  background-color: $surface-variant;
+  color: $text-secondary;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-xs;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &-name {
+    color: $text-hint;
+    font-size: $font-size-xs;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .prop-badge {
+      background-color: rgba($primary, 0.2);
+      color: $primary;
+      padding: 0 $spacing-xs;
+      border-radius: 10px;
+      font-size: 9px;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &-value {
+    font-weight: $font-weight-medium;
+    word-break: break-word;
+  }
+}
+
+// Special node content styling for different node types
+.message-bubble {
+  background-color: rgba($port-string, 0.1);
+  color: $text-primary;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius $border-radius $border-radius 0;
   position: relative;
+  max-width: 100%;
+  word-break: break-word;
+  margin-bottom: $spacing-xs;
+  font-size: $font-size-sm;
+  box-shadow: $shadow-sm;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 15px;
+    width: 16px;
+    height: 16px;
+    background-color: rgba($port-string, 0.1);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  // Emphasize specific words
+  .emphasis {
+    font-weight: $font-weight-semibold;
+    color: $primary;
+  }
+
+  // Variables in messages
+  .variable {
+    color: $port-number;
+    background-color: rgba($port-number, 0.1);
+    padding: 0 3px;
+    border-radius: 2px;
+    font-family: $font-family-mono;
+    font-size: 0.9em;
+  }
 }
 
-.node-content-separator {
-  width: 100%;
-  height: 1px;
-  background-color: $border;
-  margin: 8px 0;
+.text-node-preview {
+  padding: $spacing-xs 0;
+  word-break: break-word;
+  font-family: $font-family-mono;
+  background-color: rgba($port-text, 0.1);
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  color: $text-primary;
+  border-left: 3px solid $port-text;
+  box-shadow: $shadow-sm;
+}
+
+.input-preview {
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  padding: $spacing-md $spacing-sm $spacing-sm;
+  position: relative;
+  box-shadow: $shadow-sm;
+
+  .input-field-text, .input-field-number, .input-field-email, .input-field-password {
+    background-color: $surface-variant;
+    border-radius: $border-radius-sm;
+    padding: $spacing-xs $spacing-sm;
+    color: $text-hint;
+    font-style: italic;
+    margin-bottom: $spacing-xs;
+  }
+
+  .input-type-badge {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background-color: $port-input;
+    color: $on-primary;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .input-button {
+    text-align: center;
+    margin-top: $spacing-xs;
+
+    .btn-submit {
+      background-color: rgba($port-input, 0.8);
+      color: $on-primary;
+      border: none;
+      border-radius: $border-radius-sm;
+      padding: $spacing-xs $spacing-md;
+      font-size: $font-size-xs;
+      cursor: pointer;
+      transition: all $transition-time-fast $transition-function;
+
+      &:hover {
+        background-color: $port-input;
+        transform: translateY(-1px);
+        box-shadow: $shadow-sm;
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+.options-list {
+  .option-item {
+    background-color: rgba($port-options, 0.1);
+    color: $text-primary;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-sm;
+    margin-bottom: $spacing-xs;
+    position: relative;
+    padding-left: 24px;
+    transition: all $transition-time-fast $transition-function;
+    cursor: default;
+
+    &:hover {
+      background-color: rgba($port-options, 0.2);
+      transform: translateX(2px);
+      box-shadow: $shadow-sm;
+    }
+
+    &::before {
+      content: '•';
+      position: absolute;
+      left: 10px;
+      color: $port-options;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .option-more {
+    font-size: $font-size-xs;
+    color: $text-hint;
+    text-align: center;
+    padding-top: $spacing-xs;
+  }
+}
+
+.options-empty {
+  color: $text-hint;
+  font-style: italic;
+  text-align: center;
+  padding: $spacing-sm 0;
+}
+
+.condition-preview {
+  background-color: rgba($port-condition, 0.1);
+  border-radius: $border-radius-sm;
+  padding: $spacing-sm;
+  font-family: $font-family-mono;
+  font-size: $font-size-xs;
+  color: $text-primary;
+  box-shadow: $shadow-sm;
+
+  .condition-operator {
+    color: $port-condition;
+    font-weight: $font-weight-bold;
+  }
+
+  .condition-value {
+    color: $port-string;
+  }
+
+  .condition-variable {
+    color: $port-number;
+  }
+}
+
+.math-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm;
+
+  .math-operand {
+    background-color: rgba($port-number, 0.1);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    margin: 0 $spacing-xs;
+  }
+
+  .math-operator {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $port-number;
+    margin: 0 $spacing-xs;
+  }
+
+  .math-equals {
+    margin: 0 $spacing-sm;
+    color: $text-secondary;
+  }
+
+  .math-result {
+    background-color: rgba($port-number, 0.2);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.increment-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .increment-variable {
+    background-color: rgba($port-increment, 0.1);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    margin: 0 $spacing-xs;
+    font-family: $font-family-mono;
+  }
+
+  .increment-operation {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $port-increment;
+  }
+
+  .increment-value {
+    background-color: rgba($port-increment, 0.2);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    margin: 0 $spacing-xs;
+  }
+}
+
+.random-preview {
+  text-align: center;
+  padding: $spacing-sm;
+
+  .random-range {
+    font-family: $font-family-mono;
+    color: $port-random;
+    font-weight: $font-weight-bold;
+  }
+
+  .random-description {
+    margin-top: $spacing-xs;
+    font-size: $font-size-xs;
+    color: $text-secondary;
+  }
 }
 
 // Node data ports container
 .node-data-ports-container {
-  @include flex(row, space-between);
-  padding: 8px;
-  border-top: 1px solid $border;
-  margin-top: 5px;
-}
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-xs $spacing-sm;
+  border-top: 1px solid $border-color;
+  margin-top: $spacing-xs;
+  position: relative;
+  z-index: $z-index-port;
 
-// Connection line customization
-.leader-line {
-  z-index: 100;
-
-  &.flow-connection {
-    opacity: 0.9;
+  .data-input-ports, .data-output-ports {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    min-width: 30%;
   }
 
-  &.data-connection {
-    z-index: 4;
-    opacity: 0.8;
+  .data-port-container {
+    position: relative;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+
+    .port-label {
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+      transition: all $transition-time-fast $transition-function;
+
+      &:hover {
+        color: $text-primary;
+      }
+    }
+
+    &:hover {
+      .port-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, -100%);
+      }
+    }
+  }
+
+  .data-input-ports .port-label {
+    margin-left: $spacing-sm;
+    text-align: left;
+  }
+
+  .data-output-ports .port-label {
+    margin-right: $spacing-sm;
+    text-align: right;
+  }
+
+  .data-output-ports {
+    align-items: flex-end;
+  }
+}
+
+// Flow type indicator
+.flow-type-indicator {
+  position: absolute;
+  top: 10px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: $shadow-sm;
+}
+
+// Connection drawing mode
+.connection-drawing-active {
+  cursor: crosshair;
+
+  .node {
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary;
+    }
+  }
+
+  .port {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px rgba($primary, 0.5);
+  }
+}
+
+// Node resize handle
+.node-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  z-index: $z-index-node + 5;
+  opacity: 0;
+
+  .node:hover & {
+    opacity: 1;
+  }
+}
+
+// Node badge
+.node-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: $primary;
+  color: $on-primary;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  border: 2px solid $surface;
+  z-index: $z-index-node + 5;
+  padding: 0 4px;
+  box-shadow: $shadow-sm;
+
+  &.badge-error {
+    background-color: $danger;
+  }
+
+  &.badge-warning {
+    background-color: $warning;
+  }
+
+  &.badge-success {
+    background-color: $success;
+  }
+
+  &.badge-info {
+    background-color: $info;
+  }
+}
+
+// Node footer for additional information
+.node-footer {
+  border-top: 1px solid $border-color;
+  padding: $spacing-xs $spacing-sm;
+  background-color: rgba($surface-variant, 0.5);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .footer-status {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+
+      &.status-active {
+        background-color: $success;
+      }
+
+      &.status-error {
+        background-color: $danger;
+      }
+
+      &.status-pending {
+        background-color: $warning;
+      }
+
+      &.status-idle {
+        background-color: $text-hint;
+      }
+    }
+  }
+
+  .footer-info {
+    font-size: 10px;
+  }
+}
+
+// Execution state indicators
+.node-execution-state {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 5px;
+  border-radius: 2.5px;
+  background-color: $text-hint;
+  width: 60%;
+  z-index: 5;
+
+  &.state-waiting {
+    background-color: $text-hint;
+    animation: pulse 2s infinite;
+  }
+
+  &.state-active {
+    background-color: $warning;
+    animation: glow 1.5s infinite alternate;
+  }
+
+  &.state-complete {
+    background-color: $success;
+  }
+
+  &.state-error {
+    background-color: $danger;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba($warning, 0.5);
+  }
+  to {
+    box-shadow: 0 0 15px rgba($warning, 0.8);
+  }
+}
+
+// Node interactions
+.node-interactive-element {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
+    background-color: rgba($primary, 0.1);
+    border-radius: $border-radius-sm;
+    opacity: 0;
+    transition: opacity $transition-time-fast $transition-function;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+// Connection visualization
+.node-connection-visualization {
+  position: relative;
+
+  .connection-path {
+    stroke-width: 2.5;
+    fill: none;
+
+    &.flow-connection {
+      stroke: $flow-color;
+      stroke-linecap: round;
+    }
+
+    &.data-connection {
+      stroke: $data-color;
+      stroke-linecap: round;
+      stroke-dasharray: 4, 4;
+    }
+  }
+}
+
+// Node validation errors display
+.node-validation-errors {
+  background-color: rgba($danger, 0.1);
+  color: $danger;
+  font-size: $font-size-xs;
+  padding: $spacing-xs $spacing-sm;
+  margin-top: $spacing-xs;
+  border-radius: $border-radius-sm;
+  border-left: 3px solid $danger;
+
+  .validation-error {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: flex-start;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .error-icon {
+      margin-right: $spacing-xs;
+      flex-shrink: 0;
+      transform: translateY(2px);
+    }
+  }
+}
+
+// Node tags
+.node-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-xs;
+
+  .node-tag {
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    padding: 1px 8px;
+    font-size: $font-size-xs;
+    border-radius: 9px;
+    font-weight: $font-weight-medium;
+
+    &.tag-flow {
+      background-color: rgba($flow-color, 0.1);
+      color: $flow-color;
+    }
+
+    &.tag-data {
+      background-color: rgba($data-color, 0.1);
+      color: $data-color;
+    }
+
+    &.tag-required {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+
+    &.tag-optional {
+      background-color: rgba($text-hint, 0.2);
+      color: $text-secondary;
+    }
   }
 }

@@ -4,65 +4,316 @@
 @use 'sass:color';
 
 .btn {
-  padding: 8px 16px;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius;
   border: none;
   cursor: pointer;
-  @include flex(row, flex-start, center);
-  font-weight: 500;
-  @include transition(background-color, 0.2s);
-
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  line-height: $line-height-tight;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  transition: all $transition-time $transition-function;
+  position: relative;
+  overflow: hidden;
+  
   &:active {
     transform: translateY(1px);
   }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary, 0.25);
+  }
+  
+  &:disabled, &.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+  }
 
   &-icon {
-    margin-right: 5px;
+    margin-right: $spacing-xs;
+    font-size: 1.1em;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  // Size variants
+  &-sm {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-sm;
+    border-radius: $border-radius-sm;
+  }
+  
+  &-lg {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-lg;
+    border-radius: $border-radius-lg;
   }
 
   // Button variants
   &-primary {
     background-color: $primary;
     color: white;
-
-    &:hover {
-      background-color: $secondary;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($primary, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($primary, $lightness: -15%);
+    }
+  }
+  
+  &-secondary {
+    background-color: $secondary;
+    color: $background;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($secondary, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($secondary, $lightness: -15%);
+    }
+  }
+  
+  &-accent {
+    background-color: $accent;
+    color: white;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($accent, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($accent, $lightness: -15%);
     }
   }
 
   &-outline {
     background-color: transparent;
-    border: 1px solid $border;
-
-    &:hover {
-      background-color: $light;
+    border: 1px solid $border-color;
+    color: $text-primary;
+    
+    &:hover, &:focus {
+      background-color: rgba($surface-variant, 0.5);
+    }
+    
+    &:active {
+      background-color: $surface-variant;
+    }
+    
+    &.btn-primary {
+      border-color: $primary;
+      color: $primary;
+      
+      &:hover, &:focus {
+        background-color: rgba($primary, 0.1);
+      }
+      
+      &:active {
+        background-color: rgba($primary, 0.2);
+      }
+    }
+    
+    &.btn-secondary {
+      border-color: $secondary;
+      color: $secondary;
+      
+      &:hover, &:focus {
+        background-color: rgba($secondary, 0.1);
+      }
+      
+      &:active {
+        background-color: rgba($secondary, 0.2);
+      }
     }
   }
-
+  
   &-success {
     background-color: $success;
     color: white;
-
-    &:hover {
+    
+    &:hover, &:focus {
       background-color: color.adjust($success, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($success, $lightness: -15%);
+    }
+  }
+  
+  &-danger {
+    background-color: $danger;
+    color: white;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($danger, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($danger, $lightness: -15%);
+    }
+  }
+  
+  &-warning {
+    background-color: $warning;
+    color: $background;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($warning, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($warning, $lightness: -15%);
+    }
+  }
+  
+  &-info {
+    background-color: $info;
+    color: white;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($info, $lightness: -10%);
+    }
+    
+    &:active {
+      background-color: color.adjust($info, $lightness: -15%);
+    }
+  }
+  
+  // Icon only buttons
+  &-icon-only {
+    padding: $spacing-sm;
+    
+    .btn-icon {
+      margin-right: 0;
+    }
+    
+    &.btn-sm {
+      padding: $spacing-xs;
+    }
+    
+    &.btn-lg {
+      padding: $spacing-md;
+    }
+  }
+  
+  // Text buttons (no background)
+  &-text {
+    background-color: transparent;
+    color: $primary;
+    padding: $spacing-xs $spacing-sm;
+    
+    &:hover, &:focus {
+      background-color: rgba($primary, 0.1);
+    }
+    
+    &:active {
+      background-color: rgba($primary, 0.2);
+    }
+  }
+  
+  // Button group
+  &-group {
+    display: inline-flex;
+    
+    .btn {
+      border-radius: 0;
+      
+      &:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      &:first-child {
+        border-top-left-radius: $border-radius;
+        border-bottom-left-radius: $border-radius;
+      }
+      
+      &:last-child {
+        border-top-right-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+      }
     }
   }
 }
 
+// Tool buttons
 .tool {
   width: 40px;
   height: 40px;
-  @include flex(row, center, center);
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $border-radius;
   cursor: pointer;
-  margin-right: 5px;
-
+  margin-bottom: $spacing-sm;
+  transition: all $transition-time-fast $transition-function;
+  background-color: $surface;
+  color: $text-secondary;
+  position: relative;
+  
   &:hover {
-    background-color: $light;
+    background-color: $surface-variant;
+    color: $text-primary;
   }
-
+  
   &.active {
     background-color: $primary;
     color: white;
+    box-shadow: $shadow-sm;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: calc(50% - 4px);
+      width: 8px;
+      height: 8px;
+      background-color: $primary;
+      transform: rotate(45deg);
+    }
+  }
+  
+  &-tooltip {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: $surface-variant;
+    color: $text-primary;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $transition-time-fast $transition-function;
+    pointer-events: none;
+    margin-left: $spacing-md;
+    white-space: nowrap;
+    z-index: $z-index-tooltip;
+    box-shadow: $shadow-sm;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: calc(50% - 4px);
+      width: 8px;
+      height: 8px;
+      background-color: $surface-variant;
+      transform: rotate(45deg);
+    }
+  }
+  
+  &:hover .tool-tooltip {
+    opacity: 1;
+    visibility: visible;
   }
 }

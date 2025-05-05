@@ -1,46 +1,80 @@
 // Workspace styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use 'sass:color';
 
+// Builder content - main container for the builder application
 .builder-content {
   display: flex;
   height: 100vh;
   width: 100%;
   position: relative;
-  transition: none;
-  // No margin-left, content never shifts
+  background-color: $background;
+  overflow: hidden;
 }
 
+// Builder container - holds workspace and right panel
 .builder-container {
   display: flex;
   height: 100vh;
   width: 100%;
+  position: relative;
 }
 
+// Main workspace area - central editing canvas
 .workspace {
   flex-grow: 1;
   height: 100%;
-  overflow: hidden;
   position: relative;
-  width: calc(100% - var(--right-panel-width, $right-panel-width)); /* Adjust for right panel width */
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  width: calc(100% - var(--right-panel-width, #{$right-panel-width}));
+  transition: width $transition-time $transition-function;
+  background-color: $background;
+  overflow: hidden;
+  
+  .right-panel-collapsed & {
+    width: 100%;
+  }
 }
 
+// Canvas container - scrollable area for nodes
 .canvas-container {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: auto;
-  background-color: $light;
+  background-color: $surface;
   background-image:
-    linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px);
+    linear-gradient(to right, rgba($border-color, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba($border-color, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
   scroll-behavior: smooth;
   cursor: grab;
+  
+  // Custom scrollbars
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($text-secondary, 0.2);
+    border-radius: $border-radius;
+    border: 3px solid $surface;
+    
+    &:hover {
+      background-color: rgba($text-secondary, 0.3);
+    }
+  }
 
+  // Cursor states
   &:active {
     cursor: grabbing;
   }
@@ -49,58 +83,677 @@
     cursor: crosshair;
   }
 
+  // Flow connection mode visual indicator
   &.flow-connecting-mode {
-    background-color: rgba($flow-color, 0.05);
+    background-image:
+      linear-gradient(to right, rgba($flow-color, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba($flow-color, 0.07) 1px, transparent 1px);
+    
+    &::after {
+      content: 'Flow Connection Mode';
+      position: absolute;
+      bottom: $spacing-lg;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba($flow-color, 0.9);
+      color: white;
+      padding: $spacing-xs $spacing-md;
+      border-radius: $border-radius;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      z-index: $z-index-tooltip;
+      pointer-events: none;
+      box-shadow: $shadow;
+    }
   }
 
+  // Data connection mode visual indicator
   &.data-connecting-mode {
-    background-color: rgba($data-color, 0.05);
+    background-image:
+      linear-gradient(to right, rgba($data-color, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba($data-color, 0.07) 1px, transparent 1px);
+    
+    &::after {
+      content: 'Data Connection Mode';
+      position: absolute;
+      bottom: $spacing-lg;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba($data-color, 0.9);
+      color: $background;
+      padding: $spacing-xs $spacing-md;
+      border-radius: $border-radius;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      z-index: $z-index-tooltip;
+      pointer-events: none;
+      box-shadow: $shadow;
+    }
   }
 
+  // Focus and selection states
   &:focus,
   &.active {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.25); // subtle purple highlight
-    background-color: $light;
   }
 
   &::selection {
-    background: rgba(187, 134, 252, 0.08); // subtle purple selection
+    background: rgba($primary, 0.1);
   }
 }
 
+// Canvas content - contains all nodes
 .canvas-content {
   position: relative;
   transform-origin: 0 0;
-  min-width: 3000px;
-  min-height: 2000px;
+  min-width: 5000px;
+  min-height: 3000px;
+  
+  // Empty state message
+  &.empty {
+    &::after {
+      content: 'Drag components here to start building your bot flow';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: $text-hint;
+      font-size: $font-size-lg;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+  }
 }
 
+// Canvas overlays and indicators
+// Zoom level indicator
 .zoom-indicator {
   position: absolute;
-  bottom: 15px;
-  right: 15px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 50;
+  bottom: $spacing-md;
+  right: $spacing-md;
+  background-color: rgba($surface-variant, 0.9);
+  color: $text-primary;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  z-index: $z-index-indicator;
   pointer-events: none;
-  opacity: 0.8;
-  @include transition(opacity, 0.3s);
+  box-shadow: $shadow-sm;
+  font-family: monospace;
+  transition: all $transition-time-fast $transition-function;
+  
+  &.fading {
+    opacity: 0;
+  }
 }
 
+// Full-screen overlay for modals/messages
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-index-overlay;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba($background, 0.7);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity $transition-time $transition-function;
+  visibility: hidden;
+  
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  
+  // Overlay message box
+  .overlay-message {
+    background-color: $surface;
+    padding: $spacing-lg;
+    border-radius: $border-radius;
+    box-shadow: $shadow-lg;
+    max-width: 450px;
+    text-align: center;
+    border: 1px solid $border-color;
+    
+    .message-icon {
+      font-size: 48px;
+      color: $primary;
+      margin-bottom: $spacing-md;
+    }
+    
+    h3 {
+      margin-top: 0;
+      color: $text-primary;
+      font-size: $font-size-xl;
+      margin-bottom: $spacing-md;
+      font-weight: $font-weight-semibold;
+    }
+    
+    p {
+      color: $text-secondary;
+      margin-bottom: $spacing-lg;
+      line-height: $line-height-base;
+    }
+    
+    .message-actions {
+      display: flex;
+      justify-content: center;
+      gap: $spacing-md;
+    }
+  }
+}
+
+// Connection lines between nodes
+.connection-line {
+  position: absolute;
+  pointer-events: none;
+  z-index: $z-index-lines;
+  
+  &.flow-connection {
+    stroke: $flow-color;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    
+    &.selected {
+      stroke: lighten($primary, 10%);
+      stroke-width: 3.5;
+      filter: drop-shadow(0 0 3px rgba($primary, 0.5));
+    }
+  }
+  
+  &.data-connection {
+    stroke: $data-color;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 5, 5;
+    
+    &.selected {
+      stroke: lighten($secondary, 10%);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 3px rgba($secondary, 0.5));
+    }
+  }
+  
+  &.temporary {
+    stroke-dasharray: 5, 5;
+    animation: dash 1s linear infinite;
+    stroke-width: 2.5;
+  }
+  
+  &.invalid {
+    stroke: $danger;
+  }
+  
+  // Connection endpoints (dots)
+  .connection-endpoint {
+    fill: $surface;
+    stroke-width: 2;
+    
+    &.source {
+      stroke: $primary;
+    }
+    
+    &.target {
+      stroke: $secondary;
+    }
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+// Connection actions menu
+.connection-actions {
+  position: absolute;
+  background-color: $surface;
+  border-radius: $border-radius;
+  box-shadow: $shadow-lg;
+  padding: $spacing-xs;
+  display: flex;
+  gap: $spacing-xs;
+  z-index: $z-index-popup;
+  border: 1px solid $border-color;
+  
+  .connection-action {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    color: $text-secondary;
+    transition: all $transition-time-fast $transition-function;
+    
+    &:hover {
+      background-color: $surface-variant;
+      color: $text-primary;
+    }
+    
+    &.delete {
+      &:hover {
+        background-color: rgba($danger, 0.1);
+        color: $danger;
+      }
+    }
+  }
+}
+
+// Toolbox floating toolbar
 .toolbox {
-  padding: 10px 15px;
+  padding: $spacing-sm;
   display: flex;
   position: fixed;
-  bottom: 20px;
+  bottom: $spacing-xl;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 150;
-  background: $light;
-  color: $text;
-  border-radius: 8px;
-  @include box-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  z-index: $z-index-toolbox;
+  background-color: $surface;
+  color: $text-primary;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  gap: $spacing-xs;
+  border: 1px solid $border-color;
+  transition: all $transition-time $transition-function;
+  
+  &:hover {
+    transform: translateX(-50%) translateY(-5px);
+  }
+  
+  // Toolbox separator
+  &-separator {
+    width: 1px;
+    background-color: $border-color;
+    margin: 0 $spacing-xs;
+  }
+  
+  // Mobile responsive
+  @media (max-width: $mobile) {
+    bottom: $spacing-md;
+    padding: $spacing-xs;
+    
+    .tool {
+      width: 36px;
+      height: 36px;
+    }
+  }
+}
+
+// Individual tool buttons
+.tool {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $border-radius;
+  cursor: pointer;
+  position: relative;
+  transition: all $transition-time-fast $transition-function;
+  color: $text-secondary;
+  
+  &:hover {
+    background-color: $surface-variant;
+    color: $text-primary;
+    
+    .tool-tooltip {
+      opacity: 1;
+      transform: translateY(-$spacing-xs);
+      visibility: visible;
+    }
+  }
+  
+  &.active {
+    background-color: rgba($primary, 0.15);
+    color: $primary;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: $primary;
+    }
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      background-color: transparent;
+      color: $text-secondary;
+    }
+  }
+}
+
+// Tool icon
+.tool-icon {
+  font-size: $font-size-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Tool tooltip
+.tool-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  padding: $spacing-xs $spacing-sm;
+  background-color: $surface-variant;
+  color: $text-primary;
+  font-size: $font-size-xs;
+  border-radius: $border-radius-sm;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-time-fast $transition-function;
+  box-shadow: $shadow-sm;
+  margin-bottom: $spacing-xs;
+  z-index: $z-index-tooltip;
+  
+  // Tooltip arrow
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: $surface-variant transparent transparent transparent;
+  }
+}
+
+// Selection box for multi-select
+.selection-box {
+  position: absolute;
+  border: 2px dashed $primary;
+  background-color: rgba($primary, 0.1);
+  z-index: $z-index-overlay - 10;
+  pointer-events: none;
+  border-radius: $border-radius-sm;
+}
+
+// Mini-map navigation
+.mini-map {
+  position: absolute;
+  bottom: $spacing-md;
+  left: $spacing-md;
+  width: 200px;
+  height: 150px;
+  background-color: $surface;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $shadow;
+  z-index: $z-index-indicator;
+  transition: all $transition-time $transition-function;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+  
+  // Collapsed state
+  &.collapsed {
+    width: 40px;
+    height: 40px;
+    
+    .mini-map-content {
+      opacity: 0;
+    }
+    
+    .mini-map-toggle {
+      opacity: 1;
+    }
+  }
+  
+  // Mini-map header
+  &-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background-color: $surface-variant;
+    padding: 2px $spacing-xs;
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1;
+  }
+}
+
+// Mini-map content
+.mini-map-content {
+  width: 100%;
+  height: 100%;
+  transition: opacity $transition-time-fast $transition-function;
+  position: relative;
+  padding-top: 20px; // For header
+}
+
+// Mini-map viewport indicator
+.mini-map-viewport {
+  position: absolute;
+  border: 1px solid $primary;
+  background-color: rgba($primary, 0.1);
+  pointer-events: none;
+}
+
+// Mini-map node representations
+.mini-map-node {
+  position: absolute;
+  background-color: $surface-variant;
+  border: 1px solid $border-color;
+  border-radius: 1px;
+  pointer-events: none;
+  transition: all $transition-time-fast $transition-function;
+  
+  &.selected {
+    background-color: rgba($primary, 0.3);
+    border-color: $primary;
+  }
+  
+  // Node type coloring
+  &[data-flow-type='flow'] {
+    border-top: 2px solid $flow-color;
+  }
+  
+  &[data-flow-type='data'] {
+    border-top: 2px solid $data-color;
+  }
+}
+
+// Mini-map toggle button
+.mini-map-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: $spacing-xs;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity $transition-time-fast $transition-function;
+  background-color: rgba($surface-variant, 0.5);
+  border-radius: 0 0 0 $border-radius-sm;
+  z-index: 2;
+  
+  .mini-map:hover & {
+    opacity: 1;
+  }
+  
+  &:hover {
+    background-color: $surface-variant;
+  }
+}
+
+// Context menu
+.context-menu {
+  position: absolute;
+  background-color: $surface;
+  border-radius: $border-radius;
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+  min-width: 180px;
+  z-index: $z-index-popup;
+  overflow: hidden;
+  
+  &-item {
+    padding: $spacing-xs $spacing-md;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: $text-primary;
+    transition: all $transition-time-fast $transition-function;
+    font-size: $font-size-sm;
+    
+    &:hover {
+      background-color: $surface-variant;
+    }
+    
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        background-color: transparent;
+      }
+    }
+    
+    &.danger {
+      color: $danger;
+      
+      &:hover {
+        background-color: rgba($danger, 0.1);
+      }
+    }
+    
+    .item-icon {
+      margin-right: $spacing-sm;
+      font-size: $font-size-base;
+      width: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .item-shortcut {
+      margin-left: auto;
+      color: $text-hint;
+      font-size: $font-size-xs;
+    }
+  }
+  
+  &-divider {
+    height: 1px;
+    background-color: $border-color;
+    margin: $spacing-xs 0;
+  }
+}
+
+// Addition placeholders - these appear when hovering near nodes
+.node-add-placeholder {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-color: $primary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: $font-size-lg;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: $shadow;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-time-fast $transition-function;
+  transform: scale(0.5);
+  
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+  
+  &:hover {
+    transform: scale(1.2);
+    box-shadow: $shadow-lg;
+  }
+  
+  // Positions
+  &.top {
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    
+    &.visible {
+      transform: translateX(-50%) scale(1);
+    }
+    
+    &:hover {
+      transform: translateX(-50%) scale(1.2);
+    }
+  }
+  
+  &.right {
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+    
+    &.visible {
+      transform: translateY(-50%) scale(1);
+    }
+    
+    &:hover {
+      transform: translateY(-50%) scale(1.2);
+    }
+  }
+  
+  &.bottom {
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    
+    &.visible {
+      transform: translateX(-50%) scale(1);
+    }
+    
+    &:hover {
+      transform: translateX(-50%) scale(1.2);
+    }
+  }
+  
+  &.left {
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+    
+    &.visible {
+      transform: translateY(-50%) scale(1);
+    }
+    
+    &:hover {
+      transform: translateY(-50%) scale(1.2);
+    }
+  }
 }

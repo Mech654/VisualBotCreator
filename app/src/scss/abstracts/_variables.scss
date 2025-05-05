@@ -1,37 +1,113 @@
 // Variables
 
-// Colors (Material Dark)
-$primary: #bb86fc; // Soft purple
+// Color System
+// Base Colors
+$primary: #bb86fc; // Primary purple
+$primary-variant: #3700b3; // Darker purple 
 $secondary: #03dac6; // Teal
-$success: #2ecc71; // Keep as is for success
-$danger: #cf6679; // Material red
-$dark: #121212; // Deep black background
-$light: #121212; // Slightly lighter for surfaces
-$border: #222222; // Dark border
-$text: #ffffff; // Main text color
-$text-secondary: #b0b0b0; // Secondary text
+$secondary-variant: #018786; // Darker teal
+$accent: #cf6679; // Accent color for highlights
 
-// Sizes
+// Semantic Colors
+$success: #2ecc71; // Success color
+$warning: #f39c12; // Warning color
+$danger: #cf6679; // Error color
+$info: #3498db; // Info color
+
+// Material Dark Theme 
+$surface: #1e1e1e; // Slightly lighter than background
+$background: #121212; // Deep black background
+$surface-variant: #2d2d2d; // Higher elevation surface
+$border-color: #333333; // Border for UI elements
+$divider: #222222; // Divider between sections
+
+// Text Colors
+$text-primary: #ffffff; // Main text (high emphasis)
+$text-secondary: #b0b0b0; // Secondary text (medium emphasis)
+$text-hint: #888888; // Hint text (low emphasis)
+$text-disabled: #666666; // Disabled text
+
+// Port type colors (Material-inspired)
+$port-control: #e67e22; // Orange for control flow
+$port-string: #03dac6; // Teal for string data
+$port-number: #bb86fc; // Purple for number data
+$port-boolean: #8e44ad; // Purple for boolean data
+$port-object: #33334d; // Dark blue for object data
+$port-array: #03dac6; // Teal for array data
+$port-any: #7f8c8d; // Gray for any data type
+$port-data: #03dac6; // Teal for all data ports
+
+// Flow type colors
+$flow-color: #e67e22; // Orange for control flow
+$data-color: #03dac6; // Teal for data flow
+
+// Layout Sizes
 $panel-width: 250px;
 $right-panel-width: 320px;
 $right-panel-min-width: 250px;
 $right-panel-max-width: 500px;
+$header-height: 60px;
+$toolbox-width: 50px;
+
+// Spacing System
+$spacing-xs: 0.25rem; // 4px
+$spacing-sm: 0.5rem;  // 8px
+$spacing-md: 1rem;    // 16px
+$spacing-lg: 1.5rem;  // 24px
+$spacing-xl: 2rem;    // 32px
+
+// Border Radius
+$border-radius-sm: 4px;
+$border-radius: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-round: 50%;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.18);
+$shadow-xl: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+
+// Typography
+$font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', sans-serif;
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-base: 1.5;
+$line-height-loose: 1.75;
+
+// Animation
 $transition-time: 0.3s;
-$toggle-width: 40px;
+$transition-time-fast: 0.15s;
+$transition-time-slow: 0.5s;
+$transition-function: cubic-bezier(0.4, 0, 0.2, 1);
 
-// Port type colors (Material-inspired)
-$port-control: #e67e22; // Orange for control flow (unchanged)
-$port-string: #03dac6; // Teal for string data
-$port-number: #bb86fc; // Purple for number data
-$port-boolean: #8e44ad; // Purple for boolean data (unchanged)
-$port-object: #33334d; // Dark blue for object data
-$port-array: #03dac6; // Teal for array data
-$port-any: #7f8c8d; // Gray for any data type (unchanged)
-$port-data: #03dac6; // Teal for all data ports
-
-// Flow type colors
-$flow-color: #e67e22; // Orange for control flow (unchanged)
-$data-color: #03dac6; // Teal for data flow
+// Z-index levels
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal: 1040;
+$z-index-popover: 1050;
+$z-index-tooltip: 1060;
 
 // Breakpoints
 $mobile: 768px;
+$tablet: 992px;
+$desktop: 1200px;
+$wide: 1440px;

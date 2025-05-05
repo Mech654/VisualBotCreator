@@ -2,6 +2,75 @@
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
 
+// Header container styles
+.header {
+  background-color: var(--dark);
+  color: var(--light);
+  padding: 0.5rem 1rem;
+  @include flex(row, space-between, center);
+  height: $header-height;
+  width: 100%;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 1100;
+  @include box-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+
+  &__logo {
+    @include flex(row, flex-start, center);
+    gap: 0.75rem;
+    
+    img {
+      max-height: 32px;
+      width: auto;
+    }
+    
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--light);
+    }
+  }
+  
+  &__actions {
+    @include flex(row, flex-end, center);
+    gap: 1rem;
+  }
+  
+  &__nav {
+    @include flex(row, center, center);
+    gap: 1.5rem;
+    
+    a {
+      color: var(--light);
+      text-decoration: none;
+      font-size: 0.95rem;
+      position: relative;
+      padding: 0.5rem 0.25rem;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: var(--primary);
+      }
+      
+      &.active {
+        color: var(--primary);
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background-color: var(--primary);
+          border-radius: 2px;
+        }
+      }
+    }
+  }
+}
+
 // Make sure toggle panel button is clearly visible and clickable
 .toggle-panel {
   position: absolute;
@@ -9,7 +78,7 @@
   top: 75px;
   width: $toggle-width;
   height: 40px;
-  background-color: $dark;
+  background-color: var(--dark);
   color: white;
   @include flex(row, center, center);
   cursor: pointer;
@@ -17,13 +86,198 @@
   font-size: 18px;
   @include box-shadow(2px 0 8px rgba(0, 0, 0, 0.1));
   z-index: 1000;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: $primary;
+    background-color: var(--primary);
+    @include box-shadow(2px 0 12px rgba(0, 0, 0, 0.2));
+  }
+  
+  &:active {
+    transform: translateX(-2px);
+  }
+  
+  .icon {
+    transition: transform 0.3s ease;
+  }
+  
+  &.collapsed .icon {
+    transform: rotate(180deg);
   }
 }
 
 // Ensure proper sidebar behavior in builder page
 .builder-content .side-panel {
   z-index: 1000;
+  transition: transform 0.3s var(--transition-bounce);
+  
+  &.collapsed {
+    transform: translateX(-100%);
+  }
+}
+
+// User info and dropdown in header
+.user-dropdown {
+  position: relative;
+  
+  &__toggle {
+    @include flex(row, center, center);
+    gap: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: $border-radius;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .icon {
+      font-size: 0.8rem;
+      transition: transform 0.2s ease;
+    }
+    
+    &.open .icon {
+      transform: rotate(180deg);
+    }
+  }
+  
+  &__menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: var(--surface);
+    border-radius: $border-radius;
+    min-width: 180px;
+    @include box-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1200;
+    
+    &.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0.5rem 0;
+      margin: 0;
+      
+      li {
+        a, button {
+          display: block;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          text-align: left;
+          font-size: 0.9rem;
+          color: var(--text);
+          background: none;
+          border: none;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          
+          &:hover {
+            background-color: var(--hover);
+          }
+          
+          .icon {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+          }
+        }
+        
+        &.divider {
+          height: 1px;
+          margin: 0.5rem 0;
+          background-color: var(--border-color);
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsive menu button
+@media (max-width: 768px) {
+  .menu-toggle {
+    width: 40px;
+    height: 40px;
+    @include flex(row, center, center);
+    background: none;
+    border: none;
+    color: var(--light);
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0;
+    margin-left: auto;
+    
+    &:hover {
+      color: var(--primary);
+    }
+  }
+  
+  .header__nav {
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: 100%;
+    background-color: var(--dark);
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    border-top: 1px solid var(--border-color);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    
+    &.open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    a {
+      width: 100%;
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: $border-radius;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      &.active::after {
+        display: none;
+      }
+      
+      &.active {
+        background-color: var(--primary);
+        color: var(--light);
+      }
+    }
+  }
 }
