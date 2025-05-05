@@ -129,7 +129,4 @@ export default {
       progress: true,
     }
   },
-  experiments: {
-    outputModule: true,
-  },
 };

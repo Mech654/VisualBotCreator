@@ -28,7 +28,6 @@ const connections: Connection[] = [];
 function createWindow(): void {
   // Construct path relative to the application root
   const iconPath = path.join(app.getAppPath(), 'dist', 'src', 'assets', 'images', 'mascot.png');
-  console.log('Electron app icon path:', iconPath); // Log the icon path for verification
 
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -45,7 +44,9 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    console.log('Electron is running in development mode, loading from http://localhost:4000');
+    // Use the environment variable if provided, otherwise use the default URL
+    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/index.html';
+    console.log(`Electron is running in development mode, loading from ${startUrl}`);
 
     // Add retry logic for connecting to webpack dev server
     let retryCount = 0;
@@ -54,7 +55,7 @@ function createWindow(): void {
 
     const loadApp = () => {
       mainWindow
-        .loadURL('http://localhost:4000/src/index.html')
+        .loadURL(startUrl)
         .catch(err => {
           retryCount++;
           if (retryCount <= maxRetries) {
@@ -403,19 +404,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-if (process.env.NODE_ENV === 'development') {
-  try {
-    require.resolve('electron-reload');
-    require('electron-reload')(__dirname, {
-      electron: require('electron'),
-      awaitWriteFinish: true,
-      ignored: [
-        /dist\/src\//, // Ignore renderer output (served by webpack-dev-server)
-        /node_modules/,
-      ],
-    });
-  } catch (e) {
-    console.warn('electron-reload is not installed. To enable auto-reload, run: npm install --save-dev electron-reload');
-  }
-}

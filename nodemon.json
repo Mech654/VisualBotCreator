@@ -1,0 +1,10 @@
+{
+  "watch": ["dist"],
+  "ignore": [
+    "dist/src/**/*",
+    "node_modules/**/*"
+  ],
+  "exec": "cross-env NODEMON_RESTART=true node restart.js",
+  "ext": "js,mjs",
+  "delay": "1500"
+}
