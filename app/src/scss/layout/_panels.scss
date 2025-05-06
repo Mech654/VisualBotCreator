@@ -38,18 +38,20 @@
   .toggle-right-panel {
     position: absolute;
     top: 75px;
-    left: -50px;
-    width: 44px;
+    left: 0px;
+    margin-left: - 20px;
+    width: 20px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: $border-radius-round;
     border: 2px solid $primary;
+    border-right: none;
+    border-radius: 4px 0px 0px 4px;
     background: rgba($primary, 0.1);
     color: $primary;
     font-size: $font-size-xl;
-    z-index: $z-index-panel + 10;
+    z-index: $z-index-panel - 1;
     cursor: pointer;
     box-shadow: $shadow;
     transition: all $transition-time-fast $transition-function;
@@ -60,16 +62,20 @@
       color: white;
       border-color: $primary;
       box-shadow: $shadow-lg;
-      transform: translateX(-5px);
+      // If expanded, go left; else, go right
+      @if parent-selector('.right-panel.expanded') {
+        transform: translateX(-5px);
+      } @else {
+        transform: translateX(5px);
+      }
     }
     
+    .side-panel.collapsed & {
+      transform: rotate(0deg);
+    }
     // Rotate when panel is expanded
     .right-panel.expanded & {
       transform: rotate(180deg);
-      
-      &:hover {
-        transform: rotate(180deg) translateX(5px);
-      }
     }
   }
   
@@ -292,18 +298,19 @@
   .toggle-panel {
     position: absolute;
     top: 75px;
-    left: 100%;
-    width: 44px;
+    left: calc(100%);
+    width: 20px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: $border-radius-round;
+    //border-radius: $border-radius-round;
     border: 2px solid $primary;
+    border-left: none;
     background: rgba($primary, 0.1);
     color: $primary;
     font-size: $font-size-xl;
-    z-index: $z-index-panel + 10;
+    z-index: -1;
     cursor: pointer;
     box-shadow: $shadow;
     transition: all $transition-time-fast $transition-function;
@@ -314,13 +321,21 @@
       color: white;
       border-color: $primary;
       box-shadow: $shadow-lg;
-      transform: translateX(5px);
+      // If collapsed, go right; else, go left
+      @if parent-selector('.side-panel.collapsed') {
+        transform: translateX(5px);
+      } @else {
+        transform: translateX(-5px);
+      }
     }
     .side-panel.collapsed & {
       transform: rotate(180deg);
+    }
+    .side-panel.expanded & {
+      transform: rotate(0deg);
       
       &:hover {
-        transform: rotate(180deg) translateX(5px);
+        transform: rotate(0deg) translateX(-5px) !important;
       }
     }
   }
