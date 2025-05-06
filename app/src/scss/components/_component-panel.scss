@@ -133,7 +133,7 @@
     
     &-icon {
       position: absolute;
-      left: $spacing-sm + 8px;
+      left: calc($spacing-sm + 0.5rem);
       top: 50%;
       transform: translateY(-50%);
       color: $text-tertiary;
@@ -145,7 +145,7 @@
     
     &-clear {
       position: absolute;
-      right: $spacing-sm + 8px;
+      right: calc($spacing-sm + 0.5rem);
       top: 50%;
       transform: translateY(-50%);
       color: $text-tertiary;

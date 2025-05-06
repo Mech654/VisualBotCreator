@@ -261,7 +261,7 @@
     stroke-linecap: round;
     
     &.selected {
-      stroke: lighten($primary, 10%);
+      stroke: color.adjust($primary, $lightness: 10%);
       stroke-width: 3.5;
       filter: drop-shadow(0 0 3px rgba($primary, 0.5));
     }
@@ -274,7 +274,7 @@
     stroke-dasharray: 5, 5;
     
     &.selected {
-      stroke: lighten($secondary, 10%);
+      stroke: color.adjust($secondary, $lightness: 10%);
       stroke-width: 3;
       filter: drop-shadow(0 0 3px rgba($secondary, 0.5));
     }

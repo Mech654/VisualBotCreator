@@ -8,6 +8,13 @@ $secondary: #03dac6; // Teal
 $secondary-variant: #018786; // Darker teal
 $accent: #cf6679; // Accent color for highlights
 
+// On-colors (text on background colors)
+$on-primary: #000000; // Text on primary - black for contrast
+$on-secondary: #000000; // Text on secondary - black for contrast
+$on-background: #ffffff; // Text on background - white for contrast
+$on-surface: #ffffff; // Text on surface - white for contrast
+$on-error: #ffffff; // Text on error - white for contrast
+
 // Semantic Colors
 $success: #2ecc71; // Success color
 $warning: #f39c12; // Warning color
@@ -16,6 +23,7 @@ $info: #3498db; // Info color
 
 // Material Dark Theme 
 $surface: #1e1e1e; // Slightly lighter than background
+$surface-alt: #252525; // Alternative surface for panels and headers
 $background: #121212; // Deep black background
 $surface-variant: #2d2d2d; // Higher elevation surface
 $border-color: #333333; // Border for UI elements
@@ -24,6 +32,7 @@ $divider: #222222; // Divider between sections
 // Text Colors
 $text-primary: #ffffff; // Main text (high emphasis)
 $text-secondary: #b0b0b0; // Secondary text (medium emphasis)
+$text-tertiary: #666666; // Lower emphasis text
 $text-hint: #888888; // Hint text (low emphasis)
 $text-disabled: #666666; // Disabled text
 
@@ -37,6 +46,15 @@ $port-array: #03dac6; // Teal for array data
 $port-any: #7f8c8d; // Gray for any data type
 $port-data: #03dac6; // Teal for all data ports
 
+// Additional node-specific port colors
+$port-start: #4caf50; // Green for start nodes
+$port-input: #ff9800; // Orange for input nodes
+$port-condition: #9c27b0; // Purple for condition nodes
+$port-options: #f44336; // Red for options nodes
+$port-random: #ffeb3b; // Yellow for random nodes
+$port-increment: #2196f3; // Blue for increment nodes
+$port-text: #795548; // Brown for text nodes
+
 // Flow type colors
 $flow-color: #e67e22; // Orange for control flow
 $data-color: #03dac6; // Teal for data flow
@@ -48,6 +66,7 @@ $right-panel-min-width: 250px;
 $right-panel-max-width: 500px;
 $header-height: 60px;
 $toolbox-width: 50px;
+$toggle-width: 40px;  // Width for toggle buttons/elements
 
 // Spacing System
 $spacing-xs: 0.25rem; // 4px
@@ -59,21 +78,27 @@ $spacing-xl: 2rem;    // 32px
 // Border Radius
 $border-radius-sm: 4px;
 $border-radius: 8px;
+$border-radius-md: 10px;    // Medium radius used in component panel
 $border-radius-lg: 12px;
 $border-radius-xl: 16px;
 $border-radius-round: 50%;
+$border-radius-circle: 50%; // Alias for round, used in component panel
 
 // Shadows
 $shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 $shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+$shadow-md: 0 6px 10px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12); // Medium shadow between regular and large
 $shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.18);
 $shadow-xl: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+$shadow-right: 2px 0 8px rgba(0, 0, 0, 0.15);  // Shadow for right-facing elements like sidebars
 
 // Typography
 $font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', sans-serif;
+$font-family-mono: 'Consolas', 'Monaco', 'Courier New', monospace;  // Added for code/monospace text
 $font-size-xs: 0.75rem;    // 12px
 $font-size-sm: 0.875rem;   // 14px
 $font-size-base: 1rem;     // 16px
+$font-size-md: 1.125rem;   // 18px (medium size)
 $font-size-lg: 1.125rem;   // 18px
 $font-size-xl: 1.25rem;    // 20px
 $font-size-2xl: 1.5rem;    // 24px
@@ -83,6 +108,7 @@ $font-size-4xl: 2.25rem;   // 36px
 // Font Weights
 $font-weight-light: 300;
 $font-weight-normal: 400;
+$font-weight-regular: 400;  // Alias for normal - added for consistency
 $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
@@ -102,9 +128,22 @@ $transition-function: cubic-bezier(0.4, 0, 0.2, 1);
 $z-index-dropdown: 1000;
 $z-index-sticky: 1020;
 $z-index-fixed: 1030;
+$z-index-panel: 1032;     // UI panels like sidebars and right panels
+$z-index-sidebar: 1035;   // Sidebar should be above fixed elements but below modals
 $z-index-modal: 1040;
 $z-index-popover: 1050;
 $z-index-tooltip: 1060;
+// Workspace-specific z-index values
+$z-index-lines: 900;       // Connection lines between nodes
+$z-index-node: 1000;       // Nodes in the workspace
+$z-index-port: 1005;       // Connection ports on nodes
+$z-index-indicator: 1010;  // UI indicators like zoom level and mini-map
+$z-index-toolbox: 1015;    // Floating toolbox
+$z-index-popup: 1045;      // Context menus and popups
+$z-index-overlay: 1070;    // Full-screen overlays
+$z-index-drag-preview: 1090; // Dragging component preview
+$z-index-node-dragging: 1080; // Dragging nodes
+$z-index-node-selected: 1100; // Selected nodes
 
 // Breakpoints
 $mobile: 768px;

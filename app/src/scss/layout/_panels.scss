@@ -276,9 +276,7 @@
       white-space: nowrap;
     }
     
-    .toggle-panel {
-      transform: rotate(180deg);
-    }
+
     
     .menu-item {
       justify-content: center;
@@ -290,29 +288,40 @@
     }
   }
   
-  // Side panel toggle button
+  // Side panel toggle button (mirrors right panel toggle)
   .toggle-panel {
     position: absolute;
-    top: 15px;
-    right: -15px;
-    width: 30px;
-    height: 30px;
+    top: 75px;
+    left: 100%;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: $border-radius-round;
-    border: 1px solid $border-color;
-    background: $surface;
-    color: $text-secondary;
-    font-size: $font-size-sm;
-    z-index: 10;
+    border: 2px solid $primary;
+    background: rgba($primary, 0.1);
+    color: $primary;
+    font-size: $font-size-xl;
+    z-index: $z-index-panel + 10;
     cursor: pointer;
-    box-shadow: $shadow-sm;
+    box-shadow: $shadow;
     transition: all $transition-time-fast $transition-function;
+    outline: none;
     
-    &:hover {
-      background: $surface-variant;
-      color: $text-primary;
+    &:hover, &:focus {
+      background: $primary;
+      color: white;
+      border-color: $primary;
+      box-shadow: $shadow-lg;
+      transform: translateX(5px);
+    }
+    .side-panel.collapsed & {
+      transform: rotate(180deg);
+      
+      &:hover {
+        transform: rotate(180deg) translateX(5px);
+      }
     }
   }
   

@@ -27,6 +27,30 @@
   box-shadow: $shadow;
 }
 
+// Custom scrollbar styling
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($text-secondary, 0.2);
+    border-radius: $border-radius;
+    
+    &:hover {
+      background-color: rgba($text-secondary, 0.3);
+    }
+  }
+  
+  scrollbar-width: thin;
+  scrollbar-color: rgba($text-secondary, 0.2) transparent;
+}
+
 // Node styling
 @mixin node-base {
   position: absolute;

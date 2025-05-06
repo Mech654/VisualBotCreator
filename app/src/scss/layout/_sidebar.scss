@@ -15,7 +15,8 @@
   left: 0;
   top: 0;
   bottom: 0;
-  transition: all $transition-time $transition-function;
+  transition: width $transition-time $transition-function,
+              transform $transition-time $transition-function; /* Added transform for smooth animations */
   box-shadow: $shadow-right;
   border-right: 1px solid $border-color;
   
@@ -53,38 +54,10 @@
         margin-right: 0;
       }
     }
-    
-    .toggle-panel {
-      transform: rotate(180deg);
-    }
   }
 }
 
-.toggle-panel {
-  position: absolute;
-  top: 50%;
-  right: -16px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: $surface;
-  color: $text-secondary;
-  font-size: $font-size-lg;
-  z-index: $z-index-sidebar + 10;
-  cursor: pointer;
-  box-shadow: $shadow-sm;
-  transition: all $transition-time-fast $transition-function;
-  border: 1px solid $border-color;
-  transform: translateY(-50%);
-  
-  &:hover {
-    color: $primary;
-    background-color: rgba($primary, 0.1);
-  }
-}
+// Toggle panel is now defined in panels.scss to avoid duplication
 
 .logo {
   padding: $spacing-md $spacing-md $spacing-lg;

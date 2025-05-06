@@ -427,14 +427,21 @@ function injectTransitionStyles(): void {
     
     .transition-content {
       display: flex;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       gap: 16px;
+      text-align: center;
     }
     
     .transition-icon {
       font-size: 48px;
       animation: pulse 1.5s infinite;
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
     }
     
     .transition-message {

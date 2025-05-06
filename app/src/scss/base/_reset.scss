@@ -12,6 +12,18 @@
   --right-panel-width: 320px;
   --right-panel-min-width: 250px;
   --right-panel-max-width: 500px;
+  
+  // Color variables for CSS usage
+  --primary-color: #{$primary};
+  --secondary-color: #{$secondary};
+  --surface: #{$surface};
+  --background: #{$background};
+  --text: #{$text-primary};
+  --text-light: #{$text-secondary};
+  --border-color: #{$border-color};
+  --hover: #{$surface-variant};
+  --dark: #{$background};
+  --light: #{$text-primary};
 }
 
 html,
@@ -21,7 +33,7 @@ body {
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: $dark;
+  background-color: $background;
 }
 
 // Override default focus styles

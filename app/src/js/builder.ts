@@ -72,27 +72,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   addRippleEffect('.menu-item');
   addRippleEffect('.toolbar-button');
 
-  // Side panel toggle with improved animation
+  // Side panel expand/collapse with improved animation (mirroring right panel logic)
   const togglePanel = document.querySelector('.toggle-panel');
-  togglePanel?.addEventListener('click', (e) => {
-    if (sidePanel) {
-      sidePanel.classList.toggle('expanded');
-      
+  if (sidePanel && togglePanel) {
+    togglePanel.addEventListener('click', (e) => {
       // Create ripple effect for the toggle button
       createRippleEffect(togglePanel as HTMLElement, e as MouseEvent);
-      
-      // Highlight the workspace to indicate the layout change
-      if (workspace) {
-        setTimeout(() => {
-          workspace.style.transition = 'background-color 0.3s ease';
-          workspace.style.backgroundColor = 'rgba(0,0,0,0.05)';
-          setTimeout(() => {
-            workspace.style.backgroundColor = '';
-          }, 300);
-        }, 100);
+      const isCollapsed = sidePanel.classList.contains('collapsed');
+      if (isCollapsed) {
+        // Expanding the panel
+        sidePanel.classList.remove('collapsed');
+        togglePanel.textContent = '«';
+        enterTransition(sidePanel, 'slide-right', 300);
+      } else {
+        exitTransition(sidePanel, 'slide-right', 300, 0, false)
+          .then(() => {
+            sidePanel.classList.add('collapsed');
+            togglePanel.textContent = '»';
+          });
       }
-    }
-  });
+    });
+    // Initially expanded
+    sidePanel.classList.remove('collapsed');
+    togglePanel.textContent = '«';
+  }
 
   // Right panel expand/collapse with improved animation
   const rightToggle = rightPanel?.querySelector('.toggle-right-panel');
@@ -232,28 +235,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Create and add new node
     try {
-      const nodeInstance = await createNodeInstance(
+      const result = await createNodeInstance(
         nodeType,
         snappedX,
         snappedY,
-        `${nodeType}-${Math.floor(Math.random() * 1000)}`,
         flowType
       );
       
-      const newNodeElement = document.getElementById(nodeInstance.id) as HTMLElement;
-      if (newNodeElement) {
+      if (result) {
+        const { nodeElement, nodeInstance } = result;
         // Add entrance animation for the new node
-        enterTransition(newNodeElement, 'scale', 300);
+        enterTransition(nodeElement, 'scale', 300);
         
         // Highlight the node briefly to draw attention
         setTimeout(() => {
-          highlightElement(newNodeElement, 'var(--primary)', 800);
+          highlightElement(nodeElement, 'var(--primary)', 800);
         }, 300);
         
-        allNodes = [...allNodes, newNodeElement];
+        allNodes = [...allNodes, nodeElement];
         
         // Make the new node draggable
-        initDraggableNodes([newNodeElement], allNodes);
+        initDraggableNodes([nodeElement], allNodes);
       }
       
       showNotification(`Added ${nodeType} node`, 'success');
@@ -271,8 +273,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Animate the node before removal
         exitTransition(selectedNode, 'scale', 200)
           .then(() => {
+            // Store the id before deleting the node for filtering the array
             const nodeId = selectedNode.id;
-            deleteNode(nodeId);
+            // Pass the HTMLElement to the deleteNode function
+            deleteNode(selectedNode);
+            // Update our allNodes array to remove the deleted node
             allNodes = allNodes.filter(node => node.id !== nodeId);
             
             showNotification('Node deleted', 'info');
@@ -387,23 +392,24 @@ async function loadProject(file: File): Promise<void> {
     
     // Create and position all nodes first
     const nodePromises = project.nodes.map(async (nodeData: any) => {
-      const node = await createNodeInstance(
+      const result = await createNodeInstance(
         nodeData.type,
         nodeData.x,
         nodeData.y,
-        nodeData.id,
-        'flow',
-        JSON.parse(nodeData.data)
+        'flow' // Use flow as default flowType
       );
       
-      const nodeElement = document.getElementById(nodeData.id) as HTMLElement;
-      if (nodeElement) {
-        allLoadedNodes.push(nodeElement);
+      // If node creation succeeded, set the ID to match the saved one
+      if (result && result.nodeElement) {
+        result.nodeElement.id = nodeData.id;
+        result.nodeElement.dataset.nodeId = nodeData.id;
+        
+        allLoadedNodes.push(result.nodeElement);
         
         // Apply fade in animation to each loaded node
-        enterTransition(nodeElement, 'fade', 100);
+        enterTransition(result.nodeElement, 'fade', 100);
       }
-      return node;
+      return result;
     });
     
     await Promise.all(nodePromises);
