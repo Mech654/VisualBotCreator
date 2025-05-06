@@ -79,22 +79,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Create ripple effect for the toggle button
       createRippleEffect(togglePanel as HTMLElement, e as MouseEvent);
       const isCollapsed = sidePanel.classList.contains('collapsed');
+      
+      // We need to create the p element if it doesn't exist
+      let toggleSymbol = togglePanel.querySelector('.toggle-button-symbol');
+      if (!toggleSymbol) {
+        toggleSymbol = document.createElement('p');
+        toggleSymbol.className = 'toggle-button-symbol';
+        togglePanel.appendChild(toggleSymbol);
+      }
+      
       if (isCollapsed) {
         // Expanding the panel
         sidePanel.classList.remove('collapsed');
-        togglePanel.textContent = '«';
+        if (toggleSymbol) {
+          toggleSymbol.textContent = '«';
+        }
         enterTransition(sidePanel, 'slide-right', 300);
       } else {
         exitTransition(sidePanel, 'slide-right', 300, 0, false)
           .then(() => {
             sidePanel.classList.add('collapsed');
-            togglePanel.textContent = '»';
+            if (toggleSymbol) {
+              toggleSymbol.textContent = '»';
+            }
           });
       }
     });
+    
     // Initially expanded
     sidePanel.classList.remove('collapsed');
-    togglePanel.textContent = '«';
+    
+    // Setup initial toggle symbol content
+    let toggleSymbol = togglePanel.querySelector('.toggle-button-symbol');
+    if (!toggleSymbol) {
+      toggleSymbol = document.createElement('p');
+      toggleSymbol.className = 'toggle-button-symbol';
+      togglePanel.appendChild(toggleSymbol);
+    }
+    toggleSymbol.textContent = '«';
   }
 
   // Right panel expand/collapse with improved animation
@@ -105,23 +127,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       createRippleEffect(rightToggle as HTMLElement, e as MouseEvent);
       
       const isExpanded = rightPanel.classList.contains('expanded');
+      const toggleSymbol = rightToggle.querySelector('.toggle-button-symbol');
       
       if (isExpanded) {
         exitTransition(rightPanel, 'slide-left', 300, 0, false)
           .then(() => {
             rightPanel.classList.remove('expanded');
-            rightToggle.textContent = '«';
+            if (toggleSymbol) {
+              toggleSymbol.textContent = '«';
+            }
           });
       } else {
         rightPanel.classList.add('expanded');
-        rightToggle.textContent = '»';
+        if (toggleSymbol) {
+          toggleSymbol.textContent = '»';
+        }
         enterTransition(rightPanel, 'slide-left', 300);
       }
     });
     
     // Initially expanded
     rightPanel.classList.add('expanded');
-    rightToggle.textContent = '»';
+    const toggleSymbol = rightToggle.querySelector('.toggle-button-symbol');
+    if (toggleSymbol) {
+      toggleSymbol.textContent = '»';
+    }
   }
 
   // Toggle between components and properties panel with smooth transition
