@@ -25,7 +25,7 @@ An awesome software to create and manage your own bots.
    ```
 4. Start the application in dev mode:
    ```bash
-   npm run dev
+   npm run dev:all
    ```
 
 ## Contributing
