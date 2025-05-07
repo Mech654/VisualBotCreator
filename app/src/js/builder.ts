@@ -240,22 +240,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     let flowType = 'flow';
     
     try {
-      const nodeData = JSON.parse(nodeType);
+      // Try to parse as JSON, but if that fails, use the string directly
+      const nodeData = JSON.parse(dataTransfer.getData('application/json') || nodeType);
       nodeType = nodeData.type;
       flowType = nodeData.flowType || 'flow';
     } catch (err) {
       // If not JSON, use the string directly
+      console.log('Using direct type:', nodeType);
     }
     
     if (!canvasContent) return;
     
-    // Calculate drop position and snap to grid
+    // Calculate drop position with proper zoom handling
     const canvasRect = canvas.getBoundingClientRect();
     const currentZoom = parseFloat(canvas.dataset.zoomLevel || '1');
+    
+    // Get the proper position accounting for scroll position and zoom
     const x = (e.clientX - canvasRect.left + canvas.scrollLeft) / currentZoom;
     const y = (e.clientY - canvasRect.top + canvas.scrollTop) / currentZoom;
+    
+    // Offset to center the node under the cursor
     const snappedX = snapToGrid(x - 90);
     const snappedY = snapToGrid(y - 50);
+    
+    console.log(`Drop position: x=${x}, y=${y}, snapped: x=${snappedX}, y=${snappedY}`);
     
     // Prevent node overlap
     if (!checkPositionValidity(snappedX, snappedY, 220, 150, allNodes)) {
@@ -274,6 +282,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (result) {
         const { nodeElement, nodeInstance } = result;
+        
+        // Ensure the node is visible with proper styles
+        nodeElement.style.display = 'block';
+        nodeElement.style.visibility = 'visible';
+        nodeElement.style.opacity = '1';
+        nodeElement.style.position = 'absolute';
+        nodeElement.style.left = `${snappedX}px`;
+        nodeElement.style.top = `${snappedY}px`;
+        
+        // Explicitly add to canvas content
+        canvasContent.appendChild(nodeElement);
+        
         // Add entrance animation for the new node
         enterTransition(nodeElement, 'scale', 300);
         
@@ -286,6 +306,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Make the new node draggable
         initDraggableNodes([nodeElement], allNodes);
+        
+        console.log(`Successfully added ${nodeType} node at x=${snappedX}, y=${snappedY}`);
       }
       
       showNotification(`Added ${nodeType} node`, 'success');

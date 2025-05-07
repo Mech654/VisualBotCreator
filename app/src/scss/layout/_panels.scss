@@ -361,12 +361,11 @@
         transform: rotate(0deg) translateX(-5px) !important;
       }
     }
-    
-    // Apply centering to the toggle button symbol
+
     .toggle-button-symbol {
-      font-size: 18px; /* Consistent font size with the other toggle */
+      font-size: 18px; 
       position: relative;
-      top: -3px; /* Slight vertical adjustment */
+      top: 6px; 
     }
   }
   

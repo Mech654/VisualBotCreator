@@ -233,13 +233,11 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
             target.style.zIndex = '10';
             target.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
 
-            // Reset transition after a short delay
             setTimeout(() => {
               target.style.transition = 'box-shadow 0.2s ease';
             }, 150);
           },
         },
-        // Prevent default drag behaviors
         autoScroll: true,
         inertia: false,
       });
@@ -267,14 +265,21 @@ export function checkCollision(
  * Set up canvas drop area for component drag and drop
  */
 export function setupCanvasDropArea(canvas: HTMLElement): void {
+  const originalBgColor = canvas.style.backgroundColor || '#1e1e1e';
+  
   canvas.addEventListener('dragover', e => {
     e.preventDefault();
-    // Visual indicator for valid drop target
-    canvas.style.backgroundColor = '#e9f5fe';
+    canvas.style.backgroundColor = 'rgba(30, 30, 30, 0.9)';
+    canvas.style.cursor = 'copy';
   });
 
   canvas.addEventListener('dragleave', () => {
-    // Restore canvas background
-    canvas.style.backgroundColor = '#f0f4f8';
+    canvas.style.backgroundColor = originalBgColor;
+    canvas.style.cursor = 'default';
+  });
+  
+  canvas.addEventListener('drop', () => {
+    canvas.style.backgroundColor = originalBgColor;
+    canvas.style.cursor = 'default';
   });
 }
