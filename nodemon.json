@@ -1,10 +1,16 @@
 {
-  "watch": ["dist"],
+  "watch": ["dist", "app/main.ts", "app/preload.ts", "dist/.restart-trigger"],
   "ignore": [
-    "dist/src/**/*",
+    "dist/src/**/*.js.map",
+    "dist/src/styles/**/*",
     "node_modules/**/*"
   ],
-  "exec": "cross-env NODEMON_RESTART=true node restart.js",
-  "ext": "js,mjs",
-  "delay": "1500"
+  "exec": "cross-env NODEMON_RESTART=true RESTART_DELAY=1000 NODE_ENV=development node restart.js",
+  "ext": "js,mjs,json",
+  "delay": "500",
+  "events": {
+    "restart": "echo \"🔄 Restarting application...\""
+  },
+  "restartable": "rs",
+  "verbose": true
 }

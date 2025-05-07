@@ -20,7 +20,7 @@ export function updateNodePosition(node: HTMLElement): void {
   // Update any connections attached to this node
   updateConnections();
 }
-
+//hey
 /**
  * Check if adding a node at a position would collide with existing nodes
  */
