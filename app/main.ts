@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -28,6 +28,7 @@ const connections: Connection[] = [];
 function createWindow(): void {
   // Construct path relative to the application root
   const iconPath = path.join(app.getAppPath(), 'dist', 'src', 'assets', 'images', 'mascot.png');
+  Menu.setApplicationMenu(null);
 
   const mainWindow = new BrowserWindow({
     width: 1200,

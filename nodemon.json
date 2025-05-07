@@ -8,9 +8,9 @@
   "exec": "cross-env NODEMON_RESTART=true RESTART_DELAY=1000 NODE_ENV=development node restart.js",
   "ext": "js,mjs,json",
   "delay": "500",
-  "events": {
-    "restart": "echo \"🔄 Restarting application...\""
-  },
+  "quiet": true,
+  "stdout": false,
+  "stdin": true,
   "restartable": "rs",
-  "verbose": true
+  "verbose": false
 }
