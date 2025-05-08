@@ -9,7 +9,11 @@ interface ActionItem {
   danger?: boolean;
 }
 
+// Remove js-loading class when CSS is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Remove js-loading class to fade in content
+  document.body.classList.remove('js-loading');
+  
   document.querySelectorAll('.bot-action').forEach(action => {
     action.addEventListener('click', e => {
       e.stopPropagation();

@@ -46,6 +46,9 @@ interface Window {
 // Main builder logic
 // ------------------
 document.addEventListener('DOMContentLoaded', async () => {
+  // Remove js-loading class to fade in content
+  document.body.classList.remove('js-loading');
+  
   let allNodes = Array.from(document.querySelectorAll('.node')) as HTMLElement[];
   await loadLeaderLineScript();
   setupComponentPanelResize();
