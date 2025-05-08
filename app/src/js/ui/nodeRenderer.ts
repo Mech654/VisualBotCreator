@@ -81,10 +81,10 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
             return `
             <div class="data-port-container">
               <div class="${buildPortClassList(['port', 'input-port'], input.dataType)}" 
-                   data-port-id="${input.id}" 
-                   data-port-type="${input.dataType}" 
-                   data-port-category="${getPortCategory(input.dataType)}"
-                   title="${input.label}: ${input.dataType}">
+                  data-port-id="${input.id}" 
+                  data-port-type="${input.dataType}" 
+                  data-port-category="${getPortCategory(input.dataType)}"
+                  title="${input.label}: ${input.dataType}">
               </div>
               <span class="port-label">${input.label}</span>
             </div>
@@ -98,10 +98,10 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
             return `
             <div class="data-port-container">
               <div class="${buildPortClassList(['port', 'output-port'], output.dataType)}" 
-                   data-port-id="${output.id}" 
-                   data-port-type="${output.dataType}" 
-                   data-port-category="${getPortCategory(output.dataType)}"
-                   title="${output.label}: ${output.dataType}">
+                  data-port-id="${output.id}" 
+                  data-port-type="${output.dataType}" 
+                  data-port-category="${getPortCategory(output.dataType)}"
+                  title="${output.label}: ${output.dataType}">
               </div>
               <span class="port-label">${output.label}</span>
             </div>

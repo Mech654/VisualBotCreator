@@ -4,6 +4,7 @@ import { snapToGrid } from '../utils/grid';
 import { updateConnections } from './connectionService';
 import { checkCollision } from './dragDropService';
 import { initNodeConnections, removeNodeConnections } from './connectionService';
+import { updateNodeElementContent, setupPropertyEventListeners } from '../ui/nodeUI';
 
 // Store node positions for collision detection
 const nodePositions = new Map<HTMLElement, NodePosition>();
@@ -20,7 +21,7 @@ export function updateNodePosition(node: HTMLElement): void {
   // Update any connections attached to this node
   updateConnections();
 }
-//hey
+
 /**
  * Check if adding a node at a position would collide with existing nodes
  */
@@ -107,46 +108,23 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
   propertiesGroup.className = 'property-group';
 
   try {
-    // Request the HTML for this node's property panel from the backend
-    window.nodeSystem
-      .getNodeById(nodeInstance.id)
-      .then((node: any) => {
-        // If the node exists and has a generatePropertiesPanel method, use it
-        if (node) {
-          // Generate the HTML content through the Node API
-          propertiesGroup.innerHTML = node.generatePropertiesPanel
-            ? node.generatePropertiesPanel()
-            : generateDefaultPropertiesPanel(nodeInstance);
+    // Generate the HTML for the property panel
+    propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
+    propertiesPanel.appendChild(propertiesGroup);
 
-          // Add the properties group to the panel
-          propertiesPanel.appendChild(propertiesGroup);
-
-          // Set up event listeners
-          if (node.setupPropertyEventListeners) {
-            node.setupPropertyEventListeners(propertiesGroup);
-          }
-
-          // Add a change event handler that updates the node in the backend
-          const inputs = propertiesGroup.querySelectorAll('input, textarea, select');
-          inputs.forEach(input => {
-            input.addEventListener('change', () => {
-              // Update the node in the backend
-              window.nodeSystem
-                .createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties)
-                .catch((error: unknown) => console.error('Error updating node:', error));
-            });
-          });
-        }
-      })
-      .catch((error: unknown) => {
-        console.error('Error fetching node for properties panel:', error);
-        // Fallback to generic panel
-        propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
-        propertiesPanel.appendChild(propertiesGroup);
-      });
-  } catch (error: unknown) {
+    // Attach event listeners for property changes
+    setupPropertyEventListeners(nodeInstance, propertiesGroup, (key, value) => {
+      nodeInstance.properties[key] = value;
+      // Optionally, update the backend here if needed
+      // window.nodeSystem.createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties);
+      // Update the node element content in the UI
+      const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
+      if (nodeElement) {
+        updateNodeElementContent(nodeInstance, nodeElement);
+      }
+    });
+  } catch (error) {
     console.error('Error generating properties panel:', error);
-    // Fallback to generic panel
     propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
     propertiesPanel.appendChild(propertiesGroup);
   }

@@ -39,40 +39,6 @@ export class ConditionNode extends Node {
     this.properties.nodeContent = `<p class="condition-expression">if (${this.properties.condition}) { ... }</p>`;
     return this.properties.nodeContent;
   }
-  /** Override the default property panel with a custom one */
-  generatePropertiesPanel(): string {
-    return `
-      <div class="property-group-title">Condition</div>
-      <div class="property-item" data-tooltip="Enter a condition to evaluate">
-        <div class="property-label">Expression</div>
-        <input type="text" class="property-input condition-expression" 
-               value="${this.properties.condition}" 
-               aria-label="Condition expression">
-      </div>
-      <div class="property-item">
-        <div class="property-label">Help</div>
-        <div class="condition-help">
-          <p>Use 'value' to refer to the input value.</p>
-          <p>Examples:</p>
-          <ul>
-            <li>value == true</li>
-            <li>value > 10</li>
-            <li>value != "error"</li>
-          </ul>
-        </div>
-      </div>
-    `;
-  }
-  /** Set up event listeners for the condition node property panel */
-  setupPropertyEventListeners(panel: HTMLElement): void {
-    const expressionInput = panel.querySelector('.condition-expression') as HTMLInputElement;
-    if (expressionInput) {
-      expressionInput.addEventListener('change', () => {
-        this.properties.condition = expressionInput.value;
-        this.updateNodeContent();
-      });
-    }
-  }
 
   process(inputValues: Record<string, any>): Record<string, any> {
     let result = false;

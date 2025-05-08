@@ -36,32 +36,6 @@ export class IncrementNode extends Node {
     this.properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${this.properties.incrementBy}</span></div>`;
     return this.properties.nodeContent;
   }
-  generatePropertiesPanel(): string {
-    return `
-            <div class="property-group-title">Increment Settings</div>
-            <div class="property-item" data-tooltip="Amount to increment the input number by">
-                <div class="property-label">Increment By</div>
-                <input type="number" class="property-input increment-by-value" 
-                       value="${this.properties.incrementBy || 1}" step="1">
-            </div>
-            <div class="property-item">
-                <div class="property-label">Description</div>
-                <div class="property-value">
-                    This node takes a number input and adds the specified increment value to it.
-                </div>
-            </div>
-        `;
-  }
-  setupPropertyEventListeners(panel: HTMLElement): void {
-    const incrementInput = panel.querySelector('.increment-by-value') as HTMLInputElement;
-
-    if (incrementInput) {
-      incrementInput.addEventListener('change', () => {
-        this.properties.incrementBy = Number(incrementInput.value);
-        this.updateNodeContent();
-      });
-    }
-  }
 
   process(inputValues: Record<string, any>): Record<string, any> {
     const inputNumber = typeof inputValues['number'] === 'number' ? inputValues['number'] : 0;

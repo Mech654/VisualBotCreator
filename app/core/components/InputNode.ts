@@ -93,39 +93,6 @@ export class InputNode extends Node {
     `;
   }
 
-  setupPropertyEventListeners(panel: HTMLElement): void {
-    const placeholderInput = panel.querySelector('.input-placeholder') as HTMLInputElement;
-    const variableInput = panel.querySelector('.input-variable') as HTMLInputElement;
-    const typeSelect = panel.querySelector('.input-type') as HTMLSelectElement;
-    const validationInput = panel.querySelector('.input-validation') as HTMLInputElement;
-
-    if (placeholderInput) {
-      placeholderInput.addEventListener('change', () => {
-        this.properties.placeholder = placeholderInput.value;
-        this.updateNodeContent();
-      });
-    }
-
-    if (variableInput) {
-      variableInput.addEventListener('change', () => {
-        this.properties.variableName = variableInput.value;
-      });
-    }
-
-    if (typeSelect) {
-      typeSelect.addEventListener('change', () => {
-        this.properties.inputType = typeSelect.value as any;
-        this.updateNodeContent();
-      });
-    }
-
-    if (validationInput) {
-      validationInput.addEventListener('change', () => {
-        this.properties.validation = validationInput.value || null;
-      });
-    }
-  }
-
   process(inputValues: Record<string, any>, userInput: string = ''): Record<string, any> {
     let isValid = true;
     if (this.properties.validation && userInput) {
