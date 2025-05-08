@@ -113,14 +113,30 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
     propertiesPanel.appendChild(propertiesGroup);
 
     // Attach event listeners for property changes
-    setupPropertyEventListeners(nodeInstance, propertiesGroup, (key, value) => {
+    setupPropertyEventListeners(nodeInstance, propertiesGroup, async (key, value) => {
       nodeInstance.properties[key] = value;
-      // Optionally, update the backend here if needed
-      // window.nodeSystem.createNode(nodeInstance.type, nodeInstance.id, nodeInstance.properties);
-      // Update the node element content in the UI
-      const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
-      if (nodeElement) {
-        updateNodeElementContent(nodeInstance, nodeElement);
+      // Request backend to update node and get new nodeContent
+      try {
+        const updatedNode = await window.nodeSystem.createNode(
+          nodeInstance.type,
+          nodeInstance.id,
+          nodeInstance.properties
+        );
+        // Update nodeInstance with new properties and nodeContent
+        nodeInstance.properties = updatedNode.properties;
+        // Update the node element content in the UI
+        const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
+        if (nodeElement) {
+          // Update the main node content (visual area)
+          const contentEl = nodeElement.querySelector('.node-content');
+          if (contentEl && updatedNode.properties.nodeContent) {
+            contentEl.innerHTML = updatedNode.properties.nodeContent;
+          }
+          // Update any other property-key elements
+          updateNodeElementContent(nodeInstance, nodeElement);
+        }
+      } catch (err) {
+        console.error('Failed to update node content:', err);
       }
     });
   } catch (error) {
