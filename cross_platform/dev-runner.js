@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * dev-runner.js - Clean development runner that hides all npm verbosity
- * 
- * This script runs the development environment with minimal console output
+ * dev-runner.js - Clean development runner that hides npm verbosity
  */
 
 import { spawn } from 'child_process';
@@ -29,6 +27,7 @@ async function runCommand(command, args, options = {}) {
         ...process.env,
         npm_config_loglevel: 'silent',
         npm_config_progress: 'false',
+        SUPPRESS_HTML_LOGS: 'true'
       }
     });
     
@@ -42,6 +41,12 @@ async function runCommand(command, args, options = {}) {
       // Filter and display important messages
       const lines = data.toString().split('\n');
       for (const line of lines) {
+        // Skip HTML processing messages in the initial setup
+        if ((line.includes('Processing HTML') || line.includes('HTML ready')) && 
+            !line.includes('Starting development servers')) {
+          continue;
+        }
+        
         if (line.includes('Cleaning') || 
             line.includes('Starting') || 
             line.includes('Building') || 
@@ -101,7 +106,7 @@ async function main() {
         npm_config_loglevel: 'silent',
         npm_config_progress: 'false',
       },
-      stdio: 'inherit'  // Use inherit to preserve process signals properly
+      stdio: 'inherit'
     });
     
     // Handle process exit
