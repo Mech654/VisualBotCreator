@@ -17,8 +17,6 @@
   transition: all $transition-time-fast $transition-function;
   user-select: none;
   cursor: grab;
-  overflow: hidden;
-
   &:active {
     cursor: grabbing;
   }

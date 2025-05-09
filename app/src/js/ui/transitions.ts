@@ -11,13 +11,11 @@ export function showPageTransition(
   options: { 
     message?: string,
     delay?: number,
-    icon?: string,
     fadeColor?: string 
   } = {}
 ): void {
   const message = options.message || 'Loading...';
   const delay = options.delay || 400;
-  const icon = options.icon || '🤖';
   const fadeColor = options.fadeColor || 'var(--dark)';
 
   let pageTransition = document.querySelector('.page-transition') as HTMLElement;
@@ -28,9 +26,10 @@ export function showPageTransition(
     const transitionContent = document.createElement('div');
     transitionContent.className = 'transition-content';
     
-    const iconElement = document.createElement('span');
+    const iconElement = document.createElement('img');
     iconElement.className = 'transition-icon';
-    iconElement.textContent = icon;
+    iconElement.src = '/assets/images/mascot.png';
+    iconElement.alt = 'Loading Mascot';
 
     const messageElement = document.createElement('span');
     messageElement.className = 'transition-message';
@@ -46,10 +45,8 @@ export function showPageTransition(
       injectTransitionStyles();
     }
   } else {
-    const iconElement = pageTransition.querySelector('.transition-icon') as HTMLElement;
+    // If transition element exists, update the message but keep the mascot image
     const messageElement = pageTransition.querySelector('.transition-message') as HTMLElement;
-    
-    if (iconElement) iconElement.textContent = icon;
     if (messageElement) messageElement.textContent = message;
   }
 
@@ -416,12 +413,14 @@ function injectTransitionStyles(): void {
       visibility: hidden;
       transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
+      color: white;
     }
     
     .page-transition.active {
-      opacity: 0.9;
+      opacity: 1;
       visibility: visible;
     }
     
@@ -430,23 +429,27 @@ function injectTransitionStyles(): void {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
       text-align: center;
     }
     
     .transition-icon {
-      font-size: 48px;
-      animation: pulse 1.5s infinite;
-      max-width: 100px;
-      max-height: 100px;
+      width: 60px;
+      height: 60px;
       object-fit: contain;
-      display: block;
-      margin: 0 auto;
+      margin: 0 auto 16px;
+      animation: pulse 1.5s infinite ease-in-out;
     }
     
     .transition-message {
       color: white;
-      font-size: 24px;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
     
     /* Cursor blink animation */

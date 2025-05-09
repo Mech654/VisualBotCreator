@@ -405,11 +405,19 @@
   }
 }
 
+.transition-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .transition-icon {
   width: 60px;
   height: 60px;
   object-fit: contain;
-  margin-bottom: $spacing-md;
+  margin: 0 auto $spacing-md;
   animation: pulse 1.5s infinite ease-in-out;
 }
 

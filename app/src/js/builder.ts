@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (page === 'dashboard') {
         showPageTransition('index.html', {
           message: 'Loading Dashboard...',
-          icon: '🏠',
           delay: 600
         });
       }
