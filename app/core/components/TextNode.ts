@@ -6,12 +6,11 @@ export interface TextNodeProperties extends NodeProperties {
   fontSize?: number;
   bold?: boolean;
   color?: string;
-  nodeContent?: string; // Add nodeContent property
-  title?: string; // Make sure title is defined in the interface
+  nodeContent?: string;
+  title?: string;
 }
 
 export class TextNode extends Node {
-  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Text',
     category: ComponentCategory.DATA_PROCESSING,
@@ -31,12 +30,11 @@ export class TextNode extends Node {
       color: properties.color || '#000000',
     };
 
-    // Generate the node content
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
 
     super(id, 'text', textNodeProps);
 
-    // Add ports
+    // Add flow ports
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
 
@@ -48,7 +46,6 @@ export class TextNode extends Node {
 
   /** Update the node content when text or formatting changes */
   updateNodeContent() {
-    // Cast the properties to TextNodeProperties to ensure it has the required 'text' property
     const textProps = this.properties as TextNodeProperties;
     this.properties.nodeContent = generateTextNodePreview(textProps);
     return this.properties.nodeContent;
