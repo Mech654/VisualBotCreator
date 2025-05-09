@@ -7,6 +7,7 @@ export interface TextNodeProperties extends NodeProperties {
   bold?: boolean;
   color?: string;
   nodeContent?: string; // Add nodeContent property
+  title?: string; // Make sure title is defined in the interface
 }
 
 export class TextNode extends Node {
@@ -19,7 +20,7 @@ export class TextNode extends Node {
     icon: '📄',
   };
 
-  static override shownProperties = ['text', 'fontSize', 'bold', 'color'];
+    static override shownProperties = ['text', 'fontSize', 'bold', 'color'];
 
   constructor(id: string, properties: Partial<TextNodeProperties> = {}) {
     // Set default values

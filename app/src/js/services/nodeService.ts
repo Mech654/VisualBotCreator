@@ -95,10 +95,36 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
   const nameInput = propertiesPanel.querySelector(
     'input[aria-label="Node name"]'
   ) as HTMLInputElement;
-  if (nameInput)
+  if (nameInput) {
     nameInput.value =
       nodeInstance.properties.title ||
       nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1);
+      
+    // Add event listener to update the node title when name changes
+    nameInput.addEventListener('change', async () => {
+      nodeInstance.properties.title = nameInput.value;
+      
+      // Update the node instance with the new title
+      try {
+        const updatedNode = await window.nodeSystem.createNode(
+          nodeInstance.type,
+          nodeInstance.id,
+          nodeInstance.properties
+        );
+        
+        // Update the node element's title in the UI
+        const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
+        if (nodeElement) {
+          const titleElement = nodeElement.querySelector('[data-property-key="title"]');
+          if (titleElement) {
+            titleElement.textContent = nameInput.value;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to update node title:', err);
+      }
+    });
+  }
 
   const idInput = propertiesPanel.querySelector('input[aria-label="Node ID"]') as HTMLInputElement;
   if (idInput) idInput.value = nodeInstance.id;
@@ -153,7 +179,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
   let html = `<div class="property-group-title">${nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1)} Properties</div>`;
 
   // Get all properties except internal ones
-  const skipProps = ['title', 'id'];
+  const skipProps = ['title', 'id', 'nodeContent']; // Added 'nodeContent' to hide it from the UI
   const properties = Object.entries(nodeInstance.properties).filter(
     ([key]) => !skipProps.includes(key)
   );
