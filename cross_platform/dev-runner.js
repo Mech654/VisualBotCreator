@@ -27,49 +27,53 @@ async function runCommand(command, args, options = {}) {
         ...process.env,
         npm_config_loglevel: 'silent',
         npm_config_progress: 'false',
-        SUPPRESS_HTML_LOGS: 'true'
-      }
+        SUPPRESS_HTML_LOGS: 'true',
+      },
     });
-    
+
     let stdout = '';
     let stderr = '';
-    
+
     // Capture stdout
-    proc.stdout.on('data', (data) => {
+    proc.stdout.on('data', data => {
       stdout += data.toString();
-      
+
       // Filter and display important messages
       const lines = data.toString().split('\n');
       for (const line of lines) {
         // Skip HTML processing messages in the initial setup
-        if ((line.includes('Processing HTML') || line.includes('HTML ready')) && 
-            !line.includes('Starting development servers')) {
+        if (
+          (line.includes('Processing HTML') || line.includes('HTML ready')) &&
+          !line.includes('Starting development servers')
+        ) {
           continue;
         }
-        
-        if (line.includes('Cleaning') || 
-            line.includes('Starting') || 
-            line.includes('Building') || 
-            line.includes('Compiling') ||
-            line.includes('Processing') ||
-            line.includes('✅') ||
-            line.includes('🚀') ||
-            line.includes('⚙️') ||
-            line.includes('🎨') ||
-            line.includes('📦') ||
-            line.includes('🌐')) {
+
+        if (
+          line.includes('Cleaning') ||
+          line.includes('Starting') ||
+          line.includes('Building') ||
+          line.includes('Compiling') ||
+          line.includes('Processing') ||
+          line.includes('✅') ||
+          line.includes('🚀') ||
+          line.includes('⚙️') ||
+          line.includes('🎨') ||
+          line.includes('📦') ||
+          line.includes('🌐')
+        ) {
           console.log(line);
         }
       }
     });
-    
+
     // Display all error messages
-    proc.stderr.on('data', (data) => {
+    proc.stderr.on('data', data => {
       stderr += data.toString();
       console.error(data.toString());
     });
-    
-    proc.on('close', (code) => {
+
+    proc.on('close', code => {
       if (code === 0) {
         resolve({ stdout, stderr, code });
       } else {
@@ -85,32 +89,27 @@ async function main() {
     // Run clean operation
     console.log('🧹 Cleaning output directory...');
     await runCommand('npm', ['run', 'clean', '--silent'], { cwd: rootDir });
-    
+
     // Run dev setup
     console.log('📂 Setting up development environment...');
     await runCommand('npm', ['run', 'dev-setup', '--silent'], { cwd: rootDir });
-    
+
     // Run the actual development environment with all components
     console.log('🚀 Starting development servers...');
-    
+
     // Start all processes using concurrently with the log filter
-    const devProcess = spawn('npm', [
-      'run', 
-      'dev:actual', 
-      '--silent', 
-      '--no-progress'
-    ], {
+    const devProcess = spawn('npm', ['run', 'dev:actual', '--silent', '--no-progress'], {
       cwd: rootDir,
       env: {
         ...process.env,
         npm_config_loglevel: 'silent',
         npm_config_progress: 'false',
       },
-      stdio: 'inherit'
+      stdio: 'inherit',
     });
-    
+
     // Handle process exit
-    devProcess.on('exit', (code) => {
+    devProcess.on('exit', code => {
       if (code !== 0) {
         console.error(`\n❌ Development process exited with code ${code}`);
       }
@@ -124,7 +123,6 @@ async function main() {
         }
       });
     });
-    
   } catch (error) {
     console.error('❌ Error starting development environment:', error.message);
     process.exit(1);

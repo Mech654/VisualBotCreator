@@ -55,26 +55,19 @@ function createWindow(): void {
     const retryInterval = 1500;
 
     const loadApp = () => {
-      mainWindow
-        .loadURL(startUrl)
-        .catch(err => {
-          retryCount++;
-          if (retryCount <= maxRetries) {
-            console.log(
-              `Connection to dev server failed, retrying (${retryCount}/${maxRetries})...`
-            );
-            setTimeout(loadApp, retryInterval);
-          } else {
-            console.error(
-              'Failed to connect to webpack dev server after multiple attempts',
-              err
-            );
-            // Fallback to loading from file system
-            mainWindow
-              .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
-              .catch(e => console.error('Failed to load fallback file:', e));
-          }
-        });
+      mainWindow.loadURL(startUrl).catch(err => {
+        retryCount++;
+        if (retryCount <= maxRetries) {
+          console.log(`Connection to dev server failed, retrying (${retryCount}/${maxRetries})...`);
+          setTimeout(loadApp, retryInterval);
+        } else {
+          console.error('Failed to connect to webpack dev server after multiple attempts', err);
+          // Fallback to loading from file system
+          mainWindow
+            .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
+            .catch(e => console.error('Failed to load fallback file:', e));
+        }
+      });
     };
 
     loadApp();

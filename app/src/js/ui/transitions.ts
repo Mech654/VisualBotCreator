@@ -7,11 +7,11 @@
  * @param options Optional configuration for the transition
  */
 export function showPageTransition(
-  destination: string, 
-  options: { 
-    message?: string,
-    delay?: number,
-    fadeColor?: string 
+  destination: string,
+  options: {
+    message?: string;
+    delay?: number;
+    fadeColor?: string;
   } = {}
 ): void {
   const message = options.message || 'Loading...';
@@ -25,7 +25,7 @@ export function showPageTransition(
 
     const transitionContent = document.createElement('div');
     transitionContent.className = 'transition-content';
-    
+
     const iconElement = document.createElement('img');
     iconElement.className = 'transition-icon';
     iconElement.src = '/assets/images/mascot.png';
@@ -38,7 +38,7 @@ export function showPageTransition(
     transitionContent.appendChild(iconElement);
     transitionContent.appendChild(messageElement);
     pageTransition.appendChild(transitionContent);
-    
+
     document.body.appendChild(pageTransition);
 
     if (!document.getElementById('transition-styles')) {
@@ -52,7 +52,7 @@ export function showPageTransition(
 
   // Update color if specified
   pageTransition.style.backgroundColor = fadeColor;
-  
+
   // Activate transition
   pageTransition.classList.add('active');
 
@@ -69,9 +69,16 @@ export function showPageTransition(
  * @param delay Delay before starting the animation in ms
  */
 export function enterTransition(
-  element: HTMLElement, 
-  type: 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'scale' | 'flip' = 'fade', 
-  duration: number = 300, 
+  element: HTMLElement,
+  type:
+    | 'fade'
+    | 'slide-up'
+    | 'slide-down'
+    | 'slide-left'
+    | 'slide-right'
+    | 'scale'
+    | 'flip' = 'fade',
+  duration: number = 300,
   delay: number = 0
 ): void {
   if (!document.getElementById('transition-styles')) {
@@ -80,15 +87,15 @@ export function enterTransition(
 
   // Reset any existing animations
   element.style.animation = '';
-  
+
   // Force a reflow to ensure the animation runs
   void element.offsetWidth;
-  
+
   // Apply enter animation
   element.style.animationDuration = `${duration}ms`;
   element.style.animationDelay = `${delay}ms`;
   element.style.animationFillMode = 'both';
-  
+
   switch (type) {
     case 'fade':
       element.style.animation = 'fadeIn';
@@ -124,28 +131,35 @@ export function enterTransition(
  * @returns Promise that resolves when the animation completes
  */
 export function exitTransition(
-  element: HTMLElement, 
-  type: 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'scale' | 'flip' = 'fade', 
-  duration: number = 300, 
+  element: HTMLElement,
+  type:
+    | 'fade'
+    | 'slide-up'
+    | 'slide-down'
+    | 'slide-left'
+    | 'slide-right'
+    | 'scale'
+    | 'flip' = 'fade',
+  duration: number = 300,
   delay: number = 0,
   removeAfter: boolean = false
 ): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!document.getElementById('transition-styles')) {
       injectTransitionStyles();
     }
 
     // Reset any existing animations
     element.style.animation = '';
-    
+
     // Force a reflow to ensure the animation runs
     void element.offsetWidth;
-    
+
     // Apply exit animation
     element.style.animationDuration = `${duration}ms`;
     element.style.animationDelay = `${delay}ms`;
     element.style.animationFillMode = 'both';
-    
+
     switch (type) {
       case 'fade':
         element.style.animation = 'fadeOut';
@@ -210,16 +224,10 @@ export function highlightElement(
   element.appendChild(highlightOverlay);
 
   // Apply animation
-  highlightOverlay.animate(
-    [
-      { opacity: 0.6 },
-      { opacity: 0 }
-    ],
-    {
-      duration,
-      easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-    }
-  ).onfinish = () => {
+  highlightOverlay.animate([{ opacity: 0.6 }, { opacity: 0 }], {
+    duration,
+    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  }).onfinish = () => {
     highlightOverlay.remove();
   };
 }
@@ -264,23 +272,23 @@ export function createRippleEffect(
 
   // Calculate size based on element dimensions
   const size = Math.max(rect.width, rect.height) * 2;
-  
+
   // Position ripple at click coordinates
   ripple.style.width = ripple.style.height = `${size}px`;
-  ripple.style.left = `${x - size/2}px`;
-  ripple.style.top = `${y - size/2}px`;
+  ripple.style.left = `${x - size / 2}px`;
+  ripple.style.top = `${y - size / 2}px`;
 
   element.appendChild(ripple);
-  
+
   // Apply ripple animation
   ripple.animate(
     [
       { transform: 'scale(0)', opacity: 0.7 },
-      { transform: 'scale(1)', opacity: 0 }
+      { transform: 'scale(1)', opacity: 0 },
     ],
     {
       duration: 700,
-      easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
     }
   ).onfinish = () => {
     ripple.remove();
@@ -296,11 +304,12 @@ export function addRippleEffect(
   selector: string | HTMLElement | NodeListOf<HTMLElement>,
   color?: string
 ): void {
-  const elements = typeof selector === 'string' 
-    ? document.querySelectorAll<HTMLElement>(selector)
-    : selector instanceof HTMLElement 
-      ? [selector] 
-      : selector;
+  const elements =
+    typeof selector === 'string'
+      ? document.querySelectorAll<HTMLElement>(selector)
+      : selector instanceof HTMLElement
+        ? [selector]
+        : selector;
 
   elements.forEach(element => {
     const handleRipple = (event: MouseEvent | TouchEvent) => {
@@ -309,7 +318,7 @@ export function addRippleEffect(
 
     element.addEventListener('mousedown', handleRipple);
     element.addEventListener('touchstart', handleRipple, { passive: true });
-    
+
     // Add a class to indicate it has ripple effect
     element.classList.add('has-ripple');
   });
@@ -331,17 +340,17 @@ export function typeText(
   startDelay: number = 0,
   cursorChar: string = '|'
 ): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const originalText = text;
     element.textContent = '';
-    
+
     // Create and append cursor element
     const cursor = document.createElement('span');
     cursor.className = 'typing-cursor';
     cursor.textContent = cursorChar;
     cursor.style.animation = 'cursorBlink 1s infinite';
     element.appendChild(cursor);
-    
+
     // Add cursor blinking animation if not already present
     if (!document.getElementById('transition-styles')) {
       injectTransitionStyles();
@@ -381,12 +390,13 @@ export function staggerAnimation(
   staggerDelay: number = 100,
   duration: number = 300
 ): void {
-  const elementList = typeof elements === 'string'
-    ? Array.from(document.querySelectorAll(elements))
-    : elements instanceof NodeList
-      ? Array.from(elements)
-      : elements;
-  
+  const elementList =
+    typeof elements === 'string'
+      ? Array.from(document.querySelectorAll(elements))
+      : elements instanceof NodeList
+        ? Array.from(elements)
+        : elements;
+
   elementList.forEach((el, index) => {
     const delay = index * staggerDelay;
     enterTransition(el as HTMLElement, animationType, duration, delay);
@@ -677,9 +687,9 @@ export function addAttentionAnimation(
   // Prevent animation stacking
   element.style.animation = '';
   void element.offsetWidth; // Force reflow
-  
+
   element.style.animation = `${type} ${duration}ms`;
-  
+
   // Clear animation when done
   setTimeout(() => {
     element.style.animation = '';

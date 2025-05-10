@@ -4,12 +4,15 @@ import { NodeInstance } from '../models/types';
 /**
  * Update the node's DOM element content based on its properties.
  */
-export function updateNodeElementContent(nodeInstance: NodeInstance, nodeElement: HTMLElement): void {
+export function updateNodeElementContent(
+  nodeInstance: NodeInstance,
+  nodeElement: HTMLElement
+): void {
   if (!nodeElement) return;
   Object.entries(nodeInstance.properties).forEach(([key, value]) => {
     // Find all elements inside the node with data-property-key matching this property
     const propElements = nodeElement.querySelectorAll(`[data-property-key="${key}"]`);
-    propElements.forEach((el) => {
+    propElements.forEach(el => {
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
         if (el.type === 'checkbox') {
           (el as HTMLInputElement).checked = Boolean(value);

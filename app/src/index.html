@@ -3,16 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;"
+    />
     <title>Bot Creator - Dashboard</title>
     <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
     <!-- Prevent FOUC with inline styles -->
     <style>
-      .js-loading { opacity: 0; }
-      body { transition: opacity 0.3s ease-in; }
+      .js-loading {
+        opacity: 0;
+      }
+      body {
+        transition: opacity 0.3s ease-in;
+      }
     </style>
     <!-- Use regular stylesheet instead of preload with inline handlers -->
-    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="/styles/index.css" />
     <!-- CSS will be injected by webpack in dev mode -->
     <script type="module" src="/index.js"></script>
   </head>
@@ -81,7 +88,9 @@
               <div class="schema-icon">💬</div>
               <div class="schema-content">
                 <h3 class="schema-name">Customer Support</h3>
-                <p class="schema-description text-secondary">Answer FAQs and handle customer inquiries</p>
+                <p class="schema-description text-secondary">
+                  Answer FAQs and handle customer inquiries
+                </p>
               </div>
               <div class="schema-footer">
                 <button class="btn btn-sm btn-outline">
@@ -90,7 +99,7 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="schema-card">
               <div class="schema-icon">🛒</div>
               <div class="schema-content">
@@ -104,12 +113,14 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="schema-card">
               <div class="schema-icon">📅</div>
               <div class="schema-content">
                 <h3 class="schema-name">Scheduling</h3>
-                <p class="schema-description text-secondary">Book appointments and manage calendar</p>
+                <p class="schema-description text-secondary">
+                  Book appointments and manage calendar
+                </p>
               </div>
               <div class="schema-footer">
                 <button class="btn btn-sm btn-outline">
@@ -118,12 +129,14 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="schema-card">
               <div class="schema-icon">📰</div>
               <div class="schema-content">
                 <h3 class="schema-name">Content</h3>
-                <p class="schema-description text-secondary">Deliver personalized content to users</p>
+                <p class="schema-description text-secondary">
+                  Deliver personalized content to users
+                </p>
               </div>
               <div class="schema-footer">
                 <button class="btn btn-sm btn-outline">
@@ -132,12 +145,14 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="schema-card custom-schema">
               <div class="schema-icon">➕</div>
               <div class="schema-content">
                 <h3 class="schema-name">Custom Bot</h3>
-                <p class="schema-description text-secondary">Start from scratch with custom workflows</p>
+                <p class="schema-description text-secondary">
+                  Start from scratch with custom workflows
+                </p>
               </div>
               <div class="schema-footer">
                 <button class="btn btn-sm btn-primary">
@@ -169,7 +184,9 @@
                 </div>
               </div>
               <div class="bot-details text-secondary">
-                <p class="bot-description">Handles customer inquiries about products, returns, and technical support.</p>
+                <p class="bot-description">
+                  Handles customer inquiries about products, returns, and technical support.
+                </p>
               </div>
               <div class="bot-footer text-secondary">
                 <div class="bot-status">
@@ -192,7 +209,9 @@
                 </div>
               </div>
               <div class="bot-details text-secondary">
-                <p class="bot-description">Helps customers find products based on their preferences and needs.</p>
+                <p class="bot-description">
+                  Helps customers find products based on their preferences and needs.
+                </p>
               </div>
               <div class="bot-footer text-secondary">
                 <div class="bot-status">
@@ -215,7 +234,9 @@
                 </div>
               </div>
               <div class="bot-details text-secondary">
-                <p class="bot-description">Books appointments and sends reminders to clients about upcoming meetings.</p>
+                <p class="bot-description">
+                  Books appointments and sends reminders to clients about upcoming meetings.
+                </p>
               </div>
               <div class="bot-footer text-secondary">
                 <div class="bot-status">
@@ -238,7 +259,9 @@
                 </div>
               </div>
               <div class="bot-details text-secondary">
-                <p class="bot-description">Delivers personalized news content based on user preferences.</p>
+                <p class="bot-description">
+                  Delivers personalized news content based on user preferences.
+                </p>
               </div>
               <div class="bot-footer text-secondary">
                 <div class="bot-status">
@@ -251,10 +274,12 @@
           </div>
 
           <!-- Empty State (Hidden by default) -->
-          <div class="empty-state" style="display: none;">
+          <div class="empty-state" style="display: none">
             <img src="/assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
             <h3 class="empty-message">You haven't created any bots yet</h3>
-            <p class="empty-description text-secondary">Start by creating your first bot from a template or from scratch</p>
+            <p class="empty-description text-secondary">
+              Start by creating your first bot from a template or from scratch
+            </p>
             <button class="btn btn-primary">
               <span class="btn-icon">➕</span>
               Create Your First Bot

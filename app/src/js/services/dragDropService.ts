@@ -266,7 +266,7 @@ export function checkCollision(
  */
 export function setupCanvasDropArea(canvas: HTMLElement): void {
   const originalBgColor = canvas.style.backgroundColor || '#1e1e1e';
-  
+
   canvas.addEventListener('dragover', e => {
     e.preventDefault();
     canvas.style.backgroundColor = 'rgba(30, 30, 30, 0.9)';
@@ -277,7 +277,7 @@ export function setupCanvasDropArea(canvas: HTMLElement): void {
     canvas.style.backgroundColor = originalBgColor;
     canvas.style.cursor = 'default';
   });
-  
+
   canvas.addEventListener('drop', () => {
     canvas.style.backgroundColor = originalBgColor;
     canvas.style.cursor = 'default';

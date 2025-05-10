@@ -19,7 +19,8 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
       <div class="flow-ports">
         <div class="flow-input-ports">
           ${flowInputs
-            .map(input => `
+            .map(
+              input => `
               <div class="port-container">
                 <div class="${buildPortClassList(['port', 'input-port', 'flow-port'], input.dataType)}"
                   data-port-id="${input.id}"
@@ -28,13 +29,15 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                   title="${input.label}">
                 </div>
               </div>
-            `)
+            `
+            )
             .join('')}
         </div>
         <div class="flow-gap"></div>
         <div class="flow-output-ports">
           ${flowOutputs
-            .map(output => `
+            .map(
+              output => `
               <div class="port-container">
                 <div class="${buildPortClassList(['port', 'output-port', 'flow-port'], output.dataType)}"
                   data-port-id="${output.id}"
@@ -43,7 +46,8 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
                   title="${output.label}">
                 </div>
               </div>
-            `)
+            `
+            )
             .join('')}
         </div>
       </div>

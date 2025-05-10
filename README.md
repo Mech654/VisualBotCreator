@@ -103,11 +103,7 @@ When you run `npm run dev`, the following orchestrated process happens:
    - **Webpack Dev Server**: Bundles and serves the frontend code on port 4000
    - **Electron**: Launches after the webpack server is ready, with auto-restart on changes
 
-3. **Log Filtering**:
-   - A custom log filter script provides clean, organized console output with meaningful icons
-   - Displays build status for different components of the application
-
-4. **Hot Module Replacement**:
+3. **Hot Module Replacement**:
    - Frontend changes are automatically applied without full page reloads
    - Node.js code changes trigger automatic Electron restart via nodemon
 

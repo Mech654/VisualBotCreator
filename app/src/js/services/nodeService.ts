@@ -99,11 +99,11 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
     nameInput.value =
       nodeInstance.properties.title ||
       nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1);
-      
+
     // Add event listener to update the node title when name changes
     nameInput.addEventListener('change', async () => {
       nodeInstance.properties.title = nameInput.value;
-      
+
       // Update the node instance with the new title
       try {
         const updatedNode = await window.nodeSystem.createNode(
@@ -111,9 +111,11 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
           nodeInstance.id,
           nodeInstance.properties
         );
-        
+
         // Update the node element's title in the UI
-        const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
+        const nodeElement = document.querySelector(
+          `[data-node-id="${nodeInstance.id}"]`
+        ) as HTMLElement;
         if (nodeElement) {
           const titleElement = nodeElement.querySelector('[data-property-key="title"]');
           if (titleElement) {
@@ -151,7 +153,9 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
         // Update nodeInstance with new properties and nodeContent
         nodeInstance.properties = updatedNode.properties;
         // Update the node element content in the UI
-        const nodeElement = document.querySelector(`[data-node-id="${nodeInstance.id}"]`) as HTMLElement;
+        const nodeElement = document.querySelector(
+          `[data-node-id="${nodeInstance.id}"]`
+        ) as HTMLElement;
         if (nodeElement) {
           // Update the main node content (visual area)
           const contentEl = nodeElement.querySelector('.node-content');

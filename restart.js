@@ -21,11 +21,11 @@ if (isRestart) {
 // Start Electron process with proper environment
 const electronProcess = spawn('electron', args, {
   stdio: 'inherit',
-  env: { ...process.env }
+  env: { ...process.env },
 });
 
 // Handle process exit
-electronProcess.on('exit', (code) => {
+electronProcess.on('exit', code => {
   console.log(`Electron process exited with code ${code || 0}`);
 });
 

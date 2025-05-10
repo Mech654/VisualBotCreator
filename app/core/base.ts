@@ -43,7 +43,7 @@ export interface PortData {
 
 export class Node {
   static shownProperties: string[] = [];
-  
+
   id: string;
   type: string;
   properties: NodeProperties;
@@ -159,11 +159,7 @@ export class Node {
    * Format a property key into a readable label
    */
   private formatPropertyName(key: string): string {
-    return (
-      key
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, str => str.toUpperCase())
-    );
+    return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
   }
 }
 
