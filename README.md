@@ -1,6 +1,6 @@
 # VisualBotCrafter
 
-A highly flexible visual development environment for creating, customizing, and managing conversational bots through an intuitive node-based interface.
+A highly flexible visual development environment for creating, customizing, and managing bots through an intuitive node-based interface.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
