@@ -7,8 +7,7 @@ A highly flexible visual development environment for creating, customizing, and 
 
 ## Overview
 
-VisualBotCrafter is an Electron-based desktop application that allows users to design and implement conversational bots using a visual programming paradigm. By connecting nodes in a flow-based interface, users can create complex bot behaviors without writing code, all running locally on your machine with complete control over your data.
-
+VisualBotCrafter is an Electron-based desktop application that empowers you to build powerful automation bots with no code. By connecting nodes in a flow-based canvas—much like Unreal Engine's Blueprints—you can sequence tasks such as file operations, command-line execution, HTTP requests, loops, and error handling. Everything runs locally, giving you full control over your data and environment.
 ## Features
 
 ### Current Features
