@@ -46,7 +46,7 @@ function createWindow(): void {
 
   if (process.env.NODE_ENV === 'development') {
     // Use the environment variable if provided, otherwise use the default URL
-    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/index.html';
+    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/builder.html';
     console.log(`Electron is running in development mode, loading from ${startUrl}`);
 
     // Add retry logic for connecting to webpack dev server
@@ -64,7 +64,7 @@ function createWindow(): void {
           console.error('Failed to connect to webpack dev server after multiple attempts', err);
           // Fallback to loading from file system
           mainWindow
-            .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
+            .loadFile(path.join(projectRoot, 'dist', 'src', 'builder.html'))
             .catch(e => console.error('Failed to load fallback file:', e));
         }
       });

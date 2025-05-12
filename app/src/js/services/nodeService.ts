@@ -87,82 +87,33 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
   const propertiesPanel = document.getElementById('properties-panel');
   if (!propertiesPanel) return;
 
-  // Clear previous content groups except the general one
-  const existingGroups = propertiesPanel.querySelectorAll('.property-group:not(:first-child)');
+  const existingGroups = propertiesPanel.querySelectorAll('.property-group');
   existingGroups.forEach(group => group.remove());
 
-  // Set node name/ID in properties
-  const nameInput = propertiesPanel.querySelector(
-    'input[aria-label="Node name"]'
-  ) as HTMLInputElement;
-  if (nameInput) {
-    nameInput.value =
-      nodeInstance.properties.title ||
-      nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1);
-
-    // Add event listener to update the node title when name changes
-    nameInput.addEventListener('change', async () => {
-      nodeInstance.properties.title = nameInput.value;
-
-      // Update the node instance with the new title
-      try {
-        const updatedNode = await window.nodeSystem.createNode(
-          nodeInstance.type,
-          nodeInstance.id,
-          nodeInstance.properties
-        );
-
-        // Update the node element's title in the UI
-        const nodeElement = document.querySelector(
-          `[data-node-id="${nodeInstance.id}"]`
-        ) as HTMLElement;
-        if (nodeElement) {
-          const titleElement = nodeElement.querySelector('[data-property-key="title"]');
-          if (titleElement) {
-            titleElement.textContent = nameInput.value;
-          }
-        }
-      } catch (err) {
-        console.error('Failed to update node title:', err);
-      }
-    });
-  }
-
-  const idInput = propertiesPanel.querySelector('input[aria-label="Node ID"]') as HTMLInputElement;
-  if (idInput) idInput.value = nodeInstance.id;
-
-  // Create a property group for this node type
   const propertiesGroup = document.createElement('div');
   propertiesGroup.className = 'property-group';
 
   try {
-    // Generate the HTML for the property panel
     propertiesGroup.innerHTML = generateDefaultPropertiesPanel(nodeInstance);
     propertiesPanel.appendChild(propertiesGroup);
 
-    // Attach event listeners for property changes
     setupPropertyEventListeners(nodeInstance, propertiesGroup, async (key, value) => {
       nodeInstance.properties[key] = value;
-      // Request backend to update node and get new nodeContent
       try {
         const updatedNode = await window.nodeSystem.createNode(
           nodeInstance.type,
           nodeInstance.id,
           nodeInstance.properties
         );
-        // Update nodeInstance with new properties and nodeContent
         nodeInstance.properties = updatedNode.properties;
-        // Update the node element content in the UI
         const nodeElement = document.querySelector(
           `[data-node-id="${nodeInstance.id}"]`
         ) as HTMLElement;
         if (nodeElement) {
-          // Update the main node content (visual area)
           const contentEl = nodeElement.querySelector('.node-content');
           if (contentEl && updatedNode.properties.nodeContent) {
             contentEl.innerHTML = updatedNode.properties.nodeContent;
           }
-          // Update any other property-key elements
           updateNodeElementContent(nodeInstance, nodeElement);
         }
       } catch (err) {
@@ -182,11 +133,40 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
 function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
   let html = `<div class="property-group-title">${nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1)} Properties</div>`;
 
-  // Get all properties except internal ones
-  const skipProps = ['title', 'id', 'nodeContent']; // Added 'nodeContent' to hide it from the UI
-  const properties = Object.entries(nodeInstance.properties).filter(
-    ([key]) => !skipProps.includes(key)
-  );
+  html += `
+    <div class="property-item name-input">
+      <div class="property-label">Name</div>
+      <input type="text" aria-label="Node name" class="property-input dynamic-property" data-property-key="title" value="${
+        nodeInstance.properties.title ||
+        nodeInstance.type.charAt(0).toUpperCase() + nodeInstance.type.slice(1)
+      }">
+    </div>
+  `;
+
+  // Determine which properties to show
+  let shownProps: string[] | null = null;
+  // Try to get the class constructor from the nodeInstance
+  const nodeClass = window.nodeSystem?.getNodeClass?.(nodeInstance.type);
+  if (nodeClass && Array.isArray(nodeClass.shownProperties)) {
+    shownProps = nodeClass.shownProperties;
+  } else if ((nodeInstance as any).constructor && Array.isArray((nodeInstance as any).constructor.shownProperties)) {
+    shownProps = (nodeInstance as any).constructor.shownProperties;
+  }
+
+  // Always skip these
+  const alwaysSkip = ['id', 'nodeContent', 'flowType'];
+
+  let properties: [string, any][];
+  if (shownProps) {
+    properties = shownProps
+      .filter(key => !alwaysSkip.includes(key) && key !== 'title')
+      .map(key => [key, nodeInstance.properties[key]] as [string, any])
+      .filter(([, value]) => value !== undefined);
+  } else {
+    properties = Object.entries(nodeInstance.properties).filter(
+      ([key]) => !alwaysSkip.includes(key) && key !== 'title'
+    );
+  }
 
   if (properties.length === 0) {
     html += `
@@ -195,13 +175,10 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
       </div>
     `;
   } else {
-    // For each property, create an appropriate input control
-    properties.forEach(([key, value]) => {
+    for (const [key, value] of properties) {
       const propertyType = typeof value;
-
       switch (propertyType) {
         case 'string':
-          // For long text, use textarea
           if (String(value).length > 50) {
             html += `
               <div class="property-item" data-tooltip="Edit ${key}">
@@ -212,7 +189,6 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
               </div>
             `;
           } else {
-            // For short text, use input
             html += `
               <div class="property-item" data-tooltip="Edit ${key}">
                 <div class="property-label">${formatPropertyName(key)}</div>
@@ -223,7 +199,6 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
             `;
           }
           break;
-
         case 'number':
           html += `
             <div class="property-item" data-tooltip="Edit ${key}">
@@ -234,7 +209,6 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
             </div>
           `;
           break;
-
         case 'boolean':
           html += `
             <div class="property-item" data-tooltip="Toggle ${key}">
@@ -248,9 +222,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
             </div>
           `;
           break;
-
         case 'object':
-          // For objects, display a simplified representation
           const objStr = JSON.stringify(value, null, 2);
           html += `
             <div class="property-item" data-tooltip="Edit ${key} (JSON)">
@@ -261,9 +233,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
             </div>
           `;
           break;
-
         default:
-          // For unknown types, show as read-only
           html += `
             <div class="property-item" data-tooltip="${key}">
               <div class="property-label">${formatPropertyName(key)}</div>
@@ -271,9 +241,8 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
             </div>
           `;
       }
-    });
+    }
   }
-
   return html;
 }
 
@@ -281,12 +250,9 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
  * Format a property key into a readable label
  */
 function formatPropertyName(key: string): string {
-  // Convert camelCase to Title Case with spaces
   return (
     key
-      // Insert a space before all caps
       .replace(/([A-Z])/g, ' $1')
-      // Uppercase the first character
       .replace(/^./, str => str.toUpperCase())
   );
 }
@@ -304,50 +270,40 @@ export async function createNodeInstance(
   y: number,
   flowType: string = 'flow'
 ): Promise<{ nodeElement: HTMLElement; nodeInstance: NodeInstance } | null> {
-  // Generate a unique ID for the node
   const id = window.utils.generateNodeId();
 
   try {
-    // Create node instance using the IPC bridge
     const nodeInstance = await window.nodeSystem.createNode(type, id, {
-      flowType, // Pass flow type to the backend
+      flowType,
     });
 
-    // Create DOM element for visual representation
     const nodeElement = document.createElement('div');
     nodeElement.className = 'node';
     nodeElement.id = id;
     nodeElement.dataset.nodeId = id;
     nodeElement.dataset.nodeType = type;
-    nodeElement.dataset.flowType = flowType; // Store flow type in DOM
+    nodeElement.dataset.flowType = flowType;
 
-    // Position the node
     nodeElement.style.left = `${x}px`;
     nodeElement.style.top = `${y}px`;
 
-    // Set node header style based on flow type
     if (flowType === 'data') {
       nodeElement.classList.add('data-node');
     } else {
       nodeElement.classList.add('flow-node');
     }
 
-    // Generate node HTML
     nodeElement.innerHTML = generateNodeHtml(nodeInstance);
 
-    // Initialize connection functionality for the node
     setTimeout(() => {
       initNodeConnections(nodeElement, nodeInstance);
 
-      // Set port types based on flow type
       const ports = nodeElement.querySelectorAll('.port');
       ports.forEach(port => {
         const portEl = port as HTMLElement;
 
-        // Get specific data type from port's data attribute
         const specificType = portEl.dataset.portType;
 
-        // Only update ports that don't have specific types
         if (!specificType || specificType === 'control') {
           if (flowType === 'data') {
             portEl.classList.add('port-data');
@@ -371,17 +327,13 @@ export async function createNodeInstance(
  * Delete a node and remove its connections
  */
 export function deleteNode(nodeElement: HTMLElement): void {
-  // Get node ID
   const nodeId = nodeElement.dataset.nodeId;
 
   if (nodeId) {
-    // Remove any connections to/from this node
     removeNodeConnections(nodeId);
 
-    // Remove from DOM
     nodeElement.remove();
 
-    // Remove from position tracking
     nodePositions.delete(nodeElement);
   }
 }
