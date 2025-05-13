@@ -201,7 +201,7 @@ export class NodeFactory {
     flowType?: string;
   }> {
     // Dynamically generate the list based on registered components
-    return Object.entries(this.nodeTypes).map(([type, Component]) => {
+    const registeredComponents = Object.entries(this.nodeTypes).map(([type, Component]) => {
       // Try to get metadata from component if it has static metadata
       const metadata = Component.metadata || {};
 
@@ -212,6 +212,8 @@ export class NodeFactory {
 
       return { type, name, category: String(category), flowType };
     });
+    console.log(`Backend side sending ${registeredComponents.length} components`);
+    return registeredComponents;
   }
 
   static getNodeTypes(): string[] {

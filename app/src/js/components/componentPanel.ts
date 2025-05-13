@@ -3,7 +3,8 @@ import { createIconElement, getIcon, loadComponentIcons } from '../utils/iconLoa
 async function fetchAvailableComponents() {
   try {
     const nodeTypes: Array<string | { type: string; name: string; category: string }> =
-      await window.nodeSystem.getNodeTypes();
+      await window.nodeSystem.getRegisteredTypes();
+    console.log(`client side has received ${nodeTypes.length} components`);
 
     const componentTypeNames = nodeTypes.map(nt =>
       typeof nt === 'string' ? nt : String(nt.type || '')
@@ -152,7 +153,7 @@ export async function populateComponentsPanel(): Promise<void> {
 function getCategoryIcon(category: string): string {
   const categoryIcons: Record<string, string> = {
     'Conversation Flow':
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1 2 2z"></path></svg>',
     Logic:
       '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 12 21 22 3"></polygon></svg>',
     'Data Processing':
