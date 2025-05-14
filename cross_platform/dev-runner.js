@@ -22,6 +22,7 @@ async function runCommand(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const proc = spawn(command, args, {
       ...options,
+      shell: true,
       stdio: 'pipe',
       env: {
         ...process.env,
@@ -100,6 +101,7 @@ async function main() {
     // Start all processes using concurrently with the log filter
     const devProcess = spawn('npm', ['run', 'dev:actual', '--silent', '--no-progress'], {
       cwd: rootDir,
+      shell: true,
       env: {
         ...process.env,
         npm_config_loglevel: 'silent',
