@@ -3,7 +3,7 @@ import { ComponentCategory } from '../nodeSystem.js';
 
 export interface IncrementNodeProperties extends NodeProperties {
   incrementBy?: number;
-  nodeContent?: string; // Add nodeContent property
+  nodeContent?: string;
 }
 
 export class IncrementNode extends Node {
@@ -20,14 +20,10 @@ export class IncrementNode extends Node {
   constructor(id: string, properties: IncrementNodeProperties = {}) {
     properties.incrementBy = properties.incrementBy || 1;
     properties.title = properties.title || 'Increment';
-
     properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${properties.incrementBy}</span></div>`;
-
     super(id, 'increment', properties);
-
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-
     this.addInput(new Port('number', 'Number', 'number'));
     this.addOutput(new Port('result', 'Result', 'number'));
   }
@@ -39,11 +35,8 @@ export class IncrementNode extends Node {
 
   process(inputValues: Record<string, any>): Record<string, any> {
     const inputNumber = typeof inputValues['number'] === 'number' ? inputValues['number'] : 0;
-
     const incrementBy = this.properties.incrementBy || 1;
-
     const result = inputNumber + incrementBy;
-
     return {
       result: result,
     };

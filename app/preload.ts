@@ -1,6 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-// Define types for the APIs exposed to the renderer
 interface NodeSystemAPI {
   createNode: (type: string, id: string, properties: any) => Promise<any>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
@@ -26,34 +25,27 @@ interface UtilsAPI {
   generateNodeId: () => string;
 }
 
-// Expose nodeSystem API to the renderer process
 contextBridge.exposeInMainWorld('nodeSystem', {
-  // Create a node of specific type
   createNode: (type: string, id: string, properties: any) => {
     return ipcRenderer.invoke('node:create', { type, id, properties });
   },
 
-  // Get node types available in the system
   getNodeTypes: () => {
     return ipcRenderer.invoke('node:getTypes');
   },
 
-  // Get all registered node types with metadata
   getRegisteredTypes: () => {
     return ipcRenderer.invoke('node:getRegisteredTypes');
   },
 
-  // Get node by ID
   getNodeById: (id: string) => {
     return ipcRenderer.invoke('node:getById', id);
   },
 
-  // Process a node with given inputs
   processNode: (id: string, inputs: Record<string, any>) => {
     return ipcRenderer.invoke('node:process', { id, inputs });
   },
 
-  // Create a connection between nodes
   createConnection: (
     fromNodeId: string,
     fromPortId: string,
@@ -68,7 +60,6 @@ contextBridge.exposeInMainWorld('nodeSystem', {
     });
   },
 
-  // Delete a connection between nodes
   deleteConnection: (
     fromNodeId: string,
     fromPortId: string,
@@ -83,18 +74,13 @@ contextBridge.exposeInMainWorld('nodeSystem', {
     });
   },
 
-  // Get all connections for a node
   getNodeConnections: (nodeId: string) => {
     return ipcRenderer.invoke('connection:getForNode', nodeId);
   },
 } as NodeSystemAPI);
 
-// Expose utility functions
 contextBridge.exposeInMainWorld('utils', {
-  // Generate a random node ID
   generateNodeId: () => {
     return `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   },
 } as UtilsAPI);
-
-// TypeScript declaration file to augment the Window interface is in global.d.ts

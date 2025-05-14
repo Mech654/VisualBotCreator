@@ -7,11 +7,10 @@ export interface InputNodeProperties extends NodeProperties {
   variableName?: string;
   inputType?: 'text' | 'number' | 'email' | 'password';
   validation?: string | null;
-  nodeContent?: string; // Add nodeContent property
+  nodeContent?: string;
 }
 
 export class InputNode extends Node {
-  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Input',
     category: ComponentCategory.INPUT_OUTPUT,
@@ -23,14 +22,12 @@ export class InputNode extends Node {
   static override shownProperties = ['variableName', 'inputType', 'placeholder'];
 
   constructor(id: string, properties: InputNodeProperties = {}) {
-    // Set defaults
     properties.title = properties.title || 'User Input';
     properties.placeholder = properties.placeholder || 'Type your response...';
     properties.variableName = properties.variableName || 'userInput';
     properties.inputType = properties.inputType || 'text';
     properties.validation = properties.validation || null;
 
-    // Generate the node content without using 'this'
     const inputType = properties.inputType || 'text';
     const placeholder = properties.placeholder || 'Type your response...';
 

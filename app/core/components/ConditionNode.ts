@@ -4,11 +4,10 @@ import { ComponentCategory } from '../nodeSystem.js';
 export interface ConditionNodeProperties extends NodeProperties {
   title?: string;
   condition?: string;
-  nodeContent?: string; // Add nodeContent property
+  nodeContent?: string;
 }
 
 export class ConditionNode extends Node {
-  // Update to use ComponentCategory enum
   static metadata = {
     name: 'Condition',
     category: ComponentCategory.LOGIC,
@@ -21,13 +20,9 @@ export class ConditionNode extends Node {
 
   constructor(id: string, properties: ConditionNodeProperties = {}) {
     super(id, 'condition', properties);
-
     properties.title = properties.title || 'Condition';
     properties.condition = properties.condition || 'value == true';
-
-    // Generate the node content for display directly in properties
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
-
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addInput(new Port('value', 'Value to Check', 'any'));
     this.addOutput(new Port('true', 'True', 'control'));
@@ -42,12 +37,9 @@ export class ConditionNode extends Node {
 
   process(inputValues: Record<string, any>): Record<string, any> {
     let result = false;
-
     try {
       const valueToCheck = inputValues['value'];
       const conditionString = this.properties.condition as string;
-
-      // Safer condition evaluation without eval
       if (conditionString === 'value == true') {
         result = valueToCheck === true;
       } else if (conditionString === 'value == false') {
@@ -74,7 +66,6 @@ export class ConditionNode extends Node {
     } catch (error) {
       result = false;
     }
-
     return { result };
   }
 }

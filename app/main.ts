@@ -33,11 +33,10 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: iconPath, // Use path relative to app root
+    icon: iconPath, 
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      // Use ES module preload script with .mjs extension
       preload: path.resolve(projectRoot, 'dist', 'preload-esm.mjs'),
       webSecurity: true,
       sandbox: false,
@@ -45,11 +44,9 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    // Use the environment variable if provided, otherwise use the default URL
     const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/builder.html';
     console.log(`Electron is running in development mode, loading from ${startUrl}`);
 
-    // Add retry logic for connecting to webpack dev server
     let retryCount = 0;
     const maxRetries = 5;
     const retryInterval = 1500;
@@ -78,7 +75,6 @@ function createWindow(): void {
   }
 }
 
-// Set up IPC handlers for node system operations
 function setupIpcHandlers(): void {
   // Handle node creation requests
   ipcMain.handle(
@@ -89,10 +85,8 @@ function setupIpcHandlers(): void {
     ) => {
       try {
         const node = NodeFactory.createNode(type, id, properties);
-        // Store node instance for future reference
         nodeInstances.set(id, node);
 
-        // Return node data (safe to stringify)
         return {
           id: node.id,
           type: node.type,
@@ -151,26 +145,6 @@ function setupIpcHandlers(): void {
     };
   });
 
-  // Process a node with inputs
-  ipcMain.handle(
-    'node:process',
-    async (event, { id, inputs }: { id: string; inputs: Record<string, any> }) => {
-      const node = nodeInstances.get(id);
-      if (!node) {
-        throw new Error(`Node not found with id: ${id}`);
-      }
-
-      try {
-        const result = node.process(inputs);
-        return result;
-      } catch (error) {
-        console.error(`Error processing node ${id}:`, error);
-        throw new Error(
-          `Failed to process node: ${error instanceof Error ? error.message : String(error)}`
-        );
-      }
-    }
-  );
 
   // Create a connection between nodes
   ipcMain.handle(
@@ -351,23 +325,18 @@ const PORT_TYPE_COMPATIBILITY: Record<PortType, PortType[]> = {
  * Check if two port types are compatible for connection
  */
 function arePortTypesCompatible(sourceType: string, targetType: string): boolean {
-  // First check category compatibility - flow ports can only connect to flow ports
   const sourceIsFlow = PORT_CATEGORIES[PortCategory.FLOW].includes(sourceType as PortType);
   const targetIsFlow = PORT_CATEGORIES[PortCategory.FLOW].includes(targetType as PortType);
 
-  // If categories don't match, connection is invalid
   if (sourceIsFlow !== targetIsFlow) {
     return false;
   }
 
-  // If they're flow ports and categories match, they're compatible
   if (sourceIsFlow && targetIsFlow) {
     return true;
   }
 
   // For data ports, check specific type compatibility
-
-  // 'any' type can connect to any data type
   if (sourceType === PortType.ANY || targetType === PortType.ANY) {
     return true;
   }
@@ -377,7 +346,6 @@ function arePortTypesCompatible(sourceType: string, targetType: string): boolean
     return true;
   }
 
-  // Check if source can be converted to target
   const compatibleTypes = PORT_TYPE_COMPATIBILITY[sourceType as PortType] || [];
   return compatibleTypes.includes(targetType as PortType);
 }
