@@ -7,10 +7,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define only two component categories
+// Define only three component categories
 export enum ComponentCategory {
   FLOW = 'Flow',
   DATA = 'Data',
+  VARIABLE = 'Variable',
 }
 
 export interface NodeComponent {
@@ -140,9 +141,13 @@ export class NodeFactory {
 
       // Default values for component metadata
       const name = metadata.name || type.charAt(0).toUpperCase() + type.slice(1);
-      // Only allow 'Flow' or 'Data' as category
+      // Allow 'Flow', 'Data', or 'Variable' as category
       let category = metadata.category;
-      if (category !== ComponentCategory.FLOW && category !== ComponentCategory.DATA) {
+      if (
+        category !== ComponentCategory.FLOW &&
+        category !== ComponentCategory.DATA &&
+        category !== ComponentCategory.VARIABLE
+      ) {
         // fallback to default
         category = ComponentCategory.FLOW;
       }

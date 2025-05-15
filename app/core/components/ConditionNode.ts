@@ -26,7 +26,6 @@ export class ConditionNode extends Node {
     this.addInput(new Port('value', 'Value to Check', 'any'));
     this.addOutput(new Port('true', 'True', 'control'));
     this.addOutput(new Port('false', 'False', 'control'));
-    this.addOutput(new Port('result', 'Result', 'boolean'));
   }
 
   updateNodeContent() {

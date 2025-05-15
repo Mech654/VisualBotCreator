@@ -37,14 +37,15 @@ $text-hint: #888888; // Hint text (low emphasis)
 $text-disabled: #666666; // Disabled text
 
 // Port type colors (Material-inspired)
-$port-control: #e67e22; // Orange for control flow
-$port-string: #03dac6; // Teal for string data
-$port-number: #bb86fc; // Purple for number data
-$port-boolean: #8e44ad; // Purple for boolean data
-$port-object: #33334d; // Dark blue for object data
-$port-array: #03dac6; // Teal for array data
-$port-any: #7f8c8d; // Gray for any data type
-$port-data: #03dac6; // Teal for all data ports
+$port-control: #f39c12; // Bright Amber - clear and distinct for control flow
+$port-string: #1abc9c;  // Soft Aqua - commonly used for strings, easy on the eyes
+$port-number: #2980b9;  // Medium Blue - distinct and professional for numbers
+$port-boolean: #e74c3c; // Red - easily signals true/false logic
+$port-object: #8e44ad;  // Deep Purple - complex type, visually heavy
+$port-array: #16a085;   // Dark Teal - distinct from string, still data-like
+$port-any: #95a5a6;     // Muted Gray - ambiguous, flexible
+$port-data: #3498db;    // Blue - general data ports, easily distinguishable
+
 
 // Additional node-specific port colors
 $port-start: #4caf50; // Green for start nodes
@@ -57,7 +58,7 @@ $port-text: #795548; // Brown for text nodes
 
 // Flow type colors
 $flow-color: #e67e22; // Orange for control flow
-$data-color: #03dac6; // Teal for data flow
+$data-color: #0384da; // Teal for data flow
 
 // Layout Sizes
 $panel-width: 250px;

@@ -104,139 +104,34 @@
     }
   }
 
-  // Node type specific styling
-  &[data-node-type="start"] {
+  &[data-flow-type="flow"] {
     .node-header {
-      background-color: $port-start;
+      background-color: $flow-color;
+      color: $on-primary;
 
       &::after {
-        background: linear-gradient(to right, $port-start, color.adjust($port-start, $lightness: -15%));
+        background: linear-gradient(to right, $flow-color, color.adjust($flow-color, $lightness: -15%));
       }
     }
 
     .node-icon {
-      background-color: rgba($port-start, 0.2);
-      color: $port-start;
+      background-color: rgba($flow-color, 0.2);
+      color: $flow-color;
     }
   }
-
-  &[data-node-type="message"] {
+  &[data-flow-type="data"] {
     .node-header {
-      background-color: $port-string;
+      background-color: $data-color;
+      color: $on-primary;
 
       &::after {
-        background: linear-gradient(to right, $port-string, color.adjust($port-string, $lightness: -15%));
+        background: linear-gradient(to right, $data-color, color.adjust($data-color, $lightness: -15%));
       }
     }
 
     .node-icon {
-      background-color: rgba($port-string, 0.2);
-      color: $port-string;
-    }
-  }
-
-  &[data-node-type="input"] {
-    .node-header {
-      background-color: $port-input;
-
-      &::after {
-        background: linear-gradient(to right, $port-input, color.adjust($port-input, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-input, 0.2);
-      color: $port-input;
-    }
-  }
-
-  &[data-node-type="condition"] {
-    .node-header {
-      background-color: $port-condition;
-
-      &::after {
-        background: linear-gradient(to right, $port-condition, color.adjust($port-condition, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-condition, 0.2);
-      color: $port-condition;
-    }
-  }
-
-  &[data-node-type="options"] {
-    .node-header {
-      background-color: $port-options;
-
-      &::after {
-        background: linear-gradient(to right, $port-options, color.adjust($port-options, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-options, 0.2);
-      color: $port-options;
-    }
-  }
-
-  &[data-node-type="math"] {
-    .node-header {
-      background-color: $port-number;
-
-      &::after {
-        background: linear-gradient(to right, $port-number, color.adjust($port-number, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-number, 0.2);
-      color: $port-number;
-    }
-  }
-
-  &[data-node-type="random"] {
-    .node-header {
-      background-color: $port-random;
-
-      &::after {
-        background: linear-gradient(to right, $port-random, color.adjust($port-random, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-random, 0.2);
-      color: $port-random;
-    }
-  }
-
-  &[data-node-type="increment"] {
-    .node-header {
-      background-color: $port-increment;
-
-      &::after {
-        background: linear-gradient(to right, $port-increment, color.adjust($port-increment, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-increment, 0.2);
-      color: $port-increment;
-    }
-  }
-
-  &[data-node-type="text"] {
-    .node-header {
-      background-color: $port-text;
-
-      &::after {
-        background: linear-gradient(to right, $port-text, color.adjust($port-text, $lightness: -15%));
-      }
-    }
-
-    .node-icon {
-      background-color: rgba($port-text, 0.2);
-      color: $port-text;
+      background-color: rgba($data-color, 0.2);
+      color: $data-color;
     }
   }
 

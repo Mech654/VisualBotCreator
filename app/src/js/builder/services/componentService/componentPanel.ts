@@ -12,11 +12,11 @@ async function fetchAvailableComponents() {
 
     await loadComponentIcons(componentTypeNames);
 
-    // Only allow 'Flow' and 'Data' categories
+    // Add Variable category
     const categories: Record<
       string,
       Array<{ type: string; name: string; category: string; icon: string }>
-    > = { Flow: [], Data: [] };
+    > = { Flow: [], Data: [], Variable: [] };
 
     for (const nodeType of nodeTypes) {
       let type: string;
@@ -30,8 +30,10 @@ async function fetchAvailableComponents() {
       } else {
         type = String(nodeType.type || '');
         name = nodeType.name || (type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Unknown');
-        // Only allow 'Flow' or 'Data' as category
-        category = nodeType.category === 'Data' ? 'Data' : 'Flow';
+        // Allow Flow, Data, or Variable as category
+        if (nodeType.category === 'Data') category = 'Data';
+        else if (nodeType.category === 'Variable') category = 'Variable';
+        else category = 'Flow';
       }
 
       const iconSvg = getIcon(type.toLowerCase()) || '🧩';
@@ -157,13 +159,17 @@ function getCategoryIcon(category: string): string {
   if (category === 'Data') {
     return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>';
   }
+  if (category === 'Variable') {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><text x="12" y="16" text-anchor="middle" font-size="10" fill="currentColor">V</text></svg>';
+  }
   // Default to Flow icon
   return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1 2 2z"></path></svg>';
 }
 
 function getFlowType(category: string): string {
-  // Only two categories: Data and Flow
-  return category === 'Data' ? 'data' : 'flow';
+  // Support Variable as data type for flowType
+  if (category === 'Data' || category === 'Variable') return 'data';
+  return 'flow';
 }
 
 function initDraggableComponents(): void {

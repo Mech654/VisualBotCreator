@@ -226,21 +226,31 @@
   
   // Icon
   .component-icon {
+    all: initial;
     width: 32px;
     height: 32px;
-    margin-bottom: $spacing-xs;
+    margin-bottom: var(--spacing-xs, 0.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: $font-size-xl;
-    transition: transform $transition-time-fast $transition-function;
-    color: $text-primary;
+    font-size: var(--font-size-xl, 1.25rem);
+    transition: transform var(--transition-time-fast, 0.15s) var(--transition-function, cubic-bezier(0.4, 0, 0.2, 1));
+    
+    /* Reset color and background for SVG icons */
+    color: unset !important;
+    background: unset !important;
+    background-color: unset !important;
+    border-radius: unset !important;
+    box-shadow: unset !important;
     
     svg {
+      all: unset;
       width: 24px;
       height: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
+      stroke: unset;
+      stroke-width: unset;
+      fill: unset;
+      background: unset;
     }
   }
   

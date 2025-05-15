@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#e0e3ea"/>
+  <g font-family="monospace" font-weight="bold">
+    <text x="16" y="16" font-size="10" fill="#636e72" text-anchor="middle">BASE</text>
+    <text x="16" y="26" font-size="13" fill="#00b894" text-anchor="middle">64</text>
+  </g>
+</svg>
