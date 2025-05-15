@@ -54,7 +54,7 @@ export class GuideNode extends Node {
    */
   static metadata = {
     name: 'Guide', // Display name in the component panel
-    category: ComponentCategory.DATA_PROCESSING, // Category for organization in the UI
+    category: ComponentCategory.FLOW, // Category for organization in the UI
     description: 'A guide for creating nodes', // Description shown as tooltip
     flowType: 'data', // 'flow' or 'data' based on primary function
     icon: '📋', // Icon to display in the UI

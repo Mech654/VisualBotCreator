@@ -9,7 +9,7 @@ export interface TemplateNodeProperties extends NodeProperties {
 export class TemplateNode extends Node {
   static metadata = {
     name: 'Template',
-    category: ComponentCategory.OTHER,
+    category: ComponentCategory.FLOW,
     description: 'Minimal node template.',
     flowType: 'data',
     icon: '📄',
