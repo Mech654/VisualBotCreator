@@ -13,10 +13,9 @@ export interface TextNodeProperties extends NodeProperties {
 export class TextNode extends Node {
   static metadata = {
     name: 'Text',
-    category: ComponentCategory.DATA_PROCESSING,
-    description: 'Process and format text content',
+    category: ComponentCategory.DATA,
+    description: 'Text node',
     flowType: 'data',
-    icon: '📄',
   };
 
   static override shownProperties = ['text', 'fontSize', 'bold', 'color'];

@@ -9,8 +9,8 @@ export interface IncrementNodeProperties extends NodeProperties {
 export class IncrementNode extends Node {
   static metadata = {
     name: 'Increment',
-    category: ComponentCategory.DATA_PROCESSING,
-    description: 'Takes a number and increments it',
+    category: ComponentCategory.DATA,
+    description: 'Increment node',
     flowType: 'data',
     icon: '➕',
   };

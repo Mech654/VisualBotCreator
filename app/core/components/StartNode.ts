@@ -8,8 +8,8 @@ interface StartNodeProperties extends NodeProperties {
 export class StartNode extends Node {
   static metadata = {
     name: 'Start',
-    category: ComponentCategory.CONVERSATION_FLOW,
-    description: 'Entry point for the bot conversation',
+    category: ComponentCategory.FLOW,
+    description: 'Start node',
     flowType: 'flow',
     icon: '🚀',
   };

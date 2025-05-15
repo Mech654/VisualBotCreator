@@ -12,10 +12,11 @@ async function fetchAvailableComponents() {
 
     await loadComponentIcons(componentTypeNames);
 
+    // Only allow 'Flow' and 'Data' categories
     const categories: Record<
       string,
       Array<{ type: string; name: string; category: string; icon: string }>
-    > = {};
+    > = { Flow: [], Data: [] };
 
     for (const nodeType of nodeTypes) {
       let type: string;
@@ -25,18 +26,15 @@ async function fetchAvailableComponents() {
       if (typeof nodeType === 'string') {
         type = nodeType;
         name = nodeType.charAt(0).toUpperCase() + type.slice(1);
-        category = 'Components';
+        category = 'Flow';
       } else {
         type = String(nodeType.type || '');
         name = nodeType.name || (type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Unknown');
-        category = nodeType.category || 'Components';
+        // Only allow 'Flow' or 'Data' as category
+        category = nodeType.category === 'Data' ? 'Data' : 'Flow';
       }
 
       const iconSvg = getIcon(type.toLowerCase()) || '🧩';
-
-      if (!categories[category]) {
-        categories[category] = [];
-      }
 
       categories[category].push({
         type: String(type),
@@ -45,6 +43,11 @@ async function fetchAvailableComponents() {
         icon: iconSvg,
       });
     }
+
+    // Remove empty categories
+    Object.keys(categories).forEach(cat => {
+      if (categories[cat].length === 0) delete categories[cat];
+    });
 
     return { categories };
   } catch (error) {
@@ -100,9 +103,9 @@ export async function populateComponentsPanel(): Promise<void> {
             comp => `
           <div class="component-item" draggable="true" 
                data-type="${comp.type}" 
-               data-flow-type="${getFlowType(comp.type)}"
+               data-flow-type="${getFlowType(comp.category)}"
                data-search-terms="${comp.type} ${comp.name} ${categoryName}">
-            <div class="flow-type-indicator ${getFlowType(comp.type)}-type"></div>
+            <div class="flow-type-indicator ${getFlowType(comp.category)}-type"></div>
             <div class="component-icon" data-component-type="${comp.type}">${comp.icon}</div>
             <div class="component-name">${comp.name}</div>
           </div>
@@ -151,49 +154,16 @@ export async function populateComponentsPanel(): Promise<void> {
 }
 
 function getCategoryIcon(category: string): string {
-  const categoryIcons: Record<string, string> = {
-    'Conversation Flow':
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1 2 2z"></path></svg>',
-    Logic:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 12 21 22 3"></polygon></svg>',
-    'Data Processing':
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>',
-    'Input/Output':
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"></line><polyline points="5 15 2 12 5 9"></polyline><polyline points="19 9 22 12 19 15"></polyline></svg>',
-    Components:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
-    Media:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
-    Variables:
-      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
-  };
-
-  return (
-    categoryIcons[category] ||
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
-  );
+  if (category === 'Data') {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>';
+  }
+  // Default to Flow icon
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1 2 2z"></path></svg>';
 }
 
-function getFlowType(type: string): string {
-  const dataComponents = [
-    'math',
-    'variable',
-    'data',
-    'text',
-    'number',
-    'boolean',
-    'array',
-    'object',
-    'function',
-  ];
-
-  for (const comp of dataComponents) {
-    if (type.toLowerCase().includes(comp)) {
-      return 'data';
-    }
-  }
-
-  return 'flow';
+function getFlowType(category: string): string {
+  // Only two categories: Data and Flow
+  return category === 'Data' ? 'data' : 'flow';
 }
 
 function initDraggableComponents(): void {

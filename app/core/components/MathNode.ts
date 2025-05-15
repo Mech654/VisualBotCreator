@@ -11,7 +11,7 @@ export interface MathNodeProperties extends NodeProperties {
 export class MathNode extends Node {
   static metadata = {
     name: 'Math',
-    category: ComponentCategory.DATA_PROCESSING,
+    category: ComponentCategory.DATA,
     description: 'Perform mathematical operations on numerical inputs',
     flowType: 'data',
     icon: '🧮',

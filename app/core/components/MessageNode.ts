@@ -12,8 +12,8 @@ export interface MessageNodeProperties extends NodeProperties {
 export class MessageNode extends Node {
   static metadata = {
     name: 'Message',
-    category: ComponentCategory.CONVERSATION_FLOW,
-    description: 'Send a message to the user',
+    category: ComponentCategory.FLOW,
+    description: 'Message node',
     flowType: 'flow',
     icon: '💬',
   };

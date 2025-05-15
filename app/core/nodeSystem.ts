@@ -7,15 +7,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define component categories for organization
+// Define only two component categories
 export enum ComponentCategory {
-  CONVERSATION_FLOW = 'Conversation Flow',
-  LOGIC = 'Logic',
-  DATA_PROCESSING = 'Data Processing',
-  INPUT_OUTPUT = 'Input/Output',
-  MEDIA = 'Media',
-  VARIABLES = 'Variables',
-  OTHER = 'Other',
+  FLOW = 'Flow',
+  DATA = 'Data',
 }
 
 export interface NodeComponent {
@@ -33,49 +28,6 @@ export class NodeFactory {
   private static nodeTypes: Record<string, NodeComponent> = {};
   private static componentsDir = path.join(__dirname, 'components');
   private static isInitialized = false;
-
-  /**
-   * Map of keywords to categories - used for auto-categorization of new components
-   */
-  private static typeCategoryKeywords: Record<string, ComponentCategory> = {
-    // Conversation Flow
-    start: ComponentCategory.CONVERSATION_FLOW,
-    message: ComponentCategory.CONVERSATION_FLOW,
-    options: ComponentCategory.CONVERSATION_FLOW,
-    dialog: ComponentCategory.CONVERSATION_FLOW,
-    chat: ComponentCategory.CONVERSATION_FLOW,
-
-    // Logic
-    condition: ComponentCategory.LOGIC,
-    if: ComponentCategory.LOGIC,
-    switch: ComponentCategory.LOGIC,
-    branch: ComponentCategory.LOGIC,
-    logic: ComponentCategory.LOGIC,
-
-    // Data Processing
-    math: ComponentCategory.DATA_PROCESSING,
-    data: ComponentCategory.DATA_PROCESSING,
-    text: ComponentCategory.DATA_PROCESSING,
-    string: ComponentCategory.DATA_PROCESSING,
-    number: ComponentCategory.DATA_PROCESSING,
-
-    // Input/Output
-    input: ComponentCategory.INPUT_OUTPUT,
-    output: ComponentCategory.INPUT_OUTPUT,
-    file: ComponentCategory.INPUT_OUTPUT,
-    api: ComponentCategory.INPUT_OUTPUT,
-
-    // Media
-    image: ComponentCategory.MEDIA,
-    audio: ComponentCategory.MEDIA,
-    video: ComponentCategory.MEDIA,
-    media: ComponentCategory.MEDIA,
-
-    // Variables
-    variable: ComponentCategory.VARIABLES,
-    var: ComponentCategory.VARIABLES,
-    store: ComponentCategory.VARIABLES,
-  };
 
   /**
    * Dynamically discover and load all components from the components directory
@@ -112,9 +64,9 @@ export class NodeFactory {
             // Extract the type from the component name (assuming it ends with "Node")
             const type = this.getTypeFromComponentName(componentName);
 
-            // If the component doesn't have metadata, try to infer it
+            // If the component doesn't have metadata, set default metadata
             if (!ComponentClass.metadata) {
-              ComponentClass.metadata = this.inferMetadata(type, componentName);
+              ComponentClass.metadata = this.defaultMetadata(type, componentName);
             }
 
             // Register the component
@@ -139,42 +91,23 @@ export class NodeFactory {
   }
 
   /**
-   * Infer metadata for a component based on its name
+   * Provide default metadata for a component: only 'Flow' or 'Data' category
    */
-  private static inferMetadata(type: string, componentName: string): NodeComponent['metadata'] {
-    // Try to auto-categorize the component based on its type
-    let category: ComponentCategory = ComponentCategory.OTHER;
-
-    // Check each keyword for category matching
-    for (const [keyword, matchCategory] of Object.entries(this.typeCategoryKeywords)) {
-      if (type.includes(keyword)) {
-        category = matchCategory;
-        break;
-      }
-    }
-
-    // Infer flow type based on category
-    const flowType =
-      category === ComponentCategory.DATA_PROCESSING ||
-      type.includes('data') ||
-      type.includes('math') ||
-      type.includes('number') ||
-      type.includes('string')
-        ? 'data'
-        : 'flow';
-
-    // Format the name nicely
+  private static defaultMetadata(type: string, componentName: string): NodeComponent['metadata'] {
+    // Assign 'Data' if type includes 'data', 'math', 'number', 'string', otherwise 'Flow'
+    const isData = /data|math|number|string/.test(type);
+    const category = isData ? ComponentCategory.DATA : ComponentCategory.FLOW;
+    const flowType = isData ? 'data' : 'flow';
     const name = componentName
       .replace(/Node$/, '')
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
       .trim();
-
     return {
       name,
       category,
       description: `${name} component`,
-      flowType: flowType,
+      flowType,
     };
   }
 
@@ -207,7 +140,12 @@ export class NodeFactory {
 
       // Default values for component metadata
       const name = metadata.name || type.charAt(0).toUpperCase() + type.slice(1);
-      const category = metadata.category || ComponentCategory.OTHER;
+      // Only allow 'Flow' or 'Data' as category
+      let category = metadata.category;
+      if (category !== ComponentCategory.FLOW && category !== ComponentCategory.DATA) {
+        // fallback to default
+        category = ComponentCategory.FLOW;
+      }
       const flowType = metadata.flowType || 'flow';
 
       return { type, name, category: String(category), flowType };

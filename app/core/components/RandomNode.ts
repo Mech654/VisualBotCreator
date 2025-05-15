@@ -12,10 +12,9 @@ export interface RandomNodeProperties extends NodeProperties {
 export class RandomNode extends Node {
   static metadata = {
     name: 'Random',
-    category: ComponentCategory.DATA_PROCESSING,
-    description: 'Generate random values of different types',
+    category: ComponentCategory.DATA,
+    description: 'Random node',
     flowType: 'data',
-    icon: '🎲',
   };
 
   static override shownProperties = ['min', 'max', 'type', 'length'];

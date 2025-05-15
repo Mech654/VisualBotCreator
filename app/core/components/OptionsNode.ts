@@ -15,8 +15,8 @@ export interface OptionsNodeProperties extends NodeProperties {
 export class OptionsNode extends Node {
   static metadata = {
     name: 'Options',
-    category: ComponentCategory.CONVERSATION_FLOW,
-    description: 'Present options to the user',
+    category: ComponentCategory.FLOW,
+    description: 'Options node',
     flowType: 'flow',
     icon: '📋',
   };

@@ -10,10 +10,9 @@ export interface ConditionNodeProperties extends NodeProperties {
 export class ConditionNode extends Node {
   static metadata = {
     name: 'Condition',
-    category: ComponentCategory.LOGIC,
-    description: 'Evaluate a condition and branch flow',
+    category: ComponentCategory.FLOW,
+    description: 'Condition node',
     flowType: 'flow',
-    icon: '❓',
   };
 
   static override shownProperties = ['condition'];
