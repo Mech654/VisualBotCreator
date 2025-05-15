@@ -1,4 +1,4 @@
-import { PortCategory, PortType } from '../../../core/base';
+import { PortCategory, PortType } from '../../../../../core/base';
 import { PORT_TYPE_COMPATIBILITY } from './connectionState';
 
 export function showConnectionFeedback(portElement: HTMLElement, message: string, color: string): void {

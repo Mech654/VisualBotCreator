@@ -1,5 +1,5 @@
-import { NodeInstance, ConnectionMode } from '../models/types';
-import { PortCategory, PortType } from '../../../core/base';
+import { NodeInstance, ConnectionMode } from '../../models/types';
+import { PortCategory, PortType } from '../../../../../core/base';
 import { getConnectionState, setConnectionState, CONNECTION_COLORS } from './connectionState';
 import { showConnectionFeedback, checkPortsCompatibility } from './connectionUtils';
 import { createConnection, cancelConnectionDrawing } from './connectionLifecycle';

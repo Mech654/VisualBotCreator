@@ -1,7 +1,7 @@
-import { InteractEvent, NodeRectangle } from '../models/types';
-import { showCollisionFeedback, snapToGrid } from '../utils/grid';
-import { updateNodePosition, showPropertiesPanel } from './nodeService';
-import { updateConnections } from './connectionService';
+import { InteractEvent, NodeRectangle } from '../../models/types';
+import { showCollisionFeedback, snapToGrid } from '../../utils/grid';
+import { updateNodePosition, showPropertiesPanel } from '../nodeService/nodeService';
+import { updateConnections } from '../connectionService/connectionService';
 
 // Declare the global interact object for TypeScript
 declare const interact: any;

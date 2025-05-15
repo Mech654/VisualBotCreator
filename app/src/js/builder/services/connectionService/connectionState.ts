@@ -1,5 +1,5 @@
-import { ConnectionMode, ConnectionState } from '../models/types';
-import { PortCategory, PortType } from '../../../core/base';
+import { ConnectionMode, ConnectionState } from '../../models/types';
+import { PortCategory, PortType } from '../../../../../core/base';
 
 export let connectionState: ConnectionState = {
   mode: ConnectionMode.NONE,

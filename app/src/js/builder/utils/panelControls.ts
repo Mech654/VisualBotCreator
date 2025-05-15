@@ -1,4 +1,4 @@
-import { createRippleEffect, enterTransition, exitTransition } from '../ui/transitions';
+import { createRippleEffect, enterTransition, exitTransition } from './transitions';
 
 export function setupComponentPanelResize(): void {
   const rightPanelEl = document.querySelector('.right-panel') as HTMLElement;

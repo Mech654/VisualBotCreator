@@ -1,4 +1,4 @@
-import { enterTransition, exitTransition } from '../ui/transitions';
+import { enterTransition, exitTransition } from './transitions';
 
 export function showNotification(message: string, type: 'success' | 'error' | 'info'): void {
   const notification = document.createElement('div');

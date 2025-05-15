@@ -5,7 +5,7 @@ export const ZOOM_STEP = 0.1;
 export const DEFAULT_CANVAS_WIDTH = 3000;
 export const DEFAULT_CANVAS_HEIGHT = 2000;
 
-import { updateConnections } from '../services/connectionService';
+import { updateConnections } from '../services/connectionService/connectionService';
 
 export function setupCanvasDimensions(canvasContainer: HTMLElement): void {
   const canvasContent = canvasContainer.querySelector('.canvas-content') as HTMLElement;

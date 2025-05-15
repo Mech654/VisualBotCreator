@@ -1,14 +1,14 @@
-import { NodeInstance } from '../models/types';
-import { PortCategory, PortType } from '../../../core/base';
+import { NodeInstance } from '../../models/types';
+import { PortCategory, PortType } from '../../../../../core/base';
 
 export function generateNodeHtml(nodeInstance: NodeInstance): string {
   const { type, properties, inputs, outputs } = nodeInstance;
 
-  const flowInputs = inputs.filter(input => isFlowPort(input.dataType));
-  const dataInputs = inputs.filter(input => !isFlowPort(input.dataType));
+  const flowInputs = inputs.filter((input: {dataType: string}) => isFlowPort(input.dataType));
+  const dataInputs = inputs.filter((input: {dataType: string}) => !isFlowPort(input.dataType));
 
-  const flowOutputs = outputs.filter(output => isFlowPort(output.dataType));
-  const dataOutputs = outputs.filter(output => !isFlowPort(output.dataType));
+  const flowOutputs = outputs.filter((output: {dataType: string}) => isFlowPort(output.dataType));
+  const dataOutputs = outputs.filter((output: {dataType: string}) => !isFlowPort(output.dataType));
 
   const mainInputPort = flowInputs.length > 0 ? flowInputs[0] : null;
 
@@ -137,7 +137,7 @@ function isFlowPort(dataType: string): boolean {
   return dataType === 'control' || dataType === 'flow';
 }
 
-function hasFlowPorts(inputs: Array<any>, outputs: Array<any>): boolean {
+function hasFlowPorts(inputs: Array<{dataType: string}>, outputs: Array<{dataType: string}>): boolean {
   return (
     inputs.some(port => isFlowPort(port.dataType)) ||
     outputs.some(port => isFlowPort(port.dataType))

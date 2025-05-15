@@ -1,9 +1,9 @@
-import { exportConnections, clearConnections } from '../services/connectionService';
-import { createNodeInstance } from '../services/nodeService';
-import { initDraggableNodes } from '../services/dragDropService';
-import { showNotification } from './notifications';
-import { enterTransition, staggerAnimation, createRippleEffect, addAttentionAnimation } from '../ui/transitions';
-import { getNodes, setNodes, addNode } from './nodeState';
+import { exportConnections, clearConnections } from '../connectionService/connectionService';
+import { createNodeInstance } from '../nodeService/nodeService';
+import { initDraggableNodes } from '../dragDropService/dragDropService';
+import { showNotification } from '../../utils/notifications';
+import { enterTransition, staggerAnimation, createRippleEffect, addAttentionAnimation } from '../../utils/transitions';
+import { getNodes, addNode, setNodes } from '../nodeService/nodeState';
 
 async function saveProject(): Promise<void> {
   try {

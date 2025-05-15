@@ -1,4 +1,4 @@
-import { PortCategory } from '../../../core/base';
+import { PortCategory } from '../../../../../core/base';
 import { createConnection, connections } from './connectionLifecycle';
 
 export function exportConnections(): Record<string, any>[] {

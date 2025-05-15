@@ -1,5 +1,5 @@
 import '../scss/index.scss';
-import { showPageTransition } from './ui/transitions';
+import { showPageTransition } from './builder/utils/transitions';
 declare const module: any;
 
 interface ActionItem {

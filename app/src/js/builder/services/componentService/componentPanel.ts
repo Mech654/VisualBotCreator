@@ -1,4 +1,4 @@
-import { createIconElement, getIcon, loadComponentIcons } from '../utils/iconLoader';
+import { createIconElement, getIcon, loadComponentIcons } from '../../utils/iconLoader';
 
 async function fetchAvailableComponents() {
   try {

@@ -1,5 +1,5 @@
 // Utility functions for node UI updates and event listeners
-import { NodeInstance } from '../models/types';
+import { NodeInstance } from '../../models/types';
 
 /**
  * Update the node's DOM element content based on its properties.
@@ -22,7 +22,7 @@ export function updateNodeElementContent(
       } else if (el instanceof HTMLElement) {
         if (typeof value === 'string') {
           el.innerHTML = value;
-        } else {
+        } else if (value !== null && value !== undefined) {
           el.textContent = String(value);
         }
       }

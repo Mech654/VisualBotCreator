@@ -1,6 +1,6 @@
-import { exitTransition } from '../ui/transitions';
-import { deleteNode } from '../services/nodeService';
-import { showNotification } from './notifications';
+import { exitTransition } from '../../utils/transitions';
+import { deleteNode } from './nodeService';
+import { showNotification } from '../../utils/notifications';
 import { removeNodeById } from './nodeState';
 
 export function initNodeManagement(): void {

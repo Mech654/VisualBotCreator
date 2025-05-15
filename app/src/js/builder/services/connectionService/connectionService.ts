@@ -1,5 +1,5 @@
-import { NodeInstance } from '../models/types';
-export { initNodeConnections } from '../builder/portSetup';
+import { NodeInstance } from '../../models/types';
+export { initNodeConnections } from './portSetup';
 export {
   createConnection,
   cancelConnectionDrawing,
@@ -7,21 +7,21 @@ export {
   getNodeConnections,
   removeNodeConnections,
   connections
-} from '../builder/connectionLifecycle';
+} from './connectionLifecycle';
 export {
   exportConnections,
   importConnections,
   clearConnections
-} from '../builder/connectionIO';
+} from './connectionIO';
 export {
   showConnectionFeedback,
   checkPortsCompatibility
-} from '../builder/connectionUtils';
+} from './connectionUtils';
 export {
   getConnectionState,
   setConnectionState,
   CONNECTION_COLORS,
   PORT_TYPE_COMPATIBILITY
-} from '../builder/connectionState';
+} from './connectionState';
 
 declare const LeaderLine: any;

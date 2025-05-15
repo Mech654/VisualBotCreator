@@ -1,11 +1,11 @@
-import { snapToGrid } from '../utils/grid';
-import { exitTransition, highlightElement, enterTransition } from '../ui/transitions';
-import { createNodeInstance, checkPositionValidity } from '../services/nodeService';
-import { initDraggableNodes, setupCanvasDropArea } from '../services/dragDropService';
-import { cancelConnectionDrawing } from '../services/connectionService';
-import { initZoomControls } from '../utils/zoom';
-import { showNotification } from './notifications';
-import { getNodes, addNode } from './nodeState';
+import { snapToGrid } from '../../utils/grid';
+import { exitTransition, highlightElement, enterTransition } from '../../utils/transitions';
+import { createNodeInstance, checkPositionValidity } from '../nodeService/nodeService';
+import { initDraggableNodes, setupCanvasDropArea } from '../dragDropService/dragDropService';
+import { cancelConnectionDrawing } from '../connectionService/connectionService';
+import { initZoomControls } from '../../utils/zoom';
+import { showNotification } from '../../utils/notifications';
+import { getNodes, addNode } from '../nodeService/nodeState';
 
 export function initCanvasInteractions(): void {
   const canvas = document.getElementById('canvas') as HTMLElement;
