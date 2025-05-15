@@ -162,12 +162,10 @@ The node creation process follows these simple steps:
 Contributions are welcome! Please fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
 
 ### Areas for Contribution
-- Additional node components
-- UI/UX improvements
-- Documentation and examples
-- Testing and bug fixes
-- New feature implementations
-
+Contributions goes under 3 categories. 
+1. New components. The app is dynamicly structured to create components based on existing component.ts files inside app/core/components/. If you want to create a new component, which you are 100% welcome to do, you should make a pr with only a new component.ts file, and a .svg icon(optional). You shouldnt make changes to styles, functionality and etc. Yet you can do everything you want inside the component class file, including base node class overrides.
+2. Anything else, except new components, though you can make changes to archive a better architecture for new components to come.
+3. Issues.
 ## License
 
 This project is licensed under the MIT License.
