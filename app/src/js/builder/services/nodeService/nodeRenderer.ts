@@ -149,10 +149,33 @@ function getPortCategory(dataType: string): string {
 }
 
 function getPortTypeClass(dataType: string): string {
-  if (dataType === PortType.CONTROL || dataType === 'control' || dataType === 'flow') {
-    return 'port-control';
+  // Add type-specific class for data ports
+  switch (dataType) {
+    case PortType.STRING:
+    case 'string':
+      return 'port-string';
+    case PortType.NUMBER:
+    case 'number':
+      return 'port-number';
+    case PortType.BOOLEAN:
+    case 'boolean':
+      return 'port-boolean';
+    case PortType.OBJECT:
+    case 'object':
+      return 'port-object';
+    case PortType.ARRAY:
+    case 'array':
+      return 'port-array';
+    case PortType.ANY:
+    case 'any':
+      return 'port-any';
+    case PortType.CONTROL:
+    case 'control':
+    case 'flow':
+      return 'port-control';
+    default:
+      return 'port-data';
   }
-  return 'port-data';
 }
 
 function buildPortClassList(base: string[], dataType: string): string {

@@ -375,83 +375,14 @@
 
 .port-string {
   background: linear-gradient(135deg, $port-string, color.adjust($port-string, $lightness: -15%));
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: $background;
-    border: 1px solid $port-string;
-  }
-  
-  &::after {
-    content: '"';
-    position: absolute;
-    top: -5px;
-    right: -4px;
-    font-size: 8px;
-    color: $port-string;
-    font-weight: bold;
-    z-index: 2;
-  }
 }
 
 .port-number {
   background: linear-gradient(135deg, $port-number, color.adjust($port-number, $lightness: -15%));
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: $background;
-    border: 1px solid $port-number;
-  }
-  
-  &::after {
-    content: '#';
-    position: absolute;
-    top: -5px;
-    right: -4px;
-    font-size: 8px;
-    color: $port-number;
-    font-weight: bold;
-    z-index: 2;
-  }
 }
 
 .port-boolean {
   background: linear-gradient(135deg, $port-boolean, color.adjust($port-boolean, $lightness: -15%));
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: $background;
-    border: 1px solid $port-boolean;
-  }
-  
-  &::after {
-    content: '?';
-    position: absolute;
-    top: -5px;
-    right: -4px;
-    font-size: 8px;
-    color: $port-boolean;
-    font-weight: bold;
-    z-index: 2;
-  }
 }
 
 .port-object {
@@ -477,17 +408,6 @@
 .port-array {
   background: linear-gradient(135deg, $port-array, color.adjust($port-array, $lightness: -15%));
   border-radius: 2px;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    right: 3px;
-    bottom: 3px;
-    background-color: transparent;
-    border: 1px solid $background;
-  }
 }
 
 .port-any {
@@ -517,43 +437,7 @@
 
 // Port type indicators - small decorations showing port type
 .port-type-indicator {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid $background;
-  z-index: 5;
-  box-shadow: $shadow-sm;
-  
-  &.port-type-flow {
-    background-color: $flow-color;
-  }
-  
-  &.port-type-string {
-    background-color: $port-string;
-  }
-  
-  &.port-type-number {
-    background-color: $port-number;
-  }
-  
-  &.port-type-boolean {
-    background-color: $port-boolean;
-  }
-  
-  &.port-type-object {
-    background-color: $port-object;
-  }
-  
-  &.port-type-array {
-    background-color: $port-array;
-  }
-  
-  &.port-type-any {
-    background-color: $port-any;
-  }
+  display: none !important;
 }
 
 // Port tooltip - shows on hover
