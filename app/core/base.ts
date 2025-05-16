@@ -169,11 +169,13 @@ export class Port {
   dataType: string;
   category: PortCategory;
   connectedTo: Connection[];
+  propertyKey?: string; 
 
-  constructor(id: string, label: string, dataType: string) {
+  constructor(id: string, label: string, dataType: string, propertyKey?: string) {
     this.id = id;
     this.label = label;
     this.dataType = dataType;
+    this.propertyKey = propertyKey;
     // Determine category based on data type
     this.category = PORT_CATEGORIES[PortCategory.FLOW].includes(dataType as PortType)
       ? PortCategory.FLOW

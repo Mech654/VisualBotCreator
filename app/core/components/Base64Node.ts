@@ -21,9 +21,9 @@ export class Base64Node extends Node {
     properties.nodeContent = 'Encodes input to Base64';
     super(id, 'base64', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
-    this.addInput(new Port('value', 'Value', 'string'));
+    this.addInput(new Port('value', 'Value', 'string', 'value'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addOutput(new Port('base64', 'Base64', 'string'));
+    this.addOutput(new Port('base64', 'Base64', 'string', 'base64'));
   }
 
   updateNodeContent() {

@@ -25,7 +25,7 @@ export class IntVariableNode extends Node {
     super(id, 'intvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addOutput(new Port('value', 'Value', 'number'));
+    this.addOutput(new Port('value', 'Value', 'number', 'value'));
   }
 
   updateNodeContent() {

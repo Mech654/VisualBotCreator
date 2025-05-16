@@ -28,15 +28,15 @@ export class RandomNode extends Node {
     super(id, 'random', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addInput(new Port('min', 'Minimum', 'number'));
-    this.addInput(new Port('max', 'Maximum', 'number'));
-    this.addInput(new Port('seed', 'Seed', 'number'));
+    this.addInput(new Port('min', 'Minimum', 'number', 'min'));
+    this.addInput(new Port('max', 'Maximum', 'number', 'max'));
+    this.addInput(new Port('seed', 'Seed', 'number', 'seed'));
     if (properties.type === 'boolean') {
-      this.addOutput(new Port('value', 'Random Boolean', 'boolean'));
+      this.addOutput(new Port('value', 'Random Boolean', 'boolean', 'value'));
     } else if (properties.type === 'string') {
-      this.addOutput(new Port('value', 'Random String', 'string'));
+      this.addOutput(new Port('value', 'Random String', 'string', 'value'));
     } else {
-      this.addOutput(new Port('value', 'Random Number', 'number'));
+      this.addOutput(new Port('value', 'Random Number', 'number', 'value'));
     }
   }
   updateNodeContent() {

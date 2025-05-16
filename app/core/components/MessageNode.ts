@@ -40,7 +40,7 @@ export class MessageNode extends Node {
     super(id, 'message', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addOutput(new Port('messageText', 'Message Text', 'string'));
+    this.addOutput(new Port('messageText', 'Message Text', 'string', 'message'));
   }
 
   formatMessagePreview(message: string): string {

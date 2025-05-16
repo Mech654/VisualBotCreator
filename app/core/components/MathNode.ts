@@ -28,11 +28,11 @@ export class MathNode extends Node {
     super(id, 'math', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addInput(new Port('a', 'Variable A', 'number'));
-    this.addInput(new Port('b', 'Variable B', 'number'));
-    this.addInput(new Port('expression', 'Expression', 'string'));
-    this.addOutput(new Port('result', 'Result', 'number'));
-    this.addOutput(new Port('error', 'Error', 'string'));
+    this.addInput(new Port('a', 'Variable A', 'number', 'variables'));
+    this.addInput(new Port('b', 'Variable B', 'number', 'variables'));
+    this.addInput(new Port('expression', 'Expression', 'string', 'expression'));
+    this.addOutput(new Port('result', 'Result', 'number', 'expression'));
+    this.addOutput(new Port('error', 'Error', 'string', 'expression'));
   }
 
   updateNodeContent() {

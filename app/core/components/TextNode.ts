@@ -31,9 +31,9 @@ export class TextNode extends Node {
     super(id, 'text', textNodeProps);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addInput(new Port('textInput', 'Text Input', 'string'));
-    this.addOutput(new Port('textOutput', 'Text Output', 'string'));
-    this.addOutput(new Port('length', 'Length', 'number'));
+    this.addInput(new Port('textInput', 'Text Input', 'string', 'text'));
+    this.addOutput(new Port('textOutput', 'Text Output', 'string', 'text'));
+    this.addOutput(new Port('length', 'Length', 'number', 'text'));
   }
 
   updateNodeContent() {

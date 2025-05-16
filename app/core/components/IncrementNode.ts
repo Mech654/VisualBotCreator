@@ -24,8 +24,8 @@ export class IncrementNode extends Node {
     super(id, 'increment', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addInput(new Port('number', 'Number', 'number'));
-    this.addOutput(new Port('result', 'Result', 'number'));
+    this.addInput(new Port('number', 'Number', 'number', 'number'));
+    this.addOutput(new Port('result', 'Result', 'number', 'incrementBy'));
   }
 
   updateNodeContent() {

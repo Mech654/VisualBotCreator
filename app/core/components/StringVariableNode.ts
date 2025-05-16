@@ -25,7 +25,7 @@ export class StringVariableNode extends Node {
     super(id, 'stringvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addOutput(new Port('value', 'Value', 'string'));
+    this.addOutput(new Port('value', 'Value', 'string', 'value'));
   }
 
   updateNodeContent() {

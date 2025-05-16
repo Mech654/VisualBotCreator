@@ -20,7 +20,7 @@ export class StartNode extends Node {
     properties.title = properties.title || 'Start';
     properties.nodeContent = 'Bot conversation starts here';
     super(id, 'start', properties);
-    this.addOutput(new Port('next', 'Next', 'control'));
+    this.addOutput(new Port('next', 'Next', 'control', 'next'));
   }
 
   updateNodeContent() {

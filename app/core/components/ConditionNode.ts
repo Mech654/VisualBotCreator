@@ -23,9 +23,9 @@ export class ConditionNode extends Node {
     properties.condition = properties.condition || 'value == true';
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
     this.addInput(new Port('previous', 'Previous', 'control'));
-    this.addInput(new Port('value', 'Value to Check', 'any'));
-    this.addOutput(new Port('true', 'True', 'control'));
-    this.addOutput(new Port('false', 'False', 'control'));
+    this.addInput(new Port('value', 'Value to Check', 'any', 'condition'));
+    this.addOutput(new Port('true', 'True', 'control', 'condition'));
+    this.addOutput(new Port('false', 'False', 'control', 'condition'));
   }
 
   updateNodeContent() {

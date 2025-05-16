@@ -35,9 +35,9 @@ export class OptionsNode extends Node {
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     properties.options.forEach((option: Option, index: number) => {
-      this.addOutput(new Port(`option${index + 1}`, option.text, 'control'));
+      this.addOutput(new Port(`option${index + 1}`, option.text, 'control', 'options'));
     });
-    this.addOutput(new Port('selectedOption', 'Selected Option', 'string'));
+    this.addOutput(new Port('selectedOption', 'Selected Option', 'string', 'options'));
   }
 
   updateNodeContent() {

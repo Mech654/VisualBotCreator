@@ -25,7 +25,7 @@ export class BooleanVariableNode extends Node {
     super(id, 'booleanvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
-    this.addOutput(new Port('value', 'Value', 'boolean'));
+    this.addOutput(new Port('value', 'Value', 'boolean', 'value'));
   }
 
   updateNodeContent() {
