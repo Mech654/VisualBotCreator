@@ -54,7 +54,7 @@ VisualBotCrafter is an Electron-based desktop application that empowers you to b
 
 VisualBotCrafter is built on a modular architecture designed for maximum flexibility:
 
-- **Core Engine**: Defines the base node types, port connections, and processing logic with a plugin-based design
+- **Core Architecture**: Defines the base node types, port connections, and processing logic with a plugin-based design
 - **UI Layer**: Handles the visual representation and interaction with nodes, separated from business logic
 - **Connection System**: Manages the relationships between nodes with support for different connection types
 - **Extension System**: Allows for easy addition of new components without modifying the core codebase
