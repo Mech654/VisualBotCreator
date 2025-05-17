@@ -39,6 +39,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "better-sqlite3": "^11.10.0",
     "electron": "^35.1.5",
     "leader-line-new": "^1.1.9",
     "mathjs": "^14.4.0"
