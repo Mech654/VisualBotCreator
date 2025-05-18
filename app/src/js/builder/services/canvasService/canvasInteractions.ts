@@ -82,11 +82,32 @@ export function initCanvasInteractions(): void {
           const centerX = rect.left + rect.width / 2;
           const centerY = rect.top + rect.height / 2;
           const moveDelta = -30;
-          const pointerDown = new PointerEvent('pointerdown', { bubbles: true, clientX: centerX, clientY: centerY, pointerId: 1, pointerType: 'mouse', isPrimary: true });
+          const pointerDown = new PointerEvent('pointerdown', {
+            bubbles: true,
+            clientX: centerX,
+            clientY: centerY,
+            pointerId: 1,
+            pointerType: 'mouse',
+            isPrimary: true,
+          });
           nodeElement.dispatchEvent(pointerDown);
-          const pointerMove = new PointerEvent('pointermove', { bubbles: true, clientX: centerX + moveDelta, clientY: centerY, pointerId: 1, pointerType: 'mouse', isPrimary: true });
+          const pointerMove = new PointerEvent('pointermove', {
+            bubbles: true,
+            clientX: centerX + moveDelta,
+            clientY: centerY,
+            pointerId: 1,
+            pointerType: 'mouse',
+            isPrimary: true,
+          });
           document.dispatchEvent(pointerMove);
-          const pointerUp = new PointerEvent('pointerup', { bubbles: true, clientX: centerX + moveDelta, clientY: centerY, pointerId: 1, pointerType: 'mouse', isPrimary: true });
+          const pointerUp = new PointerEvent('pointerup', {
+            bubbles: true,
+            clientX: centerX + moveDelta,
+            clientY: centerY,
+            pointerId: 1,
+            pointerType: 'mouse',
+            isPrimary: true,
+          });
           document.dispatchEvent(pointerUp);
         }, 0);
         console.log(`Successfully added ${nodeType} node at x=${snappedX}, y=${snappedY}`);
@@ -97,5 +118,5 @@ export function initCanvasInteractions(): void {
       showNotification(`Failed to create ${nodeType} node`, 'error');
     }
   });
-   initDraggableNodes(getNodes(), getNodes());
+  initDraggableNodes(getNodes(), getNodes());
 }

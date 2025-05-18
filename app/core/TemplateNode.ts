@@ -19,7 +19,8 @@ export class TemplateNode extends Node {
 
   constructor(id: string, properties: TemplateNodeProperties = {}) {
     properties.title = properties.title || 'Template Node';
-    properties.nodeContent = properties.nodeContent || '<div class="template-node-content">Template</div>';
+    properties.nodeContent =
+      properties.nodeContent || '<div class="template-node-content">Template</div>';
     super(id, 'template', properties);
     // this.addInput(new Port('input', 'Input', 'string'));
     // this.addOutput(new Port('output', 'Output', 'string'));

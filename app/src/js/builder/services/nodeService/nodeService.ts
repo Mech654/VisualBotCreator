@@ -149,7 +149,10 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
   const nodeClass = window.nodeSystem?.getNodeClass?.(nodeInstance.type);
   if (nodeClass && Array.isArray(nodeClass.shownProperties)) {
     shownProps = nodeClass.shownProperties;
-  } else if ((nodeInstance as any).constructor && Array.isArray((nodeInstance as any).constructor.shownProperties)) {
+  } else if (
+    (nodeInstance as any).constructor &&
+    Array.isArray((nodeInstance as any).constructor.shownProperties)
+  ) {
     shownProps = (nodeInstance as any).constructor.shownProperties;
   }
 
@@ -250,11 +253,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
  * Format a property key into a readable label
  */
 function formatPropertyName(key: string): string {
-  return (
-    key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-  );
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 }
 
 /**

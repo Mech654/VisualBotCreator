@@ -1,4 +1,3 @@
-
 // Keep track of all nodes in the workspace
 const nodes: HTMLElement[] = [];
 

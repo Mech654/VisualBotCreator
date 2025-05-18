@@ -33,7 +33,7 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: iconPath, 
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -144,7 +144,6 @@ function setupIpcHandlers(): void {
       })),
     };
   });
-
 
   // Create a connection between nodes
   ipcMain.handle(

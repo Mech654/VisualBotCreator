@@ -80,7 +80,9 @@ export function cancelConnectionDrawing(): void {
       currentConnectionState.tempLine.remove();
     }
     if (currentConnectionState.tempEndPoint && currentConnectionState.tempEndPoint.parentNode) {
-      currentConnectionState.tempEndPoint.parentNode.removeChild(currentConnectionState.tempEndPoint);
+      currentConnectionState.tempEndPoint.parentNode.removeChild(
+        currentConnectionState.tempEndPoint
+      );
     }
     if (currentConnectionState.startPortElement) {
       currentConnectionState.startPortElement.classList.remove('active-port');

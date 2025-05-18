@@ -6,22 +6,15 @@ export {
   updateConnections,
   getNodeConnections,
   removeNodeConnections,
-  connections
+  connections,
 } from './connectionLifecycle';
-export {
-  exportConnections,
-  importConnections,
-  clearConnections
-} from './connectionIO';
-export {
-  showConnectionFeedback,
-  checkPortsCompatibility
-} from './connectionUtils';
+export { exportConnections, importConnections, clearConnections } from './connectionIO';
+export { showConnectionFeedback, checkPortsCompatibility } from './connectionUtils';
 export {
   getConnectionState,
   setConnectionState,
   CONNECTION_COLORS,
-  PORT_TYPE_COMPATIBILITY
+  PORT_TYPE_COMPATIBILITY,
 } from './connectionState';
 
 declare const LeaderLine: any;

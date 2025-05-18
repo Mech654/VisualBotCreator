@@ -10,7 +10,6 @@ import { initializeNodes } from './builder/services/nodeService/nodeState';
 import { initDraggableNodes } from './builder/services/dragDropService/dragDropService';
 import { getNodes } from './builder/services/nodeService/nodeState';
 
-
 interface Window {
   nodeSystem: {
     createConnection: (

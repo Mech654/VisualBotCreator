@@ -148,30 +148,25 @@ function setupOutputPort(
     document.body.appendChild(tempEndPoint);
 
     try {
-      const tempLine = new LeaderLine(
-        portElement,
-        tempEndPoint,
-        {
-          path: 'fluid',
-          startPlug: 'disc',
-          endPlug: 'arrow3',
-          color: connectionColor,
-          size: portCategory === PortCategory.FLOW ? 3 : 2,
-          startSocketGravity: 20,
-          endSocketGravity: 20,
-          dash: portCategory === PortCategory.DATA ? { animation: true } : false,
-        }
-      );
+      const tempLine = new LeaderLine(portElement, tempEndPoint, {
+        path: 'fluid',
+        startPlug: 'disc',
+        endPlug: 'arrow3',
+        color: connectionColor,
+        size: portCategory === PortCategory.FLOW ? 3 : 2,
+        startSocketGravity: 20,
+        endSocketGravity: 20,
+        dash: portCategory === PortCategory.DATA ? { animation: true } : false,
+      });
 
       if (tempLine.element) {
         tempLine.element.classList.add(`${portCategory}-connection`);
       }
-      
+
       const updatedState = getConnectionState();
       updatedState.tempLine = tempLine;
       updatedState.tempEndPoint = tempEndPoint;
       setConnectionState(updatedState);
-
     } catch (err) {
       console.error('Error creating leader line:', err);
       document.body.removeChild(tempEndPoint);

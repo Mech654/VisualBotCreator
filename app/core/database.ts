@@ -35,7 +35,9 @@ function ensureBotExists(botId: string, name: string = 'Unnamed Bot'): void {
   const botExistsStmt = db.prepare('SELECT Id FROM Bots WHERE Id = ?');
   const existingBot = botExistsStmt.get(botId);
   if (!existingBot) {
-    const insertBotStmt = db.prepare('INSERT INTO Bots (Id, Name, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?)');
+    const insertBotStmt = db.prepare(
+      'INSERT INTO Bots (Id, Name, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?)'
+    );
     insertBotStmt.run(botId, name, now, now);
   } else {
     const updateBotStmt = db.prepare('UPDATE Bots SET UpdatedAt = ? WHERE Id = ?');
@@ -43,7 +45,10 @@ function ensureBotExists(botId: string, name: string = 'Unnamed Bot'): void {
   }
 }
 
-function saveNode(botId: string, node: Node): { success: boolean; nodeId?: string; error?: string } {
+function saveNode(
+  botId: string,
+  node: Node
+): { success: boolean; nodeId?: string; error?: string } {
   const now = new Date().toISOString();
 
   try {
@@ -83,7 +88,4 @@ app.on('before-quit', () => {
   close();
 });
 
-export {
-  saveNode,
-  close,
-};
+export { saveNode, close };

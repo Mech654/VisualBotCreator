@@ -2,13 +2,18 @@ import { exportConnections, clearConnections } from '../connectionService/connec
 import { createNodeInstance } from '../nodeService/nodeService';
 import { initDraggableNodes } from '../dragDropService/dragDropService';
 import { showNotification } from '../../utils/notifications';
-import { enterTransition, staggerAnimation, createRippleEffect, addAttentionAnimation } from '../../utils/transitions';
+import {
+  enterTransition,
+  staggerAnimation,
+  createRippleEffect,
+  addAttentionAnimation,
+} from '../../utils/transitions';
 import { getNodes, addNode, setNodes } from '../nodeService/nodeState';
 
 async function saveProject(): Promise<void> {
   try {
     const nodes = getNodes().map(element => {
-      const el = element as HTMLElement;
+      const el = element;
       return {
         id: el.id,
         type: el.getAttribute('data-node-type'),
@@ -54,12 +59,7 @@ async function loadProject(file: File): Promise<void> {
     const allLoadedNodes: HTMLElement[] = [];
 
     const nodePromises = project.nodes.map(async (nodeData: any) => {
-      const result = await createNodeInstance(
-        nodeData.type,
-        nodeData.x,
-        nodeData.y,
-        'flow'
-      );
+      const result = await createNodeInstance(nodeData.type, nodeData.x, nodeData.y, 'flow');
 
       if (result && result.nodeElement) {
         result.nodeElement.id = nodeData.id;
@@ -72,7 +72,6 @@ async function loadProject(file: File): Promise<void> {
 
     await Promise.all(nodePromises);
     setNodes(allLoadedNodes);
-
 
     staggerAnimation(getNodes(), 'scale', 50, 200);
 
@@ -96,17 +95,17 @@ async function loadProject(file: File): Promise<void> {
 
 export function initProjectManagement(): void {
   document.getElementById('save-button')?.addEventListener('click', e => {
-    createRippleEffect(e.currentTarget as HTMLElement, e as MouseEvent);
+    createRippleEffect(e.currentTarget as HTMLElement, e);
     addAttentionAnimation(e.currentTarget as HTMLElement, 'bounce', 500);
     saveProject();
   });
 
   document.getElementById('load-button')?.addEventListener('click', e => {
-    createRippleEffect(e.currentTarget as HTMLElement, e as MouseEvent);
+    createRippleEffect(e.currentTarget as HTMLElement, e);
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = async (event) => {
+    input.onchange = async event => {
       const target = event.target as HTMLInputElement;
       if (target.files && target.files[0]) {
         await loadProject(target.files[0]);

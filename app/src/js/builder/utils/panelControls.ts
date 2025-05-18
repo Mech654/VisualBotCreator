@@ -100,7 +100,6 @@ export function setupComponentPanelResize(): void {
   });
 }
 
-
 export function initPanelControls(): void {
   const sidePanel = document.querySelector('.side-panel') as HTMLElement;
   const rightPanel = document.querySelector('.right-panel') as HTMLElement;
@@ -167,7 +166,7 @@ export function initPanelControls(): void {
     const propertiesToggle = document.getElementById('properties-toggle');
 
     if (!componentsPanel || !propertiesPanel || !propertiesToggle) return;
-    createRippleEffect(propertiesToggle as HTMLElement, e as MouseEvent);
+    createRippleEffect(propertiesToggle, e);
 
     if (propertiesPanel.style.display === 'none') {
       exitTransition(componentsPanel, 'fade', 200).then(() => {

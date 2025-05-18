@@ -169,7 +169,7 @@ export class Port {
   dataType: string;
   category: PortCategory;
   connectedTo: Connection[];
-  propertyKey?: string; 
+  propertyKey?: string;
 
   constructor(id: string, label: string, dataType: string, propertyKey?: string) {
     this.id = id;
