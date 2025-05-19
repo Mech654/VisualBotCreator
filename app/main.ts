@@ -353,7 +353,7 @@ function arePortTypesCompatible(sourceType: string, targetType: string): boolean
 app.whenReady().then(() => {
   setupIpcHandlers();
   createWindow();
-  //initDatabase();
+  initDatabase();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
