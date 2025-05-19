@@ -11,6 +11,7 @@ import {
   PORT_CATEGORIES,
 } from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
+import { initDatabase } from './core/database.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -352,6 +353,7 @@ function arePortTypesCompatible(sourceType: string, targetType: string): boolean
 app.whenReady().then(() => {
   setupIpcHandlers();
   createWindow();
+  //initDatabase();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

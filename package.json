@@ -8,6 +8,7 @@
     "start": "electron .",
     "dev": "node cross_platform/dev-runner.js",
     "dev:actual": "npm run clean && npm run dev-setup && concurrently --prefix-colors \"yellow,cyan,blue,magenta,green\" -n webpack,sass,tsc,preload,electron \"npm run sass:watch\" \"tsc -w\" \"npm run dev:preload\" \"cross-env NODE_ENV=development webpack serve --config webpack.config.mjs --mode development\" \"wait-on http://localhost:4000/src/index.html && echo '\n🏍️ Running electron app\n' && npm run dev:electron\" | node cross_platform/log-filter.js",
+    "dev:unfiltered": "npm run clean && npm run dev-setup && concurrently --prefix-colors \"yellow,cyan,blue,magenta,green\" -n webpack,sass,tsc,preload,electron \"npm run sass:watch\" \"tsc -w\" \"npm run dev:preload\" \"cross-env NODE_ENV=development webpack serve --config webpack.config.mjs --mode development\" \"wait-on http://localhost:4000/src/index.html && echo '\n🏍️ Running electron app\n' && npm run dev:electron\"",
     "dev:electron": "cross-env NODE_ENV=development nodemon",
     "dev:restart": "cross-env NODE_ENV=development node restart.js",
     "dev:quick": "concurrently -n electron \"cross-env NODE_ENV=development ELECTRON_ARGS='--no-sandbox' node restart.js\"",
