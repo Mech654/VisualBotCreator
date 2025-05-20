@@ -92,3 +92,9 @@ contextBridge.exposeInMainWorld('electron', {
     // You can add more methods if needed
   }
 });
+
+contextBridge.exposeInMainWorld('database', {
+  getAllBots: () => ipcRenderer.invoke('database:getAllBots'),
+  getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
+  setBotEnabled: (botId: string, enabled: boolean) => ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
+});

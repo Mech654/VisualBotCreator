@@ -11,7 +11,7 @@ import {
   PORT_CATEGORIES,
 } from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
-import { initDatabase, saveAllNodes } from './core/database.js';
+import { initDatabase, saveAllNodes, getAllBots, getRunConditions, setBotEnabled } from './core/database.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -45,7 +45,7 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/builder.html';
+    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/index.html';
     console.log(`Electron is running in development mode, loading from ${startUrl}`);
 
     let retryCount = 0;
@@ -62,7 +62,7 @@ function createWindow(): void {
           console.error('Failed to connect to webpack dev server after multiple attempts', err);
           // Fallback to loading from file system
           mainWindow
-            .loadFile(path.join(projectRoot, 'dist', 'src', 'builder.html'))
+            .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
             .catch(e => console.error('Failed to load fallback file:', e));
         }
       });
@@ -314,6 +314,35 @@ function setupIpcHandlers(): void {
       return await saveAllNodes(botId, nodeObj);
     } catch (error) {
       console.error('Error in saveAllNodes IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+
+  // Expose getAllBots via IPC
+  ipcMain.handle('database:getAllBots', async () => {
+    try {
+      return await getAllBots();
+    } catch (error) {
+      console.error('Error in getAllBots IPC handler:', error);
+      return [];
+    }
+  });
+  // Expose getRunConditions via IPC
+  ipcMain.handle('database:getRunConditions', async (event, botId: string) => {
+    try {
+      return await getRunConditions(botId);
+    } catch (error) {
+      console.error('Error in getRunConditions IPC handler:', error);
+      return [];
+    }
+  });
+  // Expose setBotEnabled via IPC
+  ipcMain.handle('database:setBotEnabled', async (event, botId: string, enabled: boolean) => {
+    try {
+      await setBotEnabled(botId, enabled);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in setBotEnabled IPC handler:', error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   });

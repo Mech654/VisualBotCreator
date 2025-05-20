@@ -35,7 +35,11 @@ function initDatabase(): Promise<void> {
             CREATE TABLE IF NOT EXISTS Bots (
               Id TEXT PRIMARY KEY,
               CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+              UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              enabled INTEGER NOT NULL DEFAULT 1,
+              description TEXT NOT NULL DEFAULT '',
+              run_success_count INTEGER NOT NULL DEFAULT 0,
+              run_failure_count INTEGER NOT NULL DEFAULT 0
             );
           `, (err: Error | null) => { if (err) return reject(err); });
 
@@ -47,6 +51,17 @@ function initDatabase(): Promise<void> {
               CreatedAt    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
               UpdatedAt    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (BotId, NodeId),
+              FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE
+            );
+          `, (err: Error | null) => { if (err) return reject(err); });
+
+          db.run(`
+            CREATE TABLE IF NOT EXISTS RunConditions (
+              BotId      VARCHAR(36) NOT NULL,
+              Key        TEXT        NOT NULL,
+              Value      TEXT        NOT NULL,
+              UpdatedAt  DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (BotId, Key),
               FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE
             );
           `, (err: Error | null) => {
@@ -163,6 +178,45 @@ async function saveAllNodes(
   }
 }
 
+// Get all bots from the Bots table
+function getAllBots(): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM Bots', [], (err: Error | null, rows: any[]) => {
+      if (err) {
+        console.error('Error fetching bots:', err);
+        return reject(err);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// Get run conditions for a bot
+function getRunConditions(botId: string): Promise<{ Key: string; Value: string }[]> {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT Key, Value FROM RunConditions WHERE BotId = ?', [botId], (err: Error | null, rows: any[]) => {
+      if (err) {
+        console.error('Error fetching run conditions:', err);
+        return reject(err);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// Set bot enabled/disabled
+function setBotEnabled(botId: string, enabled: boolean): Promise<void> {
+  return new Promise((resolve, reject) => {
+    db.run('UPDATE Bots SET enabled = ?, UpdatedAt = ? WHERE Id = ?', [enabled ? 1 : 0, new Date().toISOString(), botId], (err: Error | null) => {
+      if (err) {
+        console.error('Error updating bot enabled:', err);
+        return reject(err);
+      }
+      resolve();
+    });
+  });
+}
+
 function closeDB(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (db) {
@@ -202,4 +256,4 @@ app.on('before-quit', async (event) => {
   }
 });
 
-export { saveNode, saveAllNodes, closeDB as close, initDatabase };
+export { saveNode, saveAllNodes, closeDB as close, initDatabase, getAllBots, getRunConditions, setBotEnabled };
