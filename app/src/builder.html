@@ -9,7 +9,6 @@
     />
     <title>Bot Creator - Builder</title>
     <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
-    <!-- Prevent FOUC with inline styles -->
     <style>
       .js-loading {
         opacity: 0;
@@ -18,16 +17,11 @@
         transition: opacity 0.3s ease-in;
       }
     </style>
-    <!-- Use regular stylesheet instead of preload with inline handlers -->
     <link rel="stylesheet" href="/styles/builder.css" />
-    <!-- CSS will be injected by webpack in dev mode -->
-    <!-- Interact.js for advanced dragging capabilities -->
     <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.17/dist/interact.min.js"></script>
-    <!-- Script with type="module" attribute to use ES modules -->
     <script type="module" src="/builder.js"></script>
   </head>
   <body class="builder-page js-loading">
-    <!-- Side Panel -->
     <div class="side-panel">
       <div class="toggle-panel" title="Toggle side panel">
         <p class="toggle-button-symbol">»</p>
@@ -64,13 +58,9 @@
       </div>
     </div>
 
-    <!-- Main Content -->
     <div class="builder-content">
-      <!-- Builder Container -->
       <div class="builder-container">
-        <!-- Workspace -->
         <div class="workspace">
-          <!-- Toolbox -->
           <div class="toolbox">
             <div class="tool" title="Select">
               <span class="tool-icon">👆</span>
@@ -92,18 +82,16 @@
               <span class="tool-icon">🔍-</span>
               <span class="tool-tooltip">Zoom Out</span>
             </div>
-          </div>
-
-          <!-- Canvas -->
-          <div class="canvas-container" id="canvas">
-            <div class="canvas-content">
-              <!-- Nodes will be dynamically added here -->
+            <div class="tool" id="save-button" title="Save Project">
+              <span class="tool-icon">💾</span>
+              <span class="tool-tooltip">Save</span>
             </div>
+          </div>
+          <div class="canvas-container" id="canvas">
+            <div class="canvas-content"></div>
             <div id="zoom-indicator" class="zoom-indicator">100%</div>
           </div>
         </div>
-
-        <!-- Right Panel -->
         <div class="right-panel">
           <div class="toggle-right-panel" title="Toggle right panel">
             <p class="toggle-button-symbol">«</p>
@@ -112,10 +100,7 @@
             <span class="panel-title text-primary">Components</span>
             <span id="properties-toggle" class="panel-toggle cursor-pointer">📝</span>
           </div>
-
-          <!-- Components Panel -->
           <div class="panel-content components-container">
-            <!-- Component search -->
             <div class="component-search">
               <input
                 type="text"
@@ -124,17 +109,12 @@
                 aria-label="Search components"
               />
             </div>
-
-            <!-- Component filters -->
             <div class="component-filters">
               <div class="filter-pill active">All</div>
               <div class="filter-pill">Flow</div>
               <div class="filter-pill">Data</div>
             </div>
-
-            <!-- Component categories will be added here dynamically -->
             <div id="component-categories" class="component-categories-container">
-              <!-- Sample category structure -->
               <div class="component-category">
                 <div class="category-header">
                   <div class="category-icon">💬</div>
@@ -144,8 +124,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Properties Panel (Hidden by default) -->
           <div
             class="panel-content properties-container"
             id="properties-panel"
@@ -168,7 +146,6 @@
                 />
               </div>
             </div>
-
             <div class="property-group">
               <div class="property-group-title text-primary">Content</div>
               <div class="property-item" data-tooltip="Text message to display in this node">
@@ -187,7 +164,6 @@ Hello! How can I help you today?</textarea
                 />
               </div>
             </div>
-
             <div class="property-group">
               <div class="property-group-title text-primary">Advanced</div>
               <div
@@ -229,10 +205,22 @@ Hello! How can I help you today?</textarea
               </div>
             </div>
           </div>
-          <!-- Add the resize handle here with visual indicator -->
           <div class="right-panel-resize-handle" title="Drag to resize panel">
             <div class="resize-handle-indicator"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Name Modal -->
+    <div id="project-name-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="modal-title">Save Project</span>
+        <label for="project-name-input">Project Name:</label>
+        <input id="project-name-input" type="text" class="modal-input" placeholder="Enter project name" />
+        <div class="modal-actions">
+          <button id="modal-save-btn" class="btn btn-primary">Save</button>
+          <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
         </div>
       </div>
     </div>

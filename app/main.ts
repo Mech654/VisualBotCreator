@@ -11,7 +11,7 @@ import {
   PORT_CATEGORIES,
 } from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
-import { initDatabase } from './core/database.js';
+import { initDatabase, saveAllNodes } from './core/database.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -303,6 +303,18 @@ function setupIpcHandlers(): void {
       throw new Error(
         `Failed to get connections: ${error instanceof Error ? error.message : String(error)}`
       );
+    }
+  });
+
+  // Expose saveAllNodes via IPC
+  ipcMain.handle('database:saveAllNodes', async (event, botId: string) => {
+    try {
+      // Convert nodeInstances Map to a plain object for database compatibility
+      const nodeObj: { [key: string]: Node } = Object.fromEntries(nodeInstances.entries());
+      return await saveAllNodes(botId, nodeObj);
+    } catch (error) {
+      console.error('Error in saveAllNodes IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   });
 }

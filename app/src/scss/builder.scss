@@ -24,3 +24,80 @@
 @use 'components/properties';
 @use 'components/forms';
 @use 'components/component-panel';
+
+// Notification styles
+.notification {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(40px);
+  min-width: 220px;
+  max-width: 90vw;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #fff;
+  background: #222;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  opacity: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.3s;
+}
+.notification-success { background: #2ecc40; }
+.notification-error { background: #e74c3c; }
+.notification-info { background: #3498db; }
+.notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+// Slide-up animation (for enter/exitTransition)
+@keyframes slide-up {
+  from { transform: translateX(-50%) translateY(40px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* Project Name Modal Styles */
+#project-name-modal.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#project-name-modal .modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+#project-name-modal .modal-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+#project-name-modal .modal-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+#project-name-modal .modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+#project-name-modal .btn {
+  min-width: 80px;
+}

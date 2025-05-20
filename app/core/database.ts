@@ -95,7 +95,6 @@ async function saveNode(
   try {
     await ensureBotExists(botId);
     const definition = JSON.stringify({ type: node.type, properties: node.properties });
-
     return new Promise((resolve, reject) => {
       db.run(`
         INSERT INTO Nodes (BotId, NodeId, Definition, CreatedAt, UpdatedAt)
@@ -119,56 +118,20 @@ async function saveNode(
 
 async function saveAllNodes(
   botId: string,
-  nodes: Node[]
+  nodes: { [key: string]: Node },
 ): Promise<{ success: boolean; error?: string }> {
-  const now = new Date().toISOString();
   try {
     await ensureBotExists(botId);
-
-    return new Promise((resolve, reject) => {
-      db.serialize(() => {
-        db.run('BEGIN TRANSACTION;', (err: Error | null) => { if (err) return reject(err); });
-
-        const stmt = db.prepare(`
-          INSERT INTO Nodes (BotId, NodeId, Definition, CreatedAt, UpdatedAt)
-          VALUES (?, ?, ?, ?, ?)
-          ON CONFLICT(BotId, NodeId) DO UPDATE SET
-            Definition = excluded.Definition,
-            UpdatedAt  = excluded.UpdatedAt
-        `);
-
-        for (const node of nodes) {
-          const definition = JSON.stringify({
-            type: node.type,
-            properties: node.properties,
-          });
-          stmt.run(botId, node.id, definition, now, now, (err: Error | null) => {
-            if (err) {
-              db.run('ROLLBACK;', () => reject(err));
-              return;
-            }
-          });
-        }
-        stmt.finalize((err: Error | null) => {
-            if (err) {
-                db.run('ROLLBACK;', () => reject(err));
-                return;
-            }
-            db.run('COMMIT;', (commitErr: Error | null) => {
-                if (commitErr) return reject(commitErr);
-                resolve({ success: true });
-            });
-        });
-      });
-    });
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      const result = await saveNode(botId, node);
+      if (!result.success) {
+        return { success: false, error: result.error };
+      }
+    }
+    return { success: true };
   } catch (err) {
     console.error('Error saving all nodes:', err);
-    return new Promise((resolve) => {
-        db.run('ROLLBACK;', (rollbackErr: Error | null) => {
-            if (rollbackErr) console.error('Error rolling back transaction:', rollbackErr);
-            resolve({ success: false, error: (err as Error).message });
-        });
-    });
+    return { success: false, error: (err as Error).message };
   }
 }
 

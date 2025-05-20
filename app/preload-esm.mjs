@@ -41,3 +41,15 @@ contextBridge.exposeInMainWorld('utils', {
     return `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   },
 });
+
+// Expose Electron IPC to renderer as window.electron.ipcRenderer
+contextBridge.exposeInMainWorld('electron', {
+  ipcRenderer: {
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+    send: (channel, ...args) => ipcRenderer.send(channel, ...args),
+    on: (channel, listener) => ipcRenderer.on(channel, listener),
+    once: (channel, listener) => ipcRenderer.once(channel, listener),
+    removeListener: (channel, listener) => ipcRenderer.removeListener(channel, listener),
+    // Add more methods as needed
+  },
+});

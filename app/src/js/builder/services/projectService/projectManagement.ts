@@ -9,37 +9,80 @@ import {
   addAttentionAnimation,
 } from '../../utils/transitions';
 import { getNodes, addNode, setNodes } from '../nodeService/nodeState';
+declare global {
+  interface Window {
+    electron?: {
+      ipcRenderer?: {
+        invoke: (channel: string, ...args: any[]) => Promise<any>;
+      };
+    };
+  }
+}
+function showProjectNameModal(): Promise<string | null> {
+  return new Promise(resolve => {
+    const modal = document.getElementById('project-name-modal') as HTMLElement;
+    const input = document.getElementById('project-name-input') as HTMLInputElement;
+    const saveBtn = document.getElementById('modal-save-btn') as HTMLButtonElement;
+    const cancelBtn = document.getElementById('modal-cancel-btn') as HTMLButtonElement;
+
+    if (!modal || !input || !saveBtn || !cancelBtn) {
+      resolve(null);
+      return;
+    }
+
+    input.value = '';
+    modal.style.display = 'flex';
+    input.focus();
+
+    function cleanup() {
+      modal.style.display = 'none';
+      saveBtn.removeEventListener('click', onSave);
+      cancelBtn.removeEventListener('click', onCancel);
+      input.removeEventListener('keydown', onKeyDown);
+    }
+
+    function onSave() {
+      const value = input.value.trim();
+      cleanup();
+      resolve(value || null);
+    }
+    function onCancel() {
+      cleanup();
+      resolve(null);
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Enter') {
+        onSave();
+      } else if (e.key === 'Escape') {
+        onCancel();
+      }
+    }
+
+    saveBtn.addEventListener('click', onSave);
+    cancelBtn.addEventListener('click', onCancel);
+    input.addEventListener('keydown', onKeyDown);
+  });
+}
 
 async function saveProject(): Promise<void> {
   try {
-    const nodes = getNodes().map(element => {
-      const el = element;
-      return {
-        id: el.id,
-        type: el.getAttribute('data-node-type'),
-        x: parseInt(el.style.left, 10) || 0,
-        y: parseInt(el.style.top, 10) || 0,
-        data: el.getAttribute('data-node-data') || '{}',
-      };
-    });
+    const projectName = await showProjectNameModal();
+    if (!projectName) {
+      showNotification('Project name is required to save.', 'info');
+      return;
+    }
+    console.log('[SaveProject] Using project name:', projectName);
 
-    const connections = exportConnections();
-    const project = {
-      nodes,
-      connections,
-      version: '1.0.0',
-    };
+    // Check for ipcRenderer existence (bypass TS error)
+    const electron = (window as any).electron;
+    if (!electron || !electron.ipcRenderer) {
+      console.error('[SaveProject] window.electron or ipcRenderer is undefined!');
+      showNotification('IPC is not available. Project cannot be saved.', 'error');
+      return;
+    }
 
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(project));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().slice(0, 10);
-    downloadAnchor.setAttribute('download', `botcrafter_project_${formattedDate}.json`);
-
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const result = await electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
+    console.log('[SaveProject] IPC result:', result);
 
     showNotification('Project saved successfully!', 'success');
   } catch (error) {
@@ -94,11 +137,18 @@ async function loadProject(file: File): Promise<void> {
 }
 
 export function initProjectManagement(): void {
-  document.getElementById('save-button')?.addEventListener('click', e => {
-    createRippleEffect(e.currentTarget as HTMLElement, e);
-    addAttentionAnimation(e.currentTarget as HTMLElement, 'bounce', 500);
-    saveProject();
-  });
+  // Use event delegation or direct binding for div.tool#save-button
+  const saveBtn = document.getElementById('save-button');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', e => {
+      console.log('Save button clicked'); // Debug: verify event fires
+      createRippleEffect(saveBtn as HTMLElement, e);
+      addAttentionAnimation(saveBtn as HTMLElement, 'bounce', 500);
+      saveProject();
+    });
+  } else {
+    console.warn('Save button not found in DOM');
+  }
 
   document.getElementById('load-button')?.addEventListener('click', e => {
     createRippleEffect(e.currentTarget as HTMLElement, e);

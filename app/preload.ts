@@ -84,3 +84,11 @@ contextBridge.exposeInMainWorld('utils', {
     return `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   },
 } as UtilsAPI);
+
+// Expose ipcRenderer for generic IPC usage (for project save/load, etc)
+contextBridge.exposeInMainWorld('electron', {
+  ipcRenderer: {
+    invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
+    // You can add more methods if needed
+  }
+});

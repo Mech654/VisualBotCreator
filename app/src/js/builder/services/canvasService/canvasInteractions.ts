@@ -112,7 +112,6 @@ export function initCanvasInteractions(): void {
         }, 0);
         console.log(`Successfully added ${nodeType} node at x=${snappedX}, y=${snappedY}`);
       }
-      showNotification(`Added ${nodeType} node`, 'success');
     } catch (error) {
       console.error('Error creating node:', error);
       showNotification(`Failed to create ${nodeType} node`, 'error');
