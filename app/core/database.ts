@@ -93,7 +93,36 @@ async function saveNode(
   const now = new Date().toISOString();
   try {
     await ensureBotExists(botId);
-    const definition = JSON.stringify({ type: node.type, properties: node.properties });
+    const definition = JSON.stringify({
+      type: node.type,
+      properties: node.properties,
+      inputs: node.inputs.map(port => ({
+        id: port.id,
+        label: port.label,
+        dataType: port.dataType,
+        category: port.category,
+        propertyKey: port.propertyKey,
+        connectedTo: port.connectedTo.map(conn => ({
+          fromNodeId: conn.fromNodeId,
+          fromPortId: conn.fromPortId,
+          toNodeId: conn.toNodeId,
+          toPortId: conn.toPortId
+        }))
+      })),
+      outputs: node.outputs.map(port => ({
+        id: port.id,
+        label: port.label,
+        dataType: port.dataType,
+        category: port.category,
+        propertyKey: port.propertyKey,
+        connectedTo: port.connectedTo.map(conn => ({
+          fromNodeId: conn.fromNodeId,
+          fromPortId: conn.fromPortId,
+          toNodeId: conn.toNodeId,
+          toPortId: conn.toPortId
+        }))
+      }))
+    });
     return new Promise((resolve, reject) => {
       db.run(`
         INSERT INTO Nodes (BotId, NodeId, Definition, CreatedAt, UpdatedAt)
