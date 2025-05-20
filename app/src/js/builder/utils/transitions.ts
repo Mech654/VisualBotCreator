@@ -1,4 +1,4 @@
-// Transitions and animations system for VisualBotCrafter
+// Transitions and animations system for VisualBotCreator
 // Provides a set of reusable transitions for creating smooth user experiences
 
 /**

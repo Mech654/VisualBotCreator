@@ -2,6 +2,7 @@ import sqlite3 from 'sqlite3';
 import * as path from 'path';
 import * as fs from 'fs';
 import { app } from 'electron';
+import { fileURLToPath } from 'url';
 import { Node, Connection, NodeProperties } from './base';
 
 let db: sqlite3.Database;
@@ -10,12 +11,15 @@ let dbPath: string;
 function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      const baseDir = path.resolve(__dirname, '../..');
+      // Fix __dirname for ES modules
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirnameESM = path.dirname(__filename);
+      const baseDir = path.resolve(__dirnameESM, '../..');
       if (!fs.existsSync(baseDir)) {
         fs.mkdirSync(baseDir, { recursive: true });
       }
 
-      dbPath = path.join(baseDir, 'visualBotCrafter.db');
+      dbPath = path.join(baseDir, 'VisualBotCreator.db');
       console.log('[DB] Initializing at', dbPath);
 
       db = new sqlite3.Database(dbPath, (err: Error | null) => {
@@ -24,7 +28,7 @@ function initDatabase(): Promise<void> {
           return reject(err);
         }
         db.serialize(() => {
-          db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => { if (err) return reject(err); });
+          // db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => { if (err) return reject(err); }); // WAL mode disabled
           db.run('PRAGMA foreign_keys = ON;', (err: Error | null) => { if (err) return reject(err); });
 
           db.run(`

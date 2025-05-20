@@ -320,7 +320,6 @@ const PORT_TYPE_COMPATIBILITY: Record<PortType, PortType[]> = {
   [PortType.ARRAY]: [],
   [PortType.CONTROL]: [],
 };
-
 /**
  * Check if two port types are compatible for connection
  */
@@ -354,7 +353,7 @@ app.whenReady().then(() => {
   setupIpcHandlers();
   createWindow();
   initDatabase();
-
+  console.log('Database initialized');
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

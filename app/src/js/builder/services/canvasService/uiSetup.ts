@@ -68,7 +68,7 @@ export async function initUiSetup(): Promise<void> {
   if (welcomeMessage) {
     typeText(
       welcomeMessage,
-      'Welcome to VisualBotCrafter! Drag components to build your bot.',
+      'Welcome to VisualBotCreator! Drag components to build your bot.',
       30,
       800
     );

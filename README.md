@@ -1,4 +1,4 @@
-# VisualBotCrafter
+# VisualBotCreator
 
 A highly flexible visual development environment for creating, customizing, and managing bots through an intuitive node-based interface.
 
@@ -7,7 +7,7 @@ A highly flexible visual development environment for creating, customizing, and 
 
 ## Overview
 
-VisualBotCrafter is an Electron-based desktop application that empowers you to build powerful automation bots with no code. By connecting nodes in a flow-based canvas—much like Unreal Engine's Blueprints—you can sequence tasks such as file operations, command-line execution, HTTP requests, loops, and error handling. Everything runs locally, giving you full control over your data and environment.
+VisualBotCreator is an Electron-based desktop application that empowers you to build powerful automation bots with no code. By connecting nodes in a flow-based canvas—much like Unreal Engine's Blueprints—you can sequence tasks such as file operations, command-line execution, HTTP requests, loops, and error handling. Everything runs locally, giving you full control over your data and environment.
 ## Features
 
 ### Current Features
@@ -52,7 +52,7 @@ VisualBotCrafter is an Electron-based desktop application that empowers you to b
 
 ## Architecture
 
-VisualBotCrafter is built on a modular architecture designed for maximum flexibility:
+VisualBotCreator is built on a modular architecture designed for maximum flexibility:
 
 - **Core Architecture**: Defines the base node types, port connections, and processing logic with a plugin-based design
 - **UI Layer**: Handles the visual representation and interaction with nodes, separated from business logic
@@ -63,11 +63,11 @@ VisualBotCrafter is built on a modular architecture designed for maximum flexibi
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Mech654/VisualBotCrafter.git
+   git clone https://github.com/Mech654/VisualBotCreator.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd VisualBotCrafter
+   cd VisualBotCreator
    ```
 3. Install dependencies:
    ```bash
@@ -108,7 +108,7 @@ When you run `npm run dev`, the following orchestrated process happens:
 
 ### Build System
 
-VisualBotCrafter uses a modern build system with the following technologies:
+VisualBotCreator uses a modern build system with the following technologies:
 
 - **Webpack**: Bundles JavaScript/TypeScript, processes SCSS, and handles assets
   - Entry points for both builder and dashboard interfaces
@@ -148,7 +148,7 @@ npm run webpack:build   # Build webpack bundles only
 ```
 
 ### Creating Custom Node Types
-VisualBotCrafter includes a template system for extending the component library with custom node types. See `/app/core/TemplateNode.ts` for a detailed guide on creating new nodes.
+VisualBotCreator includes a template system for extending the component library with custom node types. See `/app/core/TemplateNode.ts` for a detailed guide on creating new nodes.
 
 The node creation process follows these simple steps:
 1. Define a properties interface

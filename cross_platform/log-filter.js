@@ -42,7 +42,7 @@ function processLine(line) {
   }
 
   if (
-    trimmedLine.match(/^>\s*visualbotcrafter@\d+\.\d+\.\d+\s/) ||
+    trimmedLine.match(/^>\s*VisualBotCreator@\d+\.\d+\.\d+\s/) ||
     trimmedLine.match(/^npm run/) ||
     trimmedLine.includes('Starting compilation') ||
     trimmedLine.includes('webpack compiled') ||
