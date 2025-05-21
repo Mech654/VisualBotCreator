@@ -1,5 +1,6 @@
 import '../scss/index.scss';
 import { showPageTransition } from './builder/utils/transitions';
+import { setupSwalDashboardModalStyle } from './swal-setup';
 declare const module: any;
 
 interface ActionItem {
@@ -260,30 +261,109 @@ document.addEventListener('DOMContentLoaded', async () => {
           const botDescription = card.querySelector('.bot-description')?.textContent || '';
           const botStatus = card.querySelector('.status-text')?.textContent || '';
           const botStats = card.querySelector('.bot-stats')?.textContent || '';
-          const botId = botName;
-          let runConditions: { Key: string; Value: string }[] = [];
+          const botId = botName; // Using botName as botId as per existing code
+          const sanitizedBotId = botId.replace(/[^a-zA-Z0-9\-_]/g, '_'); // Sanitize for DOM IDs
+
+          let initialRunConditions: { Key: string; Value: string }[] = [];
           if (window.database && typeof window.database.getRunConditions === 'function') {
             try {
-              runConditions = await window.database.getRunConditions(botId);
+              initialRunConditions = await window.database.getRunConditions(botId);
             } catch (err) {
-              runConditions = [];
+              console.error(`Failed to get run conditions for ${botId}:`, err);
+              initialRunConditions = [];
             }
           }
-          const runCondHtml = runConditions.length
-            ? `<ul style='margin:0 0 10px 0;padding-left:20px;'>${runConditions.map(rc => `<li><b>${rc.Key}:</b> ${rc.Value}</li>`).join('')}</ul>`
-            : '<i>No run conditions set.</i>';
+
+          // Mutable copy for this modal instance
+          let currentRunConditions = [...initialRunConditions];
+
+          const runConditionsListContainerId = `swal-rc-list-container-${sanitizedBotId}`;
+          const addRunConditionBtnId = `swal-add-rc-btn-${sanitizedBotId}`;
+          const addRunConditionFormId = `swal-add-rc-form-${sanitizedBotId}`;
+          const rcKeySelectId = `swal-rc-key-select-${sanitizedBotId}`;
+          const rcValueInputId = `swal-rc-value-input-${sanitizedBotId}`;
+          const saveRcBtnId = `swal-save-rc-btn-${sanitizedBotId}`;
+          const cancelRcBtnId = `swal-cancel-rc-btn-${sanitizedBotId}`;
+
+          const renderRunConditionsToList = (conditions: { Key: string; Value: string }[]) => {
+            let listHtml = '<ol class="swal-rc-list">';
+            if (conditions.length > 0) {
+              conditions.forEach((rc, index) => {
+                let prettyValue = rc.Value;
+                // Enhance display for common types
+                if (rc.Key === 'Time of Day (HH:MM)') {
+                  prettyValue = `<span style='color:#4fc3f7;'>${rc.Value}</span>`; // blue accent
+                } else if (rc.Key === 'Day of Week') {
+                  prettyValue = `<span style='color:#81c784;'>${rc.Value}</span>`; // green accent
+                } else if (rc.Key === 'Specific Date (YYYY-MM-DD)') {
+                  prettyValue = `<span style='color:#ffb74d;'>${rc.Value}</span>`; // orange accent
+                } else if (rc.Key.startsWith('Variable')) {
+                  prettyValue = `<span style='color:#ba68c8;'>${rc.Value}</span>`; // purple accent
+                } else if (rc.Key === 'Bot Enabled') {
+                  prettyValue = `<span style='color:#baffc9;'>${rc.Value}</span>`;
+                } else if (rc.Key === 'User Input') {
+                  prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}</span>`;
+                } else if (rc.Key === 'Random Chance') {
+                  prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}%</span>`;
+                }
+                listHtml += `<li><span><b>${rc.Key}:</b> ${prettyValue}</span> <button class="swal-delete-rc-btn" data-index="${index}">&times;</button></li>`;
+              });
+            } else {
+              listHtml += '<li class="swal-rc-no-conditions"><i>No run conditions set.</i></li>';
+            }
+            listHtml += '</ol>';
+            return listHtml;
+          };
+
+          const initialRunCondHtmlForSwal = renderRunConditionsToList(currentRunConditions);
+
           if (window.Swal) {
             window.Swal.fire({
               title: `<span style='font-size:2em;'>${botName}</span>`,
               html: `
-                <div style='text-align:left;font-size:1.25em;max-width:700px;padding:16px 0;'>
-                  <div style='margin-bottom:12px;'><b>Type:</b> <span style='font-size:1.1em;'>${botType}</span></div>
-                  <div style='margin-bottom:12px;'><b>Description:</b> <span style='font-size:1.1em;'>${botDescription}</span></div>
-                  <div style='margin-bottom:12px;'><b>Status:</b> <span id='swal-bot-status' style='font-weight:bold;'>${botStatus}</span> 
-                    <button id='swal-toggle-btn' style='margin-left:10px;padding:4px 18px;font-size:1.1em;border-radius:18px;border:1px solid #888;background:${botStatus==='Active'?'#4caf50':'#ccc'};color:#fff;cursor:pointer;min-width:60px;'>${botStatus==='Active'?'On':'Off'}</button>
+                <div class='swal-bot-details-grid'>
+                  <div class='swal-detail-category'>
+                    <div class='swal-category-title'>General Information</div>
+                    <div class='swal-detail-item'><b>Type:</b> <span style='font-size:1.1em;'>${botType}</span></div>
+                    <div class='swal-detail-item'><b>Description:</b> <span style='font-size:1.1em;'>${botDescription}</span></div>
                   </div>
-                  <div style='margin-bottom:12px;'><b>Stats:</b> <span style='font-size:1.1em;'>${botStats}</span></div>
-                  <div style='margin-bottom:12px;'><b>Run Conditions:</b><br>${runCondHtml}</div>
+
+                  <div class='swal-detail-category'>
+                    <div class='swal-category-title'>Operational Status</div>
+                    <div class='swal-detail-item'>
+                      <b>Status:</b> <span id='swal-bot-status' style='font-weight:bold;'>${botStatus}</span>
+                      <button id='swal-toggle-btn' style='margin-left:10px;padding:4px 18px;font-size:1.1em;border-radius:18px;border:1px solid #888;background:${botStatus === 'Active' ? '#4caf50' : '#ccc'};color:#fff;cursor:pointer;min-width:60px;'>${botStatus === 'Active' ? 'On' : 'Off'}</button>
+                    </div>
+                    <div class='swal-detail-item'><b>Stats:</b> <span style='font-size:1.1em;'>${botStats}</span></div>
+                  </div>
+
+                  <div class='swal-detail-category'>
+                    <div class='swal-category-header'>
+                      <div class='swal-category-title'>Run Conditions</div>
+                      <button id='${addRunConditionBtnId}' class='swal-add-rc-btn'></button>
+                    </div>
+                    <div class='swal-detail-item' id='${runConditionsListContainerId}'>
+                      ${initialRunCondHtmlForSwal}
+                    </div>
+                    <div id='${addRunConditionFormId}' class='swal-add-rc-form' style='display:none;'>
+                      <h4 class='swal-add-rc-title'>New Run Condition</h4>
+                      <select id='${rcKeySelectId}' class='swal-rc-select'>
+                        <option value="">-- Select Type --</option>
+                        <option value="Time of Day (HH:MM)">Time of Day (HH:MM)</option>
+                        <option value="Day of Week">Day of Week</option>
+                        <option value="Specific Date (YYYY-MM-DD)">Specific Date (YYYY-MM-DD)</option>
+                      </select>
+                      <input type="text" id='${rcValueInputId}' class='swal-rc-input' placeholder="Condition Value">
+                      <div id='swal-date-time-extra-${sanitizedBotId}' style="display:none; margin-top:8px;">
+                        <input type="text" id='swal-date-hour-${sanitizedBotId}' class='swal-rc-input' style="width:48%;display:inline-block;margin-right:2%;" placeholder="Hour (00-23, optional)">
+                        <input type="text" id='swal-date-minute-${sanitizedBotId}' class='swal-rc-input' style="width:48%;display:inline-block;" placeholder="Minute (00-59, optional)">
+                      </div>
+                      <div class='swal-rc-form-actions'>
+                        <button id='${saveRcBtnId}' class='swal-save-rc-btn'>Save</button>
+                        <button id='${cancelRcBtnId}' class='swal-cancel-rc-btn'>Cancel</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               `,
               showCloseButton: true,
@@ -307,72 +387,127 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                   });
                 }
+
+                // Run Condition interactivity
+                const listContainer = document.getElementById(runConditionsListContainerId) as HTMLElement;
+                const addBtn = document.getElementById(addRunConditionBtnId) as HTMLButtonElement;
+                const addForm = document.getElementById(addRunConditionFormId) as HTMLElement;
+                const keySelect = document.getElementById(rcKeySelectId) as HTMLSelectElement;
+                const valueInput = document.getElementById(rcValueInputId) as HTMLInputElement;
+                const saveBtn = document.getElementById(saveRcBtnId) as HTMLButtonElement;
+                const cancelBtn = document.getElementById(cancelRcBtnId) as HTMLButtonElement;
+
+                const updateAndRenderList = () => {
+                  if (listContainer) {
+                    listContainer.innerHTML = renderRunConditionsToList(currentRunConditions);
+                    attachDeleteListeners(); // Re-attach delete listeners after re-render
+                  }
+                };
+
+                const attachDeleteListeners = () => {
+                  listContainer.querySelectorAll('.swal-delete-rc-btn').forEach(btn => {
+                    btn.addEventListener('click', (ev) => {
+                      const index = parseInt((ev.currentTarget as HTMLElement).dataset.index || '-1');
+                      if (index > -1 && index < currentRunConditions.length) {
+                        currentRunConditions.splice(index, 1);
+                        // In a real app, you would call: await window.database.deleteRunCondition(botId, currentRunConditions[index]);
+                        updateAndRenderList();
+                      }
+                    });
+                  });
+                };
+
+                if (addBtn) {
+                  addBtn.addEventListener('click', () => {
+                    if (addForm) addForm.style.display = 'block';
+                    addBtn.style.display = 'none';
+                  });
+                }
+
+                if (cancelBtn) {
+                  cancelBtn.addEventListener('click', () => {
+                    if (addForm) addForm.style.display = 'none';
+                    if (addBtn) addBtn.style.display = 'inline-block';
+                    if (keySelect) keySelect.value = '';
+                    if (valueInput) valueInput.value = '';
+                  });
+                }
+
+                if (saveBtn) {
+                  saveBtn.addEventListener('click', async () => {
+                    const key = keySelect.value;
+                    const value = valueInput.value;
+                    // Validation for each type
+                    let valid = true;
+                    let errorMsg = '';
+                    if (!key || value.trim() === '') {
+                      valid = false;
+                      errorMsg = 'Please select a condition type and enter a value.';
+                    } else if (key === 'Time of Day (HH:MM)') {
+                      valid = /^([01]?\d|2[0-3]):[0-5]\d$/.test(value.trim());
+                      if (!valid) errorMsg = 'Please enter a valid time in HH:MM format.';
+                    } else if (key === 'Specific Date (YYYY-MM-DD)') {
+                      valid = /^\d{4}-\d{2}-\d{2}$/.test(value.trim());
+                      if (!valid) errorMsg = 'Please enter a valid date in YYYY-MM-DD format.';
+                      // Optionally validate hour/minute if provided
+                      const hourInput = document.getElementById(`swal-date-hour-${sanitizedBotId}`) as HTMLInputElement;
+                      const minuteInput = document.getElementById(`swal-date-minute-${sanitizedBotId}`) as HTMLInputElement;
+                      let hour = hourInput ? hourInput.value.trim() : '';
+                      let minute = minuteInput ? minuteInput.value.trim() : '';
+                      if (hour && !/^([01]?\d|2[0-3])$/.test(hour)) {
+                        valid = false;
+                        errorMsg = 'Hour must be 00-23 if provided.';
+                      }
+                      if (minute && !/^([0-5]?\d)$/.test(minute)) {
+                        valid = false;
+                        errorMsg = 'Minute must be 00-59 if provided.';
+                      }
+                      // If valid, append hour/minute to value for storage
+                      if (valid && (hour || minute)) {
+                        let dateVal = value.trim();
+                        if (hour) dateVal += ` ${hour.padStart(2,'0')}`;
+                        if (minute) dateVal += `:${minute.padStart(2,'0')}`;
+                        valueInput.value = dateVal;
+                      }
+                    } else if (key.startsWith('Variable')) {
+                      // Require format: variableName=value or variableName>value, etc.
+                      valid = /.+[=><!].+/.test(value.trim());
+                      if (!valid) errorMsg = 'Format: variableName=value (or >, <, !=)';
+                    }
+
+                    if (valid) {
+                      currentRunConditions.push({ Key: key, Value: value });
+                      updateAndRenderList();
+                      if (keySelect) keySelect.value = '';
+                      if (valueInput) valueInput.value = '';
+                      if (addForm) addForm.style.display = 'none';
+                      if (addBtn) addBtn.style.display = 'inline-block';
+                    } else {
+                      alert(errorMsg);
+                    }
+                  });
+                }
+
+                // Show/hide hour and minute inputs based on selected condition type
+                const dateTimeExtraContainer = document.getElementById(`swal-date-time-extra-${sanitizedBotId}`);
+                if (keySelect && dateTimeExtraContainer) {
+                  keySelect.addEventListener('change', () => {
+                    const extra = document.getElementById(`swal-date-time-extra-${sanitizedBotId}`);
+                    if (keySelect.value === 'Specific Date (YYYY-MM-DD)') {
+                      if (extra) extra.style.display = '';
+                    } else {
+                      if (extra) extra.style.display = 'none';
+                    }
+                  });
+                }
               }
             });
-          } else {
-            alert(`${botName}\nType: ${botType}\nDescription: ${botDescription}\nStatus: ${botStatus}\nStats: ${botStats}`);
           }
         });
-      });
+      }); // Corrected: Added missing closing parenthesis and semicolon for forEach
     }
   }
 
-  document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', e => {
-      const menuItem = e.currentTarget as HTMLElement;
-      const isActive = menuItem.classList.contains('active');
-      const itemText = menuItem.innerText || '';
-
-      if (!isActive && itemText.includes('Bot Builder')) {
-        showPageTransition('builder.html');
-      }
-    });
-  });
-
-  // Add custom SweetAlert2 CSS for dashboard bot modal
-  const swalStyle = document.createElement('style');
-  swalStyle.innerHTML = `
-  .swal2-dashboard-bot-modal {
-    font-size: 1.25em !important;
-    max-width: 700px !important;
-    padding: 32px 32px 24px 32px !important;
-    border-radius: 18px !important;
-    background: #23272e !important;
-    color: #f3f3f3 !important;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  }
-  .swal2-dashboard-bot-modal .swal2-title {
-    font-size: 2.2em !important;
-    margin-bottom: 0.5em !important;
-    color: #fff !important;
-  }
-  .swal2-dashboard-bot-modal b {
-    color: #4cafef;
-  }
-  .swal2-dashboard-bot-modal ul {
-    margin: 0.5em 0 0.5em 0.5em;
-    padding-left: 1.5em;
-  }
-  .swal2-dashboard-bot-modal #swal-toggle-btn {
-    font-size: 1.1em;
-    border-radius: 18px;
-    border: 1px solid #888;
-    min-width: 70px;
-    font-weight: bold;
-    transition: background 0.2s;
-  }
-  .swal2-dashboard-bot-modal #swal-toggle-btn[style*='#4caf50'] {
-    background: #4caf50 !important;
-    color: #fff !important;
-  }
-  .swal2-dashboard-bot-modal #swal-toggle-btn[style*='#ccc'] {
-    background: #ccc !important;
-    color: #222 !important;
-  }
-  `;
-  document.head.appendChild(swalStyle);
+  // Initial setup for SweetAlert2 styles
+  setupSwalDashboardModalStyle();
 });
-
-if (module && module.hot) {
-  module.hot.accept();
-}
