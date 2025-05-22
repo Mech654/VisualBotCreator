@@ -26,7 +26,7 @@ interface UtilsAPI {
 }
 
 interface BotConfigAPI {
-  changeName: (botId: string, newName: string) => Promise<{success: boolean, error?: string}>;
+  changeName: (oldId: string, newId: string) => Promise<{success: boolean, error?: string}>; // Updated parameters
   changeDescription: (botId: string, newDescription: string) => Promise<{success: boolean, error?: string}>;
   changeStatus: (botId: string, newStatus: boolean) => Promise<{success: boolean, error?: string}>;
   addOrUpdateCondition: (botId: string, key: string, value: string) => Promise<{success: boolean, error?: string}>;
@@ -93,28 +93,42 @@ contextBridge.exposeInMainWorld('utils', {
   },
 } as UtilsAPI);
 
+// Expose database functions for bot configurations
+contextBridge.exposeInMainWorld('botconfig', {
+  changeName: (oldId: string, newId: string) => { // Updated parameters
+    console.log('[PRELOAD] botconfig:changeName called with:', { oldId, newId });
+    return ipcRenderer.invoke('botconfig:changeName', oldId, newId);
+  },
+  changeDescription: (botId: string, newDescription: string) => {
+    return ipcRenderer.invoke('botconfig:changeDescription', botId, newDescription);
+  },
+  changeStatus: (botId: string, newStatus: boolean) => {
+    return ipcRenderer.invoke('botconfig:changeStatus', botId, newStatus);
+  },
+  addOrUpdateCondition: (botId: string, key: string, value: string) => {
+    return ipcRenderer.invoke('botconfig:addOrUpdateCondition', botId, key, value);
+  },
+  deleteCondition: (botId: string, key: string) => {
+    return ipcRenderer.invoke('botconfig:deleteCondition', botId, key);
+  }
+} as BotConfigAPI);
+
+
+contextBridge.exposeInMainWorld('database', {
+  saveAllNodes: (botId: string, nodes: any) => ipcRenderer.invoke('database:saveAllNodes', botId, nodes),
+  getAllBots: () => ipcRenderer.invoke('database:getAllBots'),
+  getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
+  setBotEnabled: (botId: string, enabled: boolean) => ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
+  // Note: Exposing changeNameDb directly, ensure UI uses botconfig.changeName for consistency if business logic differs
+  changeNameDb: (oldId: string, newId: string) => ipcRenderer.invoke('database:changeName', oldId, newId), // Updated parameters
+  changeDescriptionDb: (botId: string, newDescription: string) => ipcRenderer.invoke('database:changeDescription', botId, newDescription),
+  changeStatusDb: (botId: string, newStatus: boolean) => ipcRenderer.invoke('database:changeStatus', botId, newStatus),
+  addOrUpdateBotConditionDb: (botId: string, key: string, value: string) => ipcRenderer.invoke('database:addOrUpdateBotCondition', botId, key, value),
+  deleteBotConditionDb: (botId: string, conditionId: string) => ipcRenderer.invoke('database:deleteBotCondition', botId, conditionId),
+});
+
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
   }
 });
-
-contextBridge.exposeInMainWorld('database', {
-  getAllBots: () => ipcRenderer.invoke('database:getAllBots'),
-  getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
-  setBotEnabled: (botId: string, enabled: boolean) => ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
-});
-
-// Expose botconfig API
-contextBridge.exposeInMainWorld('botconfig', {
-  changeName: (botId: string, newName: string) => 
-    ipcRenderer.invoke('botconfig:changeName', botId, newName),
-  changeDescription: (botId: string, newDescription: string) => 
-    ipcRenderer.invoke('botconfig:changeDescription', botId, newDescription),
-  changeStatus: (botId: string, newStatus: boolean) => 
-    ipcRenderer.invoke('botconfig:changeStatus', botId, newStatus),
-  addOrUpdateCondition: (botId: string, key: string, value: string) => 
-    ipcRenderer.invoke('botconfig:addOrUpdateCondition', botId, key, value),
-  deleteCondition: (botId: string, key: string) => 
-    ipcRenderer.invoke('botconfig:deleteCondition', botId, key)
-} as BotConfigAPI);

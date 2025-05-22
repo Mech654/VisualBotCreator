@@ -10,28 +10,6 @@ interface ActionItem {
   danger?: boolean;
 }
 
-// Add a type for the database API to the global Window interface
-interface Bot {
-  Id: string;
-  name: string; // Standardized to lowercase 'name' as per received data
-  CreatedAt: string;
-  UpdatedAt: string;
-  enabled: number;
-  description: string;
-  run_success_count: number;
-  run_failure_count: number;
-}
-
-declare global {
-  interface Window {
-    database?: {
-      getAllBots: () => Promise<Bot[]>;
-      getRunConditions: (botId: string) => Promise<{ Key: string; Value: string }[]>;
-      setBotEnabled: (botId: string, enabled: boolean) => Promise<void>;
-    };
-  }
-}
-
 // Remove js-loading class when CSS is loaded
 document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.remove('js-loading');
@@ -53,18 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (emptyState) emptyState.style.display = 'none';
         if (countElement) countElement.textContent = `${bots.length} bot${bots.length === 1 ? '' : 's'}`;
         bots.forEach((bot: Bot) => {
-          // Log to inspect the bot object, especially name property
-          console.log(`[INDEX] Bot data for card: Id=${bot.Id}, name=${bot.name}, Raw: ${JSON.stringify(bot)}`);
+          console.log(`[INDEX] Bot data for card: Id=${bot.Id}, Name=${bot.Name}, Raw: ${JSON.stringify(bot)}`);
 
           if (!botList) return;
           const card = document.createElement('div');
           card.className = 'bot-card';
-          card.dataset.botId = bot.Id; // Store the actual bot ID on the card element itself
+          card.dataset.botId = bot.Id;
           card.innerHTML = `
             <div class="bot-header">
               <div class="bot-icon">${(bot.Id || '??').substring(0, 2).toUpperCase()}</div>
               <div class="bot-info">
-                <h3 class="bot-name text-primary" data-bot-id="${bot.Id}">${bot.name || 'Unnamed Bot'}</h3>
+                <h3 class="bot-name text-primary" data-bot-id="${bot.Id}">${bot.Id}</h3>
                 <div class="bot-type text-secondary" data-bot-id="${bot.Id}">${bot.description || ''}</div>
               </div>
               <div class="bot-actions">
@@ -261,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
 
           const botNameElement = card.querySelector('.bot-name');
-          const botName = botNameElement?.textContent || 'Bot'; 
+          // const botName = botNameElement?.textContent || 'Bot'; // botName will be actualBotId now for display
           const botDescriptionElement = card.querySelector('.bot-description');
           const botDescription = botDescriptionElement?.textContent || '';
           const botStatus = card.querySelector('.status-text')?.textContent || '';
@@ -312,15 +289,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           const initialRunCondHtmlForSwal = renderRunConditionsToList(currentRunConditions);
 
           if (window.Swal) {
+            let initialModalIdForSwalDisplay: string = actualBotId; // Used for display and updates within modal
+            let currentCommittedId: string = initialModalIdForSwalDisplay || '';
+
             window.Swal.fire({
-              title: `<span style='font-size:2em;'>${botName}</span>`,
+              title: `<span style='font-size:2em;'>${initialModalIdForSwalDisplay}</span>`, // Use actualBotId for title
               html: `
                 <div class='swal-bot-details-grid'>
                   <div class='swal-detail-category'>
                     <div class='swal-category-title'>General Information</div>
                     <div class='swal-detail-item'>
-                      <b>Name:</b> 
-                      <input type="text" id="swal-bot-name-input-${sanitizedBotIdForDOM}" value="${botName}" class="swal-inline-input">
+                      <b>Identifier (ID):</b> 
+                      <input type="text" id="swal-bot-name-input-${sanitizedBotIdForDOM}" value="${initialModalIdForSwalDisplay}" class="swal-inline-input">
                     </div>
                     <div class='swal-detail-item'>
                       <b>Description:</b> 
@@ -377,37 +357,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const nameInput = document.getElementById(`swal-bot-name-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
                 const descriptionInput = document.getElementById(`swal-bot-description-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
                 
-                let initialModalName = nameInput.value;
-                let initialModalDescription = descriptionInput.value;
+                let initialDescriptionForModal = descriptionInput.value;
 
                 if (nameInput) {
-                  nameInput.addEventListener('blur', () => {
-                    const newName = nameInput.value.trim();
-                    if (newName !== initialModalName && newName.length > 0) {
-                      initialModalName = newName; 
-                      const botNameElementOnCard = document.querySelector(`.bot-name[data-bot-id="${actualBotId}"]`);
-                      if (botNameElementOnCard) botNameElementOnCard.textContent = newName;
-                      
-                      if (window.botconfig && typeof window.botconfig.changeName === 'function') {
-                        window.botconfig.changeName(actualBotId, newName)
-                          .then(result => {
-                            if (!result.success) console.error('Error saving bot name:', result.error);
-                          })
-                          .catch(err => console.error('Failed to save bot name:', err));
+                  nameInput.addEventListener('blur', async () => {
+                    const newIdCandidate = nameInput.value.trim();
+                    if (!newIdCandidate) {
+                        nameInput.value = currentCommittedId; // Prevent empty ID
+                        window.Swal.fire('Error', 'ID cannot be empty.', 'error');
+                        return;
+                    }
+                    if (newIdCandidate === currentCommittedId) {
+                        // No change, do nothing
+                        return;
+                    }
+
+                    console.log(`[INDEX] Attempting to change bot ID from ${currentCommittedId} to ${newIdCandidate}`);
+                    if (window.botconfig && typeof window.botconfig.changeName === 'function') {
+                      try {
+                        const result = await window.botconfig.changeName(currentCommittedId, newIdCandidate);
+                        if (result.success) {
+                          console.log(`[INDEX] Bot ID successfully changed to ${newIdCandidate}`);
+
+                          // Update UI elements on the card
+                          const cardNameElement = document.querySelector(`.bot-name[data-bot-id="${currentCommittedId}"]`);
+                          const cardBotIconElement = botCardElement.querySelector('.bot-icon');
+                          if (cardNameElement) {
+                              cardNameElement.textContent = newIdCandidate;
+                              cardNameElement.setAttribute('data-bot-id', newIdCandidate);
+                          }
+                          if (cardBotIconElement) {
+                              cardBotIconElement.textContent = newIdCandidate.substring(0, 2).toUpperCase();
+                          }
+                          botCardElement.dataset.botId = newIdCandidate;
+                          
+                          // Update the modal title
+                          const swalTitle = document.querySelector('.swal2-title');
+                          if (swalTitle) swalTitle.innerHTML = `<span style='font-size:2em;'>${newIdCandidate}</span>`;
+
+                          // Update the reference ID for subsequent changes in this modal session
+                          currentCommittedId = newIdCandidate;
+                          initialModalIdForSwalDisplay = newIdCandidate;
+
+                        } else {
+                          nameInput.value = currentCommittedId;
+                          window.Swal.fire('Error', `Failed to change ID: ${result.error || 'Unknown error'}`, 'error');
+                        }
+                      } catch (err: any) {
+                        nameInput.value = currentCommittedId;
+                        window.Swal.fire('Error', `An unexpected error occurred: ${err.message || 'Unknown error'}`, 'error');
                       }
+                    } else {
+                      nameInput.value = currentCommittedId;
                     }
                   });
                 }
+                
                 if (descriptionInput) {
                   descriptionInput.addEventListener('blur', () => {
                     const newDesc = descriptionInput.value.trim();
-                    if (newDesc !== initialModalDescription) {
-                      initialModalDescription = newDesc; 
-                      const botDescElementOnCard = document.querySelector(`.bot-description[data-bot-id="${actualBotId}"]`);
+                    const idForDescChange: string = currentCommittedId;
+                    if (newDesc !== initialDescriptionForModal) {
+                      initialDescriptionForModal = newDesc;
+                      const botDescElementOnCard = document.querySelector(`.bot-description[data-bot-id="${idForDescChange}"]`);
                       if (botDescElementOnCard) botDescElementOnCard.textContent = newDesc;
 
                       if (window.botconfig && typeof window.botconfig.changeDescription === 'function') {
-                        window.botconfig.changeDescription(actualBotId, newDesc)
+                        window.botconfig.changeDescription(idForDescChange, newDesc)
                           .then(result => {
                             if (!result.success) console.error('Error saving bot description:', result.error);
                           })
@@ -421,6 +437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const statusSpan = document.getElementById(`swal-bot-status-${sanitizedBotIdForDOM}`);
                 if (toggleBtn && statusSpan) {
                   toggleBtn.addEventListener('click', async () => {
+                    const idForStatusChange: string = currentCommittedId;
                     const isActive = statusSpan.textContent === 'Active';
                     statusSpan.textContent = isActive ? 'Offline' : 'Active';
                     toggleBtn.textContent = isActive ? 'Off' : 'On';
@@ -434,7 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         cardStatusText.textContent = isActive ? 'Offline' : 'Active';
                     }
                     if (window.database && typeof window.database.setBotEnabled === 'function') {
-                      await window.database.setBotEnabled(actualBotId, !isActive);
+                      await window.database.setBotEnabled(idForStatusChange, !isActive);
                     }
                   });
                 }
@@ -563,34 +580,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
               },
               willClose: () => {
-                const nameInput = document.getElementById(`swal-bot-name-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
-                const descriptionInput = document.getElementById(`swal-bot-description-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
-                
-                const finalName = nameInput ? nameInput.value.trim() : botName;
-                if (nameInput && finalName !== botName && finalName.length > 0) {
-                  const botNameElementOnCard = document.querySelector(`.bot-name[data-bot-id="${actualBotId}"]`);
-                  if (botNameElementOnCard) botNameElementOnCard.textContent = finalName;
-                  if (window.botconfig && typeof window.botconfig.changeName === 'function') {
-                    window.botconfig.changeName(actualBotId, finalName)
-                      .then(result => {
-                        if (!result.success) console.error('Error saving bot name on close:', result.error);
-                      })
-                      .catch(err => console.error('Failed to save bot name on close:', err));
-                  }
-                }
-                
-                const finalDescription = descriptionInput ? descriptionInput.value.trim() : botDescription;
-                if (descriptionInput && finalDescription !== botDescription) {
-                  const botDescElementOnCard = document.querySelector(`.bot-description[data-bot-id="${actualBotId}"]`);
-                  if (botDescElementOnCard) botDescElementOnCard.textContent = finalDescription;
-                  if (window.botconfig && typeof window.botconfig.changeDescription === 'function') {
-                    window.botconfig.changeDescription(actualBotId, finalDescription)
-                      .then(result => {
-                        if (!result.success) console.error('Error saving bot description on close:', result.error);
-                      })
-                      .catch(err => console.error('Failed to save bot description on close:', err));
-                  }
-                }
+                // No specific action needed here for ID change as it's handled on blur.
+                // If there were pending changes not committed by blur, this would be the place.
+                console.log(`[INDEX] Modal for bot (last known ID: ${currentCommittedId}) is closing.`);
               }
             });
           }
@@ -598,5 +590,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   }
-  setupSwalDashboardModalStyle();
 });
+
+if (module.hot) {
+  module.hot.accept();
+}
+
+setupSwalDashboardModalStyle();

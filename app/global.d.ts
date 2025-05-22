@@ -15,8 +15,11 @@ interface UtilsAPI {
   generateNodeId: () => string;
 }
 
-// Augment the Window interface
-declare interface Window {
-  nodeSystem: any;
-  utils: any;
-}
+// All Window interface augmentations have been moved to app/types/global.d.ts
+// This file can be removed or repurposed if no other global types are defined here.
+
+// The following were moved to app/types/global.d.ts:
+// declare interface Window {
+//   nodeSystem: any;
+//   utils: any;
+// }

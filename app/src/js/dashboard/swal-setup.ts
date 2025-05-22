@@ -1,12 +1,12 @@
 import Swal from 'sweetalert2';
 
-declare global {
-  interface Window {
-	Swal: typeof Swal;
-  }
-}
-
+// Make SweetAlert2 available globally for legacy/modal code
 window.Swal = Swal;
+
+declare global {
+  // Remove the explicit type and use 'var' to match the global.d.ts declaration if present
+  // If this still fails, remove this block entirely and rely on the global.d.ts declaration
+}
 
 // SweetAlert2 dashboard modal custom CSS setup
 export function setupSwalDashboardModalStyle() {

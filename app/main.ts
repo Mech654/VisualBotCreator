@@ -347,12 +347,14 @@ function setupIpcHandlers(): void {
     }
   });
   // Expose changeNameDb via IPC
-  ipcMain.handle('database:changeName', async (event, botId: string, newName: string) => {
+  // This is a direct database function exposure, consider using the botconfig namespaced one for business logic
+  ipcMain.handle('database:changeName', async (event, oldId: string, newId: string) => { // Changed parameters
     try {
-      await changeNameDb(botId, newName);
-      return { success: true };
+      // Directly calling the refactored database function
+      const result = await changeNameDb(oldId, newId);
+      return result; // Return the {success, error} object
     } catch (error) {
-      console.error('Error in changeNameDb IPC handler:', error);
+      console.error('Error in database:changeName IPC handler:', error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   });
@@ -398,25 +400,23 @@ function setupIpcHandlers(): void {
   });
 
   // Bot configuration IPC handlers
-  ipcMain.handle('botconfig:changeName', async (event, botId: string, newName: string) => {
+  ipcMain.handle('botconfig:changeName', async (event, oldId: string, newId: string) => { // Changed parameters
     try {
-      console.log('[MAIN] Received botconfig:changeName IPC request:', { botId, newName });
-      await changeNameDb(botId, newName);
+      console.log('[MAIN] Received botconfig:changeName IPC request:', { oldId, newId });
+      // Call the refactored database function which now handles Id and Name update
+      const result = await changeNameDb(oldId, newId);
       
-      // Verify the change was made by querying the database
-      try {
-        const bots = await getAllBots();
-        const updatedBot = bots.find(bot => bot.Id === botId);
-        console.log('[MAIN] Verified bot data after update:', { botId, name: updatedBot?.Name });
-      } catch (verifyErr) {
-        console.error('[MAIN] Error verifying bot update:', verifyErr);
+      if (result.success) {
+        console.log('[MAIN] Successfully updated bot Id/Name in database to:', newId);
+        // Optional: Verification step can be added here if needed,
+        // but the database function already checks for this.changes
+      } else {
+        console.warn('[MAIN] Failed to update bot Id/Name in database:', result.error);
       }
-      
-      console.log('[MAIN] Successfully updated bot name in database');
-      return { success: true };
+      return result; // Return the {success, error} object from changeNameDb
     } catch (error) {
-      console.error('Error changing bot name:', error);
-      return { success: false, error: (error as Error).message || 'Unknown error' };
+      console.error('Error changing bot Id/Name:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error during ID/Name change' };
     }
   });
 

@@ -46,24 +46,24 @@ function initDatabase(): Promise<void> {
 
           db.run(`
             CREATE TABLE IF NOT EXISTS Nodes (
-              BotId        VARCHAR(36)   NOT NULL,
-              NodeId       VARCHAR(36)   NOT NULL,
-              Definition   TEXT          NOT NULL,
+              BotId        TEXT   NOT NULL,
+              NodeId       TEXT   NOT NULL,
+              Definition   TEXT   NOT NULL,
               CreatedAt    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
               UpdatedAt    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (BotId, NodeId),
-              FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE
+              FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE ON UPDATE CASCADE
             );
           `, (err: Error | null) => { if (err) return reject(err); });
 
           db.run(`
             CREATE TABLE IF NOT EXISTS RunConditions (
-              BotId      VARCHAR(36) NOT NULL,
-              Key        TEXT        NOT NULL,
-              Value      TEXT        NOT NULL,
+              BotId      TEXT NOT NULL,
+              Key        TEXT NOT NULL,
+              Value      TEXT NOT NULL,
               UpdatedAt  DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (BotId, Key),
-              FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE
+              FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE ON UPDATE CASCADE
             );
           `, (err: Error | null) => {
             if (err) return reject(err);
@@ -235,28 +235,30 @@ function closeDB(): Promise<void> {
   });
 }
 
-function changeNameDb(botId: string, newName: string): Promise<void> {
-  console.log('[DATABASE] Changing bot name - botId:', botId, 'newName:', newName);
+function changeNameDb(oldId: string, newId: string): Promise<{success: boolean, error?: string}> {
+  if (!oldId || !newId) {
+    return Promise.resolve({ success: false, error: 'Both old and new IDs are required.' });
+  }
+  if (typeof oldId !== 'string' || typeof newId !== 'string') {
+    return Promise.resolve({ success: false, error: 'IDs must be strings.' });
+  }
+  if (oldId === newId) {
+    return Promise.resolve({ success: true }); // No change needed
+  }
+  console.log('[DATABASE] Attempting to change bot Id and Name - oldId:', oldId, 'newId:', newId);
   return new Promise((resolve, reject) => {
     const now = new Date().toISOString();
-    // First check if the bot exists
-    db.get('SELECT Id, Name FROM Bots WHERE Id = ?', [botId], (getErr: Error | null, row: any) => {
-      if (getErr) {
-        console.error('[DATABASE] Error checking if bot exists:', getErr);
-        return reject(getErr);
+    db.run('UPDATE Bots SET Id = ?, Name = ?, UpdatedAt = ? WHERE Id = ?', [newId, newId, now, oldId], function(this: sqlite3.RunResult, err: Error | null) {
+      if (err) {
+        console.error('[DATABASE] Error updating bot Id and Name:', err);
+        return resolve({ success: false, error: err.message }); // Return error as part of result
       }
-      
-      console.log('[DATABASE] Current bot data:', row);
-      
-      // Now perform the update
-      db.run('UPDATE Bots SET Name = ?, UpdatedAt = ? WHERE Id = ?', [newName, now, botId], (err: Error | null) => {
-        if (err) {
-          console.error('[DATABASE] Error updating bot name:', err);
-          return reject(err);
-        }
-        console.log('[DATABASE] Bot name updated successfully');
-        resolve();
-      });
+      if (this.changes === 0) {
+        console.warn('[DATABASE] No bot found with Id to update:', oldId);
+        return resolve({ success: false, error: 'Bot with the original ID not found.' });
+      }
+      console.log('[DATABASE] Bot Id and Name updated successfully to:', newId);
+      resolve({ success: true });
     });
   });
 }
