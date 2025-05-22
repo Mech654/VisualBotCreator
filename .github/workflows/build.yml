@@ -29,10 +29,10 @@ jobs:
         run: npm install
 
       - name: Build Electron app
-        run: npm run dist
+        run: npm run build && npm run dist
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: electron-market-build
-          path: ./dist/
+          path: .
