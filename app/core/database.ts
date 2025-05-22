@@ -28,10 +28,15 @@ function initDatabase(): Promise<void> {
           return reject(err);
         }
         db.serialize(() => {
-          db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => { if (err) return reject(err); });
-          db.run('PRAGMA foreign_keys = ON;', (err: Error | null) => { if (err) return reject(err); });
+          db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => {
+            if (err) return reject(err);
+          });
+          db.run('PRAGMA foreign_keys = ON;', (err: Error | null) => {
+            if (err) return reject(err);
+          });
 
-          db.run(`
+          db.run(
+            `
             CREATE TABLE IF NOT EXISTS Bots (
               Id TEXT PRIMARY KEY,
               Name TEXT NOT NULL DEFAULT 'Unnamed Bot',
@@ -42,9 +47,14 @@ function initDatabase(): Promise<void> {
               run_success_count INTEGER NOT NULL DEFAULT 0,
               run_failure_count INTEGER NOT NULL DEFAULT 0
             );
-          `, (err: Error | null) => { if (err) return reject(err); });
+          `,
+            (err: Error | null) => {
+              if (err) return reject(err);
+            }
+          );
 
-          db.run(`
+          db.run(
+            `
             CREATE TABLE IF NOT EXISTS Nodes (
               BotId        TEXT   NOT NULL,
               NodeId       TEXT   NOT NULL,
@@ -54,9 +64,14 @@ function initDatabase(): Promise<void> {
               PRIMARY KEY (BotId, NodeId),
               FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE ON UPDATE CASCADE
             );
-          `, (err: Error | null) => { if (err) return reject(err); });
+          `,
+            (err: Error | null) => {
+              if (err) return reject(err);
+            }
+          );
 
-          db.run(`
+          db.run(
+            `
             CREATE TABLE IF NOT EXISTS RunConditions (
               BotId      TEXT NOT NULL,
               Key        TEXT NOT NULL,
@@ -65,10 +80,12 @@ function initDatabase(): Promise<void> {
               PRIMARY KEY (BotId, Key),
               FOREIGN KEY (BotId) REFERENCES Bots(Id) ON DELETE CASCADE ON UPDATE CASCADE
             );
-          `, (err: Error | null) => {
-            if (err) return reject(err);
-            resolve();
-          });
+          `,
+            (err: Error | null) => {
+              if (err) return reject(err);
+              resolve();
+            }
+          );
         });
       });
     } catch (error) {
@@ -122,8 +139,8 @@ async function saveNode(
           fromNodeId: conn.fromNodeId,
           fromPortId: conn.fromPortId,
           toNodeId: conn.toNodeId,
-          toPortId: conn.toPortId
-        }))
+          toPortId: conn.toPortId,
+        })),
       })),
       outputs: node.outputs.map(port => ({
         id: port.id,
@@ -135,24 +152,28 @@ async function saveNode(
           fromNodeId: conn.fromNodeId,
           fromPortId: conn.fromPortId,
           toNodeId: conn.toNodeId,
-          toPortId: conn.toPortId
-        }))
-      }))
+          toPortId: conn.toPortId,
+        })),
+      })),
     });
     return new Promise((resolve, reject) => {
-      db.run(`
+      db.run(
+        `
         INSERT INTO Nodes (BotId, NodeId, Definition, CreatedAt, UpdatedAt)
         VALUES (?, ?, ?, ?, ?)
         ON CONFLICT(BotId, NodeId) DO UPDATE SET
           Definition = excluded.Definition,
           UpdatedAt  = excluded.UpdatedAt
-      `, [botId, node.id, definition, now, now], function(this: sqlite3.RunResult, err: Error | null) {
-        if (err) {
-          console.error('Error saving node:', err);
-          return reject(err);
+      `,
+        [botId, node.id, definition, now, now],
+        function (this: sqlite3.RunResult, err: Error | null) {
+          if (err) {
+            console.error('Error saving node:', err);
+            return reject(err);
+          }
+          resolve({ success: true, nodeId: node.id });
         }
-        resolve({ success: true, nodeId: node.id });
-      });
+      );
     });
   } catch (err) {
     console.error('Error saving node:', err);
@@ -162,7 +183,7 @@ async function saveNode(
 
 async function saveAllNodes(
   botId: string,
-  nodes: { [key: string]: Node },
+  nodes: { [key: string]: Node }
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await ensureBotExists(botId);
@@ -195,26 +216,34 @@ function getAllBots(): Promise<any[]> {
 // Get run conditions for a bot
 function getRunConditions(botId: string): Promise<{ Key: string; Value: string }[]> {
   return new Promise((resolve, reject) => {
-    db.all('SELECT Key, Value FROM RunConditions WHERE BotId = ?', [botId], (err: Error | null, rows: any[]) => {
-      if (err) {
-        console.error('Error fetching run conditions:', err);
-        return reject(err);
+    db.all(
+      'SELECT Key, Value FROM RunConditions WHERE BotId = ?',
+      [botId],
+      (err: Error | null, rows: any[]) => {
+        if (err) {
+          console.error('Error fetching run conditions:', err);
+          return reject(err);
+        }
+        resolve(rows);
       }
-      resolve(rows);
-    });
+    );
   });
 }
 
 // Set bot enabled/disabled
 function setBotEnabled(botId: string, enabled: boolean): Promise<void> {
   return new Promise((resolve, reject) => {
-    db.run('UPDATE Bots SET enabled = ?, UpdatedAt = ? WHERE Id = ?', [enabled ? 1 : 0, new Date().toISOString(), botId], (err: Error | null) => {
-      if (err) {
-        console.error('Error updating bot enabled:', err);
-        return reject(err);
+    db.run(
+      'UPDATE Bots SET enabled = ?, UpdatedAt = ? WHERE Id = ?',
+      [enabled ? 1 : 0, new Date().toISOString(), botId],
+      (err: Error | null) => {
+        if (err) {
+          console.error('Error updating bot enabled:', err);
+          return reject(err);
+        }
+        resolve();
       }
-      resolve();
-    });
+    );
   });
 }
 
@@ -235,7 +264,7 @@ function closeDB(): Promise<void> {
   });
 }
 
-function changeNameDb(oldId: string, newId: string): Promise<{success: boolean, error?: string}> {
+function changeNameDb(oldId: string, newId: string): Promise<{ success: boolean; error?: string }> {
   if (!oldId || !newId) {
     return Promise.resolve({ success: false, error: 'Both old and new IDs are required.' });
   }
@@ -248,31 +277,39 @@ function changeNameDb(oldId: string, newId: string): Promise<{success: boolean, 
   console.log('[DATABASE] Attempting to change bot Id and Name - oldId:', oldId, 'newId:', newId);
   return new Promise((resolve, reject) => {
     const now = new Date().toISOString();
-    db.run('UPDATE Bots SET Id = ?, Name = ?, UpdatedAt = ? WHERE Id = ?', [newId, newId, now, oldId], function(this: sqlite3.RunResult, err: Error | null) {
-      if (err) {
-        console.error('[DATABASE] Error updating bot Id and Name:', err);
-        return resolve({ success: false, error: err.message }); // Return error as part of result
+    db.run(
+      'UPDATE Bots SET Id = ?, Name = ?, UpdatedAt = ? WHERE Id = ?',
+      [newId, newId, now, oldId],
+      function (this: sqlite3.RunResult, err: Error | null) {
+        if (err) {
+          console.error('[DATABASE] Error updating bot Id and Name:', err);
+          return resolve({ success: false, error: err.message }); // Return error as part of result
+        }
+        if (this.changes === 0) {
+          console.warn('[DATABASE] No bot found with Id to update:', oldId);
+          return resolve({ success: false, error: 'Bot with the original ID not found.' });
+        }
+        console.log('[DATABASE] Bot Id and Name updated successfully to:', newId);
+        resolve({ success: true });
       }
-      if (this.changes === 0) {
-        console.warn('[DATABASE] No bot found with Id to update:', oldId);
-        return resolve({ success: false, error: 'Bot with the original ID not found.' });
-      }
-      console.log('[DATABASE] Bot Id and Name updated successfully to:', newId);
-      resolve({ success: true });
-    });
+    );
   });
 }
 
 function changeDescriptionDb(botId: string, newDescription: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const now = new Date().toISOString();
-    db.run('UPDATE Bots SET description = ?, UpdatedAt = ? WHERE Id = ?', [newDescription, now, botId], (err: Error | null) => {
-      if (err) {
-        console.error('Error updating bot description:', err);
-        return reject(err);
+    db.run(
+      'UPDATE Bots SET description = ?, UpdatedAt = ? WHERE Id = ?',
+      [newDescription, now, botId],
+      (err: Error | null) => {
+        if (err) {
+          console.error('Error updating bot description:', err);
+          return reject(err);
+        }
+        resolve();
       }
-      resolve();
-    });
+    );
   });
 }
 
@@ -317,7 +354,8 @@ function deleteBotConditionDb(botId: string, key: string): Promise<void> {
   });
 }
 
-app.whenReady()
+app
+  .whenReady()
   .then(async () => {
     await initDatabase();
     // ...create windows, menus, etc.
@@ -328,15 +366,28 @@ app.whenReady()
   });
 
 // Ensure we close DB on quit
-app.on('before-quit', async (event) => {
+app.on('before-quit', async event => {
   event.preventDefault(); // Prevent immediate quit
   try {
     await closeDB();
   } catch (err) {
-    console.error("Error closing DB before quit:", err);
+    console.error('Error closing DB before quit:', err);
   } finally {
     app.exit(); // Proceed to quit
   }
 });
 
-export { saveNode, saveAllNodes, closeDB as close, initDatabase, getAllBots, getRunConditions, setBotEnabled, changeNameDb, changeDescriptionDb, changeStatusDb, addOrUpdateBotConditionDb, deleteBotConditionDb };
+export {
+  saveNode,
+  saveAllNodes,
+  closeDB as close,
+  initDatabase,
+  getAllBots,
+  getRunConditions,
+  setBotEnabled,
+  changeNameDb,
+  changeDescriptionDb,
+  changeStatusDb,
+  addOrUpdateBotConditionDb,
+  deleteBotConditionDb,
+};

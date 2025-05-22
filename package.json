@@ -1,5 +1,5 @@
 {
-  "name": "VisualBotCreator",
+  "name": "visualbotcreator",
   "version": "1.0.0",
   "description": "An awesome software to create and manage your own bots.",
   "main": "dist/main.js",

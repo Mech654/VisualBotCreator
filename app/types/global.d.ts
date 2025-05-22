@@ -50,11 +50,21 @@ interface UtilsAPI {
 }
 
 interface BotConfigAPI {
-  changeName: (oldId: string, newId: string) => Promise<{success: boolean, error?: string}>; // Updated signature
-  changeDescription: (botId: string, newDescription: string) => Promise<{success: boolean, error?: string}>;
-  changeStatus: (botId: string, newStatus: boolean) => Promise<{success: boolean, error?: string}>;
-  addOrUpdateCondition: (botId: string, key: string, value: string) => Promise<{success: boolean, error?: string}>;
-  deleteCondition: (botId: string, key: string) => Promise<{success: boolean, error?: string}>;
+  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>; // Updated signature
+  changeDescription: (
+    botId: string,
+    newDescription: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  changeStatus: (
+    botId: string,
+    newStatus: boolean
+  ) => Promise<{ success: boolean; error?: string }>;
+  addOrUpdateCondition: (
+    botId: string,
+    key: string,
+    value: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  deleteCondition: (botId: string, key: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare interface Window {

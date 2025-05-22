@@ -1,11 +1,17 @@
-import { changeNameDb, changeDescriptionDb, changeStatusDb, addOrUpdateBotConditionDb, deleteBotConditionDb } from './database';
+import {
+  changeNameDb,
+  changeDescriptionDb,
+  changeStatusDb,
+  addOrUpdateBotConditionDb,
+  deleteBotConditionDb,
+} from './database';
 
 export async function changeName(botId: string, newName: string) {
   const botNameElement = document.querySelector(`.bot-name[data-bot-id="${botId}"]`);
   if (botNameElement) {
     botNameElement.textContent = newName;
   }
-  
+
   // Try to use IPC if available (when called from renderer)
   if (typeof window !== 'undefined' && window.botconfig?.changeName) {
     return window.botconfig.changeName(botId, newName);
@@ -20,7 +26,7 @@ export async function changeDescription(botId: string, newDescription: string) {
   if (botDescriptionElement) {
     botDescriptionElement.textContent = newDescription;
   }
-  
+
   // Try to use IPC if available (when called from renderer)
   if (typeof window !== 'undefined' && window.botconfig?.changeDescription) {
     return window.botconfig.changeDescription(botId, newDescription);
@@ -35,7 +41,7 @@ export async function changeStatus(botId: string, newStatus: boolean) {
   if (botStatusElement) {
     botStatusElement.textContent = newStatus ? 'Online' : 'Offline';
   }
-  
+
   // Try to use IPC if available (when called from renderer)
   if (typeof window !== 'undefined' && window.botconfig?.changeStatus) {
     return window.botconfig.changeStatus(botId, newStatus);

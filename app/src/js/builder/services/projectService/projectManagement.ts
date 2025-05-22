@@ -142,8 +142,8 @@ export function initProjectManagement(): void {
   if (saveBtn) {
     saveBtn.addEventListener('click', e => {
       console.log('Save button clicked'); // Debug: verify event fires
-      createRippleEffect(saveBtn as HTMLElement, e);
-      addAttentionAnimation(saveBtn as HTMLElement, 'bounce', 500);
+      createRippleEffect(saveBtn, e);
+      addAttentionAnimation(saveBtn, 'bounce', 500);
       saveProject();
     });
   } else {
