@@ -11,7 +11,7 @@ import {
   PORT_CATEGORIES,
 } from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
-import { initDatabase, saveAllNodes, getAllBots, getRunConditions, setBotEnabled } from './core/database.js';
+import { initDatabase, saveAllNodes, getAllBots, getRunConditions, setBotEnabled, changeNameDb, changeDescriptionDb, changeStatusDb, addOrUpdateBotConditionDb, deleteBotConditionDb } from './core/database.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -346,6 +346,119 @@ function setupIpcHandlers(): void {
       return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   });
+  // Expose changeNameDb via IPC
+  ipcMain.handle('database:changeName', async (event, botId: string, newName: string) => {
+    try {
+      await changeNameDb(botId, newName);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in changeNameDb IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+  // Expose changeDescriptionDb via IPC
+  ipcMain.handle('database:changeDescription', async (event, botId: string, newDescription: string) => {
+    try {
+      await changeDescriptionDb(botId, newDescription);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in changeDescriptionDb IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+  // Expose changeStatusDb via IPC
+  ipcMain.handle('database:changeStatus', async (event, botId: string, newStatus: boolean) => {
+    try {
+      await changeStatusDb(botId, newStatus);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in changeStatusDb IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+  // Expose addOrUpdateBotConditionDb via IPC
+  ipcMain.handle('database:addOrUpdateBotCondition', async (event, botId: string, key: string, value: string) => {
+    try {
+      await addOrUpdateBotConditionDb(botId, key, value);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in addOrUpdateBotConditionDb IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+  // Expose deleteBotConditionDb via IPC
+  ipcMain.handle('database:deleteBotCondition', async (event, botId: string, conditionId: string) => {
+    try {
+      await deleteBotConditionDb(botId, conditionId);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in deleteBotConditionDb IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+
+  // Bot configuration IPC handlers
+  ipcMain.handle('botconfig:changeName', async (event, botId: string, newName: string) => {
+    try {
+      console.log('[MAIN] Received botconfig:changeName IPC request:', { botId, newName });
+      await changeNameDb(botId, newName);
+      
+      // Verify the change was made by querying the database
+      try {
+        const bots = await getAllBots();
+        const updatedBot = bots.find(bot => bot.Id === botId);
+        console.log('[MAIN] Verified bot data after update:', { botId, name: updatedBot?.Name });
+      } catch (verifyErr) {
+        console.error('[MAIN] Error verifying bot update:', verifyErr);
+      }
+      
+      console.log('[MAIN] Successfully updated bot name in database');
+      return { success: true };
+    } catch (error) {
+      console.error('Error changing bot name:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('botconfig:changeDescription', async (event, botId: string, newDescription: string) => {
+    try {
+      await changeDescriptionDb(botId, newDescription);
+      return { success: true };
+    } catch (error) {
+      console.error('Error changing bot description:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('botconfig:changeStatus', async (event, botId: string, newStatus: boolean) => {
+    try {
+      await changeStatusDb(botId, newStatus);
+      return { success: true };
+    } catch (error) {
+      console.error('Error changing bot status:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('botconfig:addOrUpdateCondition', async (event, botId: string, key: string, value: string) => {
+    try {
+      await addOrUpdateBotConditionDb(botId, key, value);
+      return { success: true };
+    } catch (error) {
+      console.error('Error adding/updating bot condition:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('botconfig:deleteCondition', async (event, botId: string, key: string) => {
+    try {
+      await deleteBotConditionDb(botId, key);
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting bot condition:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
 }
 
 /**
@@ -390,11 +503,19 @@ function arePortTypesCompatible(sourceType: string, targetType: string): boolean
   return compatibleTypes.includes(targetType as PortType);
 }
 
+async function main() {
+  try {
+    await initDatabase();
+    createWindow();
+    setupIpcHandlers();
+  } catch (err) {
+    console.error('Failed to start application:', err);
+  }
+}
+
 app.whenReady().then(() => {
-  setupIpcHandlers();
-  createWindow();
-  initDatabase();
-  console.log('Database initialized');
+  main();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

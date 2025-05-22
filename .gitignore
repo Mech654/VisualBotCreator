@@ -68,3 +68,5 @@ coverage/
 
 # DBs
 VisualBotCreator.db
+VisualBotCreator.db-wal
+VisualBotCreator.db-shm

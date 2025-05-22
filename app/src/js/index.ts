@@ -13,6 +13,7 @@ interface ActionItem {
 // Add a type for the database API to the global Window interface
 interface Bot {
   Id: string;
+  name: string; // Standardized to lowercase 'name' as per received data
   CreatedAt: string;
   UpdatedAt: string;
   enabled: number;
@@ -33,10 +34,8 @@ declare global {
 
 // Remove js-loading class when CSS is loaded
 document.addEventListener('DOMContentLoaded', async () => {
-  // Remove js-loading class to fade in content
   document.body.classList.remove('js-loading');
 
-  // Fetch bots from the database and render them
   const botList = document.querySelector('.bot-list') as HTMLElement | null;
   const emptyState = document.querySelector('.empty-state') as HTMLElement | null;
   const countElement = document.querySelector('.section-subtitle') as HTMLElement | null;
@@ -54,25 +53,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (emptyState) emptyState.style.display = 'none';
         if (countElement) countElement.textContent = `${bots.length} bot${bots.length === 1 ? '' : 's'}`;
         bots.forEach((bot: Bot) => {
+          // Log to inspect the bot object, especially name property
+          console.log(`[INDEX] Bot data for card: Id=${bot.Id}, name=${bot.name}, Raw: ${JSON.stringify(bot)}`);
+
           if (!botList) return;
           const card = document.createElement('div');
           card.className = 'bot-card';
+          card.dataset.botId = bot.Id; // Store the actual bot ID on the card element itself
           card.innerHTML = `
             <div class="bot-header">
               <div class="bot-icon">${(bot.Id || '??').substring(0, 2).toUpperCase()}</div>
               <div class="bot-info">
-                <h3 class="bot-name text-primary">${bot.Id || 'Unnamed Bot'}</h3>
-                <div class="bot-type text-secondary">${bot.description || ''}</div>
+                <h3 class="bot-name text-primary" data-bot-id="${bot.Id}">${bot.name || 'Unnamed Bot'}</h3>
+                <div class="bot-type text-secondary" data-bot-id="${bot.Id}">${bot.description || ''}</div>
               </div>
               <div class="bot-actions">
                 <div class="bot-action dropdown-trigger">⋮</div>
               </div>
             </div>
             <div class="bot-details text-secondary">
-              <p class="bot-description">${bot.description || ''}</p>
+              <p class="bot-description" data-bot-id="${bot.Id}">${bot.description || ''}</p>
             </div>
             <div class="bot-footer text-secondary">
-              <div class="bot-status">
+              <div class="bot-status" data-bot-id="${bot.Id}">
                 <div class="status-dot ${bot.enabled ? 'status-active' : 'status-offline'}"></div>
                 <span class="status-text">${bot.enabled ? 'Active' : 'Offline'}</span>
               </div>
@@ -93,38 +96,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.bot-action').forEach(action => {
     action.addEventListener('click', e => {
       e.stopPropagation();
-
       document.querySelectorAll('.action-dropdown').forEach(dropdown => dropdown.remove());
-
       const dropdown = document.createElement('div');
       dropdown.className = 'action-dropdown';
-
       const actions: ActionItem[] = [
         { icon: '✏️', text: 'Edit', action: 'edit' },
         { icon: '🔄', text: 'Duplicate', action: 'duplicate' },
         { icon: '⚙️', text: 'Settings', action: 'settings' },
         { icon: '🗑️', text: 'Delete', action: 'delete', danger: true },
       ];
-
       actions.forEach(item => {
         const actionItem = document.createElement('div');
         actionItem.className = 'dropdown-item';
         if (item.danger) actionItem.classList.add('danger');
-
         actionItem.innerHTML = `<span class="dropdown-icon">${item.icon}</span>${item.text}`;
-
         actionItem.addEventListener('click', () => {
           const target = e.target as HTMLElement;
           const botCard = target.closest('.bot-card') as HTMLElement;
           handleBotAction(item.action, botCard);
           dropdown.remove();
         });
-
         dropdown.appendChild(actionItem);
       });
-
       (action as HTMLElement).appendChild(dropdown);
-
       document.addEventListener('click', function closeDropdown(evt) {
         const target = evt.target as HTMLElement;
         if (!target.closest('.bot-action')) {
@@ -239,8 +233,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  const createButton = document.querySelector('.btn-primary');
-  createButton?.addEventListener('click', () => {
+  const mainCreateButton = document.querySelector('.empty-state .btn-primary, .section-header .btn-primary');
+  mainCreateButton?.addEventListener('click', () => {
     showPageTransition('builder.html');
   });
 
@@ -257,56 +251,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.addEventListener('click', async e => {
           const target = e.target as HTMLElement;
           if (target.closest('.bot-action')) return;
-          const botName = card.querySelector('.bot-name')?.textContent || 'Bot';
-          const botType = card.querySelector('.bot-type')?.textContent || '';
-          const botDescription = card.querySelector('.bot-description')?.textContent || '';
+
+          const botCardElement = card as HTMLElement;
+          const actualBotId = botCardElement.dataset.botId; 
+
+          if (!actualBotId) {
+            console.error('[INDEX] Could not find actual bot ID for card:', card);
+            return;
+          }
+
+          const botNameElement = card.querySelector('.bot-name');
+          const botName = botNameElement?.textContent || 'Bot'; 
+          const botDescriptionElement = card.querySelector('.bot-description');
+          const botDescription = botDescriptionElement?.textContent || '';
           const botStatus = card.querySelector('.status-text')?.textContent || '';
           const botStats = card.querySelector('.bot-stats')?.textContent || '';
-          const botId = botName; // Using botName as botId as per existing code
-          const sanitizedBotId = botId.replace(/[^a-zA-Z0-9\-_]/g, '_'); // Sanitize for DOM IDs
+          
+          const sanitizedBotIdForDOM = actualBotId.replace(/[^a-zA-Z0-9\\-_]/g, '_');
 
           let initialRunConditions: { Key: string; Value: string }[] = [];
           if (window.database && typeof window.database.getRunConditions === 'function') {
             try {
-              initialRunConditions = await window.database.getRunConditions(botId);
+              initialRunConditions = await window.database.getRunConditions(actualBotId);
             } catch (err) {
-              console.error(`Failed to get run conditions for ${botId}:`, err);
+              console.error(`Failed to get run conditions for ${actualBotId}:`, err);
               initialRunConditions = [];
             }
           }
-
-          // Mutable copy for this modal instance
+          
           let currentRunConditions = [...initialRunConditions];
-
-          const runConditionsListContainerId = `swal-rc-list-container-${sanitizedBotId}`;
-          const addRunConditionBtnId = `swal-add-rc-btn-${sanitizedBotId}`;
-          const addRunConditionFormId = `swal-add-rc-form-${sanitizedBotId}`;
-          const rcKeySelectId = `swal-rc-key-select-${sanitizedBotId}`;
-          const rcValueInputId = `swal-rc-value-input-${sanitizedBotId}`;
-          const saveRcBtnId = `swal-save-rc-btn-${sanitizedBotId}`;
-          const cancelRcBtnId = `swal-cancel-rc-btn-${sanitizedBotId}`;
+          const runConditionsListContainerId = `swal-rc-list-container-${sanitizedBotIdForDOM}`;
+          const addRunConditionBtnId = `swal-add-rc-btn-${sanitizedBotIdForDOM}`;
+          const addRunConditionFormId = `swal-add-rc-form-${sanitizedBotIdForDOM}`;
+          const rcKeySelectId = `swal-rc-key-select-${sanitizedBotIdForDOM}`;
+          const rcValueInputId = `swal-rc-value-input-${sanitizedBotIdForDOM}`;
+          const saveRcBtnId = `swal-save-rc-btn-${sanitizedBotIdForDOM}`;
+          const cancelRcBtnId = `swal-cancel-rc-btn-${sanitizedBotIdForDOM}`;
 
           const renderRunConditionsToList = (conditions: { Key: string; Value: string }[]) => {
             let listHtml = '<ol class="swal-rc-list">';
             if (conditions.length > 0) {
               conditions.forEach((rc, index) => {
                 let prettyValue = rc.Value;
-                // Enhance display for common types
-                if (rc.Key === 'Time of Day (HH:MM)') {
-                  prettyValue = `<span style='color:#4fc3f7;'>${rc.Value}</span>`; // blue accent
-                } else if (rc.Key === 'Day of Week') {
-                  prettyValue = `<span style='color:#81c784;'>${rc.Value}</span>`; // green accent
-                } else if (rc.Key === 'Specific Date (YYYY-MM-DD)') {
-                  prettyValue = `<span style='color:#ffb74d;'>${rc.Value}</span>`; // orange accent
-                } else if (rc.Key.startsWith('Variable')) {
-                  prettyValue = `<span style='color:#ba68c8;'>${rc.Value}</span>`; // purple accent
-                } else if (rc.Key === 'Bot Enabled') {
-                  prettyValue = `<span style='color:#baffc9;'>${rc.Value}</span>`;
-                } else if (rc.Key === 'User Input') {
-                  prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}</span>`;
-                } else if (rc.Key === 'Random Chance') {
-                  prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}%</span>`;
-                }
+                if (rc.Key === 'Time of Day (HH:MM)') prettyValue = `<span style='color:#4fc3f7;'>${rc.Value}</span>`;
+                else if (rc.Key === 'Day of Week') prettyValue = `<span style='color:#81c784;'>${rc.Value}</span>`;
+                else if (rc.Key === 'Specific Date (YYYY-MM-DD)') prettyValue = `<span style='color:#ffb74d;'>${rc.Value}</span>`;
+                else if (rc.Key.startsWith('Variable')) prettyValue = `<span style='color:#ba68c8;'>${rc.Value}</span>`;
+                else if (rc.Key === 'Bot Enabled') prettyValue = `<span style='color:#baffc9;'>${rc.Value}</span>`;
+                else if (rc.Key === 'User Input') prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}</span>`;
+                else if (rc.Key === 'Random Chance') prettyValue = `<span style='color:#e0e0e0;'>${rc.Value}%</span>`;
                 listHtml += `<li><span><b>${rc.Key}:</b> ${prettyValue}</span> <button class="swal-delete-rc-btn" data-index="${index}">&times;</button></li>`;
               });
             } else {
@@ -327,19 +320,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class='swal-category-title'>General Information</div>
                     <div class='swal-detail-item'>
                       <b>Name:</b> 
-                      <input type="text" id="swal-bot-name-input-${sanitizedBotId}" value="${botName}" class="swal-inline-input">
+                      <input type="text" id="swal-bot-name-input-${sanitizedBotIdForDOM}" value="${botName}" class="swal-inline-input">
                     </div>
                     <div class='swal-detail-item'>
                       <b>Description:</b> 
-                      <input type="text" id="swal-bot-description-input-${sanitizedBotId}" value="${botDescription}" class="swal-inline-input">
+                      <input type="text" id="swal-bot-description-input-${sanitizedBotIdForDOM}" value="${botDescription}" class="swal-inline-input">
                     </div>
                   </div>
 
                   <div class='swal-detail-category'>
                     <div class='swal-category-title'>Operational Status</div>
                     <div class='swal-detail-item'>
-                      <b>Status:</b> <span id='swal-bot-status' style='font-weight:bold;'>${botStatus}</span>
-                      <button id='swal-toggle-btn' style='margin-left:10px;padding:4px 18px;font-size:1.1em;border-radius:18px;border:1px solid #888;background:${botStatus === 'Active' ? '#4caf50' : '#ccc'};color:#fff;cursor:pointer;min-width:60px;'>${botStatus === 'Active' ? 'On' : 'Off'}</button>
+                      <b>Status:</b> <span id='swal-bot-status-${sanitizedBotIdForDOM}' style='font-weight:bold;'>${botStatus}</span>
+                      <button id='swal-toggle-btn-${sanitizedBotIdForDOM}' style='margin-left:10px;padding:4px 18px;font-size:1.1em;border-radius:18px;border:1px solid #888;background:${botStatus === 'Active' ? '#4caf50' : '#ccc'};color:#fff;cursor:pointer;min-width:60px;'>${botStatus === 'Active' ? 'On' : 'Off'}</button>
                     </div>
                     <div class='swal-detail-item'><b>Stats:</b> <span style='font-size:1.1em;'>${botStats}</span></div>
                   </div>
@@ -361,9 +354,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <option value="Specific Date (YYYY-MM-DD)">Specific Date (YYYY-MM-DD)</option>
                       </select>
                       <input type="text" id='${rcValueInputId}' class='swal-rc-input' placeholder="Condition Value">
-                      <div id='swal-date-time-extra-${sanitizedBotId}' style="display:none; margin-top:8px;">
-                        <input type="text" id='swal-date-hour-${sanitizedBotId}' class='swal-rc-input' style="width:48%;display:inline-block;margin-right:2%;" placeholder="Hour (00-23, optional)">
-                        <input type="text" id='swal-date-minute-${sanitizedBotId}' class='swal-rc-input' style="width:48%;display:inline-block;" placeholder="Minute (00-59, optional)">
+                      <div id='swal-date-time-extra-${sanitizedBotIdForDOM}' style="display:none; margin-top:8px;">
+                        <input type="text" id='swal-date-hour-${sanitizedBotIdForDOM}' class='swal-rc-input' style="width:48%;display:inline-block;margin-right:2%;" placeholder="Hour (00-23, optional)">
+                        <input type="text" id='swal-date-minute-${sanitizedBotIdForDOM}' class='swal-rc-input' style="width:48%;display:inline-block;" placeholder="Minute (00-59, optional)">
                       </div>
                       <div class='swal-rc-form-actions'>
                         <button id='${saveRcBtnId}' class='swal-save-rc-btn'>Save</button>
@@ -381,21 +374,71 @@ document.addEventListener('DOMContentLoaded', async () => {
                 popup: 'swal2-dashboard-bot-modal'
               },
               didOpen: () => {
-                const toggleBtn = document.getElementById('swal-toggle-btn');
-                const statusSpan = document.getElementById('swal-bot-status');
+                const nameInput = document.getElementById(`swal-bot-name-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
+                const descriptionInput = document.getElementById(`swal-bot-description-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
+                
+                let initialModalName = nameInput.value;
+                let initialModalDescription = descriptionInput.value;
+
+                if (nameInput) {
+                  nameInput.addEventListener('blur', () => {
+                    const newName = nameInput.value.trim();
+                    if (newName !== initialModalName && newName.length > 0) {
+                      initialModalName = newName; 
+                      const botNameElementOnCard = document.querySelector(`.bot-name[data-bot-id="${actualBotId}"]`);
+                      if (botNameElementOnCard) botNameElementOnCard.textContent = newName;
+                      
+                      if (window.botconfig && typeof window.botconfig.changeName === 'function') {
+                        window.botconfig.changeName(actualBotId, newName)
+                          .then(result => {
+                            if (!result.success) console.error('Error saving bot name:', result.error);
+                          })
+                          .catch(err => console.error('Failed to save bot name:', err));
+                      }
+                    }
+                  });
+                }
+                if (descriptionInput) {
+                  descriptionInput.addEventListener('blur', () => {
+                    const newDesc = descriptionInput.value.trim();
+                    if (newDesc !== initialModalDescription) {
+                      initialModalDescription = newDesc; 
+                      const botDescElementOnCard = document.querySelector(`.bot-description[data-bot-id="${actualBotId}"]`);
+                      if (botDescElementOnCard) botDescElementOnCard.textContent = newDesc;
+
+                      if (window.botconfig && typeof window.botconfig.changeDescription === 'function') {
+                        window.botconfig.changeDescription(actualBotId, newDesc)
+                          .then(result => {
+                            if (!result.success) console.error('Error saving bot description:', result.error);
+                          })
+                          .catch(err => console.error('Failed to save bot description:', err));
+                      }
+                    }
+                  });
+                }
+
+                const toggleBtn = document.getElementById(`swal-toggle-btn-${sanitizedBotIdForDOM}`);
+                const statusSpan = document.getElementById(`swal-bot-status-${sanitizedBotIdForDOM}`);
                 if (toggleBtn && statusSpan) {
                   toggleBtn.addEventListener('click', async () => {
                     const isActive = statusSpan.textContent === 'Active';
                     statusSpan.textContent = isActive ? 'Offline' : 'Active';
                     toggleBtn.textContent = isActive ? 'Off' : 'On';
                     toggleBtn.style.background = isActive ? '#ccc' : '#4caf50';
+                    // Update status on the card as well
+                    const cardStatusDot = botCardElement.querySelector('.status-dot');
+                    const cardStatusText = botCardElement.querySelector('.status-text');
+                    if (cardStatusDot && cardStatusText) {
+                        cardStatusDot.classList.toggle('status-active', !isActive);
+                        cardStatusDot.classList.toggle('status-offline', isActive);
+                        cardStatusText.textContent = isActive ? 'Offline' : 'Active';
+                    }
                     if (window.database && typeof window.database.setBotEnabled === 'function') {
-                      await window.database.setBotEnabled(botId, !isActive);
+                      await window.database.setBotEnabled(actualBotId, !isActive);
                     }
                   });
                 }
-
-                // Run Condition interactivity
+                
                 const listContainer = document.getElementById(runConditionsListContainerId) as HTMLElement;
                 const addBtn = document.getElementById(addRunConditionBtnId) as HTMLButtonElement;
                 const addForm = document.getElementById(addRunConditionFormId) as HTMLElement;
@@ -407,22 +450,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const updateAndRenderList = () => {
                   if (listContainer) {
                     listContainer.innerHTML = renderRunConditionsToList(currentRunConditions);
-                    attachDeleteListeners(); // Re-attach delete listeners after re-render
+                    attachDeleteListeners(); 
                   }
                 };
 
                 const attachDeleteListeners = () => {
                   listContainer.querySelectorAll('.swal-delete-rc-btn').forEach(btn => {
-                    btn.addEventListener('click', (ev) => {
+                    btn.addEventListener('click', async (ev) => {
                       const index = parseInt((ev.currentTarget as HTMLElement).dataset.index || '-1');
                       if (index > -1 && index < currentRunConditions.length) {
+                        const conditionToDelete = currentRunConditions[index];
                         currentRunConditions.splice(index, 1);
-                        // In a real app, you would call: await window.database.deleteRunCondition(botId, currentRunConditions[index]);
+                        if (window.botconfig && typeof window.botconfig.deleteCondition === 'function') {
+                           try {
+                            await window.botconfig.deleteCondition(actualBotId, conditionToDelete.Key);
+                           } catch (err) {
+                            console.error('Error deleting run condition:', err);
+                            // Optionally add it back to currentRunConditions or show error to user
+                           }
+                        }
                         updateAndRenderList();
                       }
                     });
                   });
                 };
+                updateAndRenderList(); // Initial call to attach listeners
 
                 if (addBtn) {
                   addBtn.addEventListener('click', () => {
@@ -437,84 +489,114 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (addBtn) addBtn.style.display = 'inline-block';
                     if (keySelect) keySelect.value = '';
                     if (valueInput) valueInput.value = '';
+                    const dateTimeExtraContainer = document.getElementById(`swal-date-time-extra-${sanitizedBotIdForDOM}`);
+                    if (dateTimeExtraContainer) dateTimeExtraContainer.style.display = 'none';
                   });
                 }
 
                 if (saveBtn) {
                   saveBtn.addEventListener('click', async () => {
                     const key = keySelect.value;
-                    const value = valueInput.value;
-                    // Validation for each type
+                    let value = valueInput.value.trim();
                     let valid = true;
                     let errorMsg = '';
-                    if (!key || value.trim() === '') {
+                    if (!key || value === '') {
                       valid = false;
                       errorMsg = 'Please select a condition type and enter a value.';
                     } else if (key === 'Time of Day (HH:MM)') {
-                      valid = /^([01]?\d|2[0-3]):[0-5]\d$/.test(value.trim());
+                      valid = /^([01]?\d|2[0-3]):[0-5]\d$/.test(value);
                       if (!valid) errorMsg = 'Please enter a valid time in HH:MM format.';
                     } else if (key === 'Specific Date (YYYY-MM-DD)') {
-                      valid = /^\d{4}-\d{2}-\d{2}$/.test(value.trim());
+                      const datePart = value.split(' ')[0];
+                      valid = /^\d{4}-\d{2}-\d{2}$/.test(datePart);
                       if (!valid) errorMsg = 'Please enter a valid date in YYYY-MM-DD format.';
-                      // Optionally validate hour/minute if provided
-                      const hourInput = document.getElementById(`swal-date-hour-${sanitizedBotId}`) as HTMLInputElement;
-                      const minuteInput = document.getElementById(`swal-date-minute-${sanitizedBotId}`) as HTMLInputElement;
+                      const hourInput = document.getElementById(`swal-date-hour-${sanitizedBotIdForDOM}`) as HTMLInputElement;
+                      const minuteInput = document.getElementById(`swal-date-minute-${sanitizedBotIdForDOM}`) as HTMLInputElement;
                       let hour = hourInput ? hourInput.value.trim() : '';
                       let minute = minuteInput ? minuteInput.value.trim() : '';
-                      if (hour && !/^([01]?\d|2[0-3])$/.test(hour)) {
-                        valid = false;
-                        errorMsg = 'Hour must be 00-23 if provided.';
-                      }
-                      if (minute && !/^([0-5]?\d)$/.test(minute)) {
-                        valid = false;
-                        errorMsg = 'Minute must be 00-59 if provided.';
-                      }
-                      // If valid, append hour/minute to value for storage
+                      if (hour && !/^([01]?\d|2[0-3])$/.test(hour)) { valid = false; errorMsg = 'Hour must be 00-23.'; }
+                      if (minute && !/^([0-5]?\d)$/.test(minute)) { valid = false; errorMsg = 'Minute must be 00-59.'; }
                       if (valid && (hour || minute)) {
-                        let dateVal = value.trim();
-                        if (hour) dateVal += ` ${hour.padStart(2,'0')}`;
-                        if (minute) dateVal += `:${minute.padStart(2,'0')}`;
-                        valueInput.value = dateVal;
+                        value = datePart; // Start with only the date part
+                        if (hour) value += ` ${hour.padStart(2,'0')}`;
+                        if (minute && hour) value += `:${minute.padStart(2,'0')}`;
+                        else if (minute && !hour) value += ` 00:${minute.padStart(2,'0')}`; // Default hour if only minute provided
                       }
                     } else if (key.startsWith('Variable')) {
-                      // Require format: variableName=value or variableName>value, etc.
-                      valid = /.+[=><!].+/.test(value.trim());
+                      valid = /.+[=><!].+/.test(value);
                       if (!valid) errorMsg = 'Format: variableName=value (or >, <, !=)';
                     }
 
                     if (valid) {
-                      currentRunConditions.push({ Key: key, Value: value });
+                      const existingConditionIndex = currentRunConditions.findIndex(rc => rc.Key === key);
+                      if (existingConditionIndex > -1) {
+                        currentRunConditions[existingConditionIndex].Value = value;
+                      } else {
+                        currentRunConditions.push({ Key: key, Value: value });
+                      }
+                      if (window.botconfig && typeof window.botconfig.addOrUpdateCondition === 'function') {
+                        try {
+                            await window.botconfig.addOrUpdateCondition(actualBotId, key, value);
+                        } catch (err) {
+                            console.error('Error saving run condition:', err);
+                            // Handle error, maybe revert UI change or show message
+                        }
+                      }
                       updateAndRenderList();
                       if (keySelect) keySelect.value = '';
                       if (valueInput) valueInput.value = '';
                       if (addForm) addForm.style.display = 'none';
                       if (addBtn) addBtn.style.display = 'inline-block';
+                      const dateTimeExtraContainer = document.getElementById(`swal-date-time-extra-${sanitizedBotIdForDOM}`);
+                      if (dateTimeExtraContainer) dateTimeExtraContainer.style.display = 'none';
                     } else {
                       alert(errorMsg);
                     }
                   });
                 }
 
-                // Show/hide hour and minute inputs based on selected condition type
-                const dateTimeExtraContainer = document.getElementById(`swal-date-time-extra-${sanitizedBotId}`);
+                const dateTimeExtraContainer = document.getElementById(`swal-date-time-extra-${sanitizedBotIdForDOM}`);
                 if (keySelect && dateTimeExtraContainer) {
                   keySelect.addEventListener('change', () => {
-                    const extra = document.getElementById(`swal-date-time-extra-${sanitizedBotId}`);
-                    if (keySelect.value === 'Specific Date (YYYY-MM-DD)') {
-                      if (extra) extra.style.display = '';
-                    } else {
-                      if (extra) extra.style.display = 'none';
-                    }
+                    dateTimeExtraContainer.style.display = keySelect.value === 'Specific Date (YYYY-MM-DD)' ? '' : 'none';
                   });
+                }
+              },
+              willClose: () => {
+                const nameInput = document.getElementById(`swal-bot-name-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
+                const descriptionInput = document.getElementById(`swal-bot-description-input-${sanitizedBotIdForDOM}`) as HTMLInputElement;
+                
+                const finalName = nameInput ? nameInput.value.trim() : botName;
+                if (nameInput && finalName !== botName && finalName.length > 0) {
+                  const botNameElementOnCard = document.querySelector(`.bot-name[data-bot-id="${actualBotId}"]`);
+                  if (botNameElementOnCard) botNameElementOnCard.textContent = finalName;
+                  if (window.botconfig && typeof window.botconfig.changeName === 'function') {
+                    window.botconfig.changeName(actualBotId, finalName)
+                      .then(result => {
+                        if (!result.success) console.error('Error saving bot name on close:', result.error);
+                      })
+                      .catch(err => console.error('Failed to save bot name on close:', err));
+                  }
+                }
+                
+                const finalDescription = descriptionInput ? descriptionInput.value.trim() : botDescription;
+                if (descriptionInput && finalDescription !== botDescription) {
+                  const botDescElementOnCard = document.querySelector(`.bot-description[data-bot-id="${actualBotId}"]`);
+                  if (botDescElementOnCard) botDescElementOnCard.textContent = finalDescription;
+                  if (window.botconfig && typeof window.botconfig.changeDescription === 'function') {
+                    window.botconfig.changeDescription(actualBotId, finalDescription)
+                      .then(result => {
+                        if (!result.success) console.error('Error saving bot description on close:', result.error);
+                      })
+                      .catch(err => console.error('Failed to save bot description on close:', err));
+                  }
                 }
               }
             });
           }
         });
-      }); // Corrected: Added missing closing parenthesis and semicolon for forEach
+      });
     }
   }
-
-  // Initial setup for SweetAlert2 styles
   setupSwalDashboardModalStyle();
 });

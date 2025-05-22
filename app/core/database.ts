@@ -28,7 +28,7 @@ function initDatabase(): Promise<void> {
           return reject(err);
         }
         db.serialize(() => {
-          // db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => { if (err) return reject(err); }); // WAL mode disabled
+          db.run('PRAGMA journal_mode = WAL;', (err: Error | null) => { if (err) return reject(err); });
           db.run('PRAGMA foreign_keys = ON;', (err: Error | null) => { if (err) return reject(err); });
 
           db.run(`
@@ -236,14 +236,27 @@ function closeDB(): Promise<void> {
 }
 
 function changeNameDb(botId: string, newName: string): Promise<void> {
+  console.log('[DATABASE] Changing bot name - botId:', botId, 'newName:', newName);
   return new Promise((resolve, reject) => {
     const now = new Date().toISOString();
-    db.run('UPDATE Bots SET Name = ?, UpdatedAt = ? WHERE Id = ?', [newName, now, botId], (err: Error | null) => {
-      if (err) {
-        console.error('Error updating bot name:', err);
-        return reject(err);
+    // First check if the bot exists
+    db.get('SELECT Id, Name FROM Bots WHERE Id = ?', [botId], (getErr: Error | null, row: any) => {
+      if (getErr) {
+        console.error('[DATABASE] Error checking if bot exists:', getErr);
+        return reject(getErr);
       }
-      resolve();
+      
+      console.log('[DATABASE] Current bot data:', row);
+      
+      // Now perform the update
+      db.run('UPDATE Bots SET Name = ?, UpdatedAt = ? WHERE Id = ?', [newName, now, botId], (err: Error | null) => {
+        if (err) {
+          console.error('[DATABASE] Error updating bot name:', err);
+          return reject(err);
+        }
+        console.log('[DATABASE] Bot name updated successfully');
+        resolve();
+      });
     });
   });
 }

@@ -25,6 +25,14 @@ interface UtilsAPI {
   generateNodeId: () => string;
 }
 
+interface BotConfigAPI {
+  changeName: (botId: string, newName: string) => Promise<{success: boolean, error?: string}>;
+  changeDescription: (botId: string, newDescription: string) => Promise<{success: boolean, error?: string}>;
+  changeStatus: (botId: string, newStatus: boolean) => Promise<{success: boolean, error?: string}>;
+  addOrUpdateCondition: (botId: string, key: string, value: string) => Promise<{success: boolean, error?: string}>;
+  deleteCondition: (botId: string, key: string) => Promise<{success: boolean, error?: string}>;
+}
+
 contextBridge.exposeInMainWorld('nodeSystem', {
   createNode: (type: string, id: string, properties: any) => {
     return ipcRenderer.invoke('node:create', { type, id, properties });
@@ -85,11 +93,9 @@ contextBridge.exposeInMainWorld('utils', {
   },
 } as UtilsAPI);
 
-// Expose ipcRenderer for generic IPC usage (for project save/load, etc)
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
-    // You can add more methods if needed
   }
 });
 
@@ -98,3 +104,17 @@ contextBridge.exposeInMainWorld('database', {
   getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
   setBotEnabled: (botId: string, enabled: boolean) => ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
 });
+
+// Expose botconfig API
+contextBridge.exposeInMainWorld('botconfig', {
+  changeName: (botId: string, newName: string) => 
+    ipcRenderer.invoke('botconfig:changeName', botId, newName),
+  changeDescription: (botId: string, newDescription: string) => 
+    ipcRenderer.invoke('botconfig:changeDescription', botId, newDescription),
+  changeStatus: (botId: string, newStatus: boolean) => 
+    ipcRenderer.invoke('botconfig:changeStatus', botId, newStatus),
+  addOrUpdateCondition: (botId: string, key: string, value: string) => 
+    ipcRenderer.invoke('botconfig:addOrUpdateCondition', botId, key, value),
+  deleteCondition: (botId: string, key: string) => 
+    ipcRenderer.invoke('botconfig:deleteCondition', botId, key)
+} as BotConfigAPI);
