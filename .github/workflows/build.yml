@@ -1,40 +1,104 @@
-name: Build Electron App
+name: Build and Release Electron App
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+    paths: ['**']
   pull_request:
-    branches:
-      - master
-    paths:
-      - 'app/**'  # Trigger for pull requests on the app folder only
+    branches: [master]
+    paths: ['**']
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./app  # Specify the app directory
-        run: |
-          npm install
+        run: npm install
 
-      - name: Build Electron app
-        working-directory: ./app  # Specify the app directory
-        run: |
-          npm run dist
+      - name: Rebuild native modules for Electron
+        run: npx electron-rebuild
 
-      - name: Upload Build Artifacts
+      - name: Build Electron app for Linux
+        run: npm run build && npm run dist
+
+      - name: Upload Linux build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: electron-market-build
-          path: ./app/dist/
+          name: linux-build-artifact
+          path: dist/
+
+  build-windows:
+    runs-on: windows-latest
+    needs: build-linux
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rebuild native modules for Electron
+        run: npx electron-rebuild
+
+      - name: Build Electron app for Windows
+        run: npm run build && npm run dist
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-artifact
+          path: dist/
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    env:
+      RELEASE_TAG: v${{ github.run_id }}
+
+    steps:
+      - name: Download Linux build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-build-artifact
+          path: release-files/linux
+
+      - name: Download Windows build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build-artifact
+          path: release-files/windows
+
+      - name: List downloaded artifacts
+        run: |
+          echo "--- Listing contents of release-files ---"
+          find release-files -ls
+          echo "--- End of listing ---"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
+          files: |
+            release-files/linux/*.AppImage
+            release-files/windows/*.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

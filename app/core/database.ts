@@ -11,14 +11,11 @@ let dbPath: string;
 function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      // Fix __dirname for ES modules
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirnameESM = path.dirname(__filename);
-      const baseDir = path.resolve(__dirnameESM, '../..');
+      // Use Electron's userData directory for a writable DB location
+      const baseDir = app.getPath('userData');
       if (!fs.existsSync(baseDir)) {
         fs.mkdirSync(baseDir, { recursive: true });
       }
-
       dbPath = path.join(baseDir, 'VisualBotCreator.db');
       console.log('[DB] Initializing at', dbPath);
 
