@@ -12,7 +12,6 @@ async function fetchAvailableComponents() {
 
     await loadComponentIcons(componentTypeNames);
 
-    // Add Variable category
     const categories: Record<
       string,
       Array<{ type: string; name: string; category: string; icon: string }>

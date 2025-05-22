@@ -13,11 +13,9 @@ import {
 import { NodeFactory } from './core/nodeSystem.js';
 import { initDatabase, saveAllNodes, getAllBots, getRunConditions, setBotEnabled, changeNameDb, changeDescriptionDb, changeStatusDb, addOrUpdateBotConditionDb, deleteBotConditionDb } from './core/database.js';
 
-// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Get the project root directory (two levels up from __dirname)
 const projectRoot = path.resolve(__dirname, '..');
 
 // Store created nodes for reference
@@ -27,7 +25,6 @@ const nodeInstances = new Map<string, Node>();
 const connections: Connection[] = [];
 
 function createWindow(): void {
-  // Construct path relative to the application root
   const iconPath = path.join(app.getAppPath(), 'dist', 'src', 'assets', 'images', 'mascot.png');
   Menu.setApplicationMenu(null);
 
@@ -309,7 +306,6 @@ function setupIpcHandlers(): void {
   // Expose saveAllNodes via IPC
   ipcMain.handle('database:saveAllNodes', async (event, botId: string) => {
     try {
-      // Convert nodeInstances Map to a plain object for database compatibility
       const nodeObj: { [key: string]: Node } = Object.fromEntries(nodeInstances.entries());
       return await saveAllNodes(botId, nodeObj);
     } catch (error) {

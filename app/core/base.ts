@@ -1,14 +1,11 @@
-// Port categories and types
 export enum PortCategory {
   FLOW = 'flow',
   DATA = 'data',
 }
 
 export enum PortType {
-  // Flow types
   CONTROL = 'control',
 
-  // Data types
   STRING = 'string',
   NUMBER = 'number',
   BOOLEAN = 'boolean',
@@ -17,7 +14,6 @@ export enum PortType {
   ANY = 'any',
 }
 
-// Port category to types mapping
 export const PORT_CATEGORIES = {
   [PortCategory.FLOW]: [PortType.CONTROL],
   [PortCategory.DATA]: [
