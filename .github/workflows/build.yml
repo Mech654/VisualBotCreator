@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**'
   pull_request:
     branches:
       - master
     paths:
-      - 'app/**'  # Trigger for pull requests on the app folder only
+      - '**'
 
 jobs:
   build:
