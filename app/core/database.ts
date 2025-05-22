@@ -34,6 +34,7 @@ function initDatabase(): Promise<void> {
           db.run(`
             CREATE TABLE IF NOT EXISTS Bots (
               Id TEXT PRIMARY KEY,
+              Name TEXT NOT NULL DEFAULT 'Unnamed Bot',
               CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
               UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
               enabled INTEGER NOT NULL DEFAULT 1,
@@ -84,8 +85,8 @@ function ensureBotExists(botId: string, name: string = 'Unnamed Bot'): Promise<v
       if (err) return reject(err);
       if (!row) {
         db.run(
-          'INSERT INTO Bots (Id, CreatedAt, UpdatedAt) VALUES (?, ?, ?)',
-          [botId, now, now],
+          'INSERT INTO Bots (Id, Name, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?)',
+          [botId, name, now, now],
           (err: Error | null) => {
             if (err) return reject(err);
             resolve();
@@ -234,6 +235,73 @@ function closeDB(): Promise<void> {
   });
 }
 
+function changeNameDb(botId: string, newName: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const now = new Date().toISOString();
+    db.run('UPDATE Bots SET Name = ?, UpdatedAt = ? WHERE Id = ?', [newName, now, botId], (err: Error | null) => {
+      if (err) {
+        console.error('Error updating bot name:', err);
+        return reject(err);
+      }
+      resolve();
+    });
+  });
+}
+
+function changeDescriptionDb(botId: string, newDescription: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const now = new Date().toISOString();
+    db.run('UPDATE Bots SET description = ?, UpdatedAt = ? WHERE Id = ?', [newDescription, now, botId], (err: Error | null) => {
+      if (err) {
+        console.error('Error updating bot description:', err);
+        return reject(err);
+      }
+      resolve();
+    });
+  });
+}
+
+function changeStatusDb(botId: string, newStatus: boolean): Promise<void> {
+  return setBotEnabled(botId, newStatus);
+}
+
+function addOrUpdateBotConditionDb(botId: string, key: string, value: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const now = new Date().toISOString();
+    db.run(
+      `INSERT INTO RunConditions (BotId, Key, Value, UpdatedAt)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(BotId, Key) DO UPDATE SET
+         Value = excluded.Value,
+         UpdatedAt = excluded.UpdatedAt`,
+      [botId, key, value, now],
+      (err: Error | null) => {
+        if (err) {
+          console.error('Error adding/updating bot condition:', err);
+          return reject(err);
+        }
+        resolve();
+      }
+    );
+  });
+}
+
+function deleteBotConditionDb(botId: string, key: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'DELETE FROM RunConditions WHERE BotId = ? AND Key = ?',
+      [botId, key],
+      (err: Error | null) => {
+        if (err) {
+          console.error('Error deleting bot condition:', err);
+          return reject(err);
+        }
+        resolve();
+      }
+    );
+  });
+}
+
 app.whenReady()
   .then(async () => {
     await initDatabase();
@@ -256,4 +324,4 @@ app.on('before-quit', async (event) => {
   }
 });
 
-export { saveNode, saveAllNodes, closeDB as close, initDatabase, getAllBots, getRunConditions, setBotEnabled };
+export { saveNode, saveAllNodes, closeDB as close, initDatabase, getAllBots, getRunConditions, setBotEnabled, changeNameDb, changeDescriptionDb, changeStatusDb, addOrUpdateBotConditionDb, deleteBotConditionDb };

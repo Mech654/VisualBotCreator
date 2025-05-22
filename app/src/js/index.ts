@@ -1,6 +1,6 @@
 import '../scss/index.scss';
 import { showPageTransition } from './builder/utils/transitions';
-import { setupSwalDashboardModalStyle } from './swal-setup';
+import { setupSwalDashboardModalStyle } from './dashboard/swal-setup';
 declare const module: any;
 
 interface ActionItem {
