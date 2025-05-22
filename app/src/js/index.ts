@@ -14,8 +14,8 @@ interface ActionItem {
 document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.remove('js-loading');
 
-  const botList = document.querySelector('.bot-list');
-  const emptyState = document.querySelector('.empty-state');
+  const botList = document.querySelector('.bot-list') as HTMLElement;
+  const emptyState = document.querySelector('.empty-state') as HTMLElement;
   const countElement = document.querySelector('.section-subtitle');
 
   if (window.database && typeof window.database.getAllBots === 'function') {

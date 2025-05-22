@@ -22,8 +22,13 @@
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/strict-boolean-expressions": "warn",
     "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/consistent-type-assertions": ["error", {
+      "assertionStyle": "as"
+    }],
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
-    "prettier/prettier": "error"
+    "prettier/prettier": ["error", {
+      "typeAssertions": "preserve"
+    }]
   },
   "ignorePatterns": ["dist/**", "node_modules/**", "*.js"]
 }
