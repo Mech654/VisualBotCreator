@@ -83,6 +83,22 @@ export function setupSwalDashboardModalStyle() {
     font-weight: 500 !important;
   }
 
+  /* Inline input for bot name and description */
+  .swal2-dashboard-bot-modal .swal-inline-input {
+    background-color: transparent;
+    color: #ffffff; /* $on-surface / $text-primary */
+    border: none;
+    border-bottom: 1px solid #333333; /* $border-color */
+    font-size: 1em;
+    padding: 4px 0;
+    margin-left: 8px;
+    width: calc(100% - 100px); /* Adjust width as needed */
+  }
+  .swal2-dashboard-bot-modal .swal-inline-input:focus {
+    outline: none;
+    border-bottom: 1px solid #bb86fc; /* $primary */
+  }
+
   /* Run Conditions List Styling */
   .swal2-dashboard-bot-modal .swal-rc-list {
     list-style-type: decimal;

@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       case 'duplicate':
         const notification = document.createElement('div');
         notification.className = 'notification';
+        notification.className = 'notification';
         notification.innerHTML = `<span>✅</span> Bot "${botName}" duplicated successfully!`;
         document.body.appendChild(notification);
 
@@ -324,8 +325,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class='swal-bot-details-grid'>
                   <div class='swal-detail-category'>
                     <div class='swal-category-title'>General Information</div>
-                    <div class='swal-detail-item'><b>Type:</b> <span style='font-size:1.1em;'>${botType}</span></div>
-                    <div class='swal-detail-item'><b>Description:</b> <span style='font-size:1.1em;'>${botDescription}</span></div>
+                    <div class='swal-detail-item'>
+                      <b>Name:</b> 
+                      <input type="text" id="swal-bot-name-input-${sanitizedBotId}" value="${botName}" class="swal-inline-input">
+                    </div>
+                    <div class='swal-detail-item'>
+                      <b>Description:</b> 
+                      <input type="text" id="swal-bot-description-input-${sanitizedBotId}" value="${botDescription}" class="swal-inline-input">
+                    </div>
                   </div>
 
                   <div class='swal-detail-category'>
