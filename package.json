@@ -35,7 +35,8 @@
     "webpack:watch": "webpack --watch --mode development",
     "build:preload": "tsc --project preload.tsconfig.json",
     "dev:preload": "tsc-watch --project preload.tsconfig.json --onSuccess \"shx mv dist/preload.js dist/preload-esm.mjs\"",
-    "restart:debug": "cross-env RESTART_DELAY=0 NODEMON_RESTART=true NODE_ENV=development node restart.js"
+    "restart:debug": "cross-env RESTART_DELAY=0 NODEMON_RESTART=true NODE_ENV=development node restart.js",
+    "dist": "electron-builder"
   },
   "author": "",
   "license": "MIT",
@@ -59,6 +60,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron": "^35.1.5",
+    "electron-builder": "^24.14.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-import": "^2.31.0",
@@ -83,5 +85,26 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.1",
     "webpack-hot-middleware": "^2.26.1"
+  },
+  "build": {
+    "appId": "com.electron.market",
+    "productName": "Electron Market",
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities",
+      "icon": "dist/src/assets/images/mascot.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "dist/src/assets/images/mascot.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "dist/src/assets/images/mascot.png"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "publish": null
   }
 }
