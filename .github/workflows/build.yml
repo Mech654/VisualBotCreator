@@ -2,25 +2,23 @@ name: Build and Release Electron App
 
 on:
   push:
-    branches:
-      - master
-    paths:
-      - '**'
+    branches: [master]
+    paths: ['**']
   pull_request:
-    branches:
-      - master
-    paths:
-      - '**'
+    branches: [master]
+    paths: ['**']
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      tag: v1.0.${{ github.run_number }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -37,21 +35,37 @@ jobs:
       - name: Create and push tag
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
+          TAG=v1.0.${{ github.run_number }}
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag v1.0.${{ github.run_number }}
-          git push origin v1.0.${{ github.run_number }}
+          git tag $TAG
+          git push origin $TAG
+        # export tag name for downstream job
+        id: tag
 
-      - name: Fetch tags from remote
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: git fetch --tags
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-market-build
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.outputs.tag != ''
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: electron-market-build
+          path: release-files
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Release v1.0.${{ github.run_number }}
+          tag_name: ${{ needs.build.outputs.tag }}
+          name: Release ${{ needs.build.outputs.tag }}
           draft: false
           prerelease: false
         env:
@@ -59,12 +73,12 @@ jobs:
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         with:
+          tag_name: ${{ needs.build.outputs.tag }}
           files: |
-            dist/**/*.exe
-            dist/**/*.dmg
-            dist/**/*.AppImage
-            dist/**/*.zip
+            release-files/**/*.AppImage
+            release-files/**/*.dmg
+            release-files/**/*.exe
+            release-files/**/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
