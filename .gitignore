@@ -1,6 +1,6 @@
 **/.history/**
 
-# Node modules
+# Node files/directories
 node_modules/
 
 # Build directories
@@ -41,13 +41,6 @@ Thumbs.db
 
 # Electron build folders
 release/
-
-# Package-lock files (uncomment if you want to ignore them)
-# package-lock.json
-# yarn.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
 
 # Temp directories
 .tmp/
