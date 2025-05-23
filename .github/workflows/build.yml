@@ -1,4 +1,4 @@
-name: Build Electron App
+name: Build and Release Electron App
 
 on:
   push:
@@ -34,8 +34,24 @@ jobs:
       - name: Build Electron app
         run: npm run build && npm run dist
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/master'
         with:
-          name: electron-market-build
-          path: .
+          tag_name: v1.0.${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/**/*.exe
+            dist/**/*.dmg
+            dist/**/*.AppImage
+            dist/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
