@@ -90,14 +90,15 @@ jobs:
           find release-files -ls
           echo "--- End of listing ---"
 
-      - name: Create or update GitHub Release & upload assets
-        uses: ncipollo/release-action@v1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
           files: |
             release-files/linux/*.AppImage
             release-files/windows/*.exe
-          overwrite: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
