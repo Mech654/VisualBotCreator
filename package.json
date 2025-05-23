@@ -48,7 +48,6 @@
     "sweetalert2": "^11.21.2"
   },
   "devDependencies": {
-    "electron": "^35.1.5",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.14.1",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
@@ -59,7 +58,9 @@
     "copy-webpack-plugin": "^13.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
+    "electron": "^35.1.5",
     "electron-builder": "^24.6.0",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-import": "^2.31.0",
