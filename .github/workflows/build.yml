@@ -76,9 +76,9 @@ jobs:
         with:
           tag_name: ${{ needs.build.outputs.tag }}
           files: |
-            release-files/**/*.AppImage
-            release-files/**/*.dmg
-            release-files/**/*.exe
-            release-files/**/*.zip
+            release-files/*.AppImage
+            release-files/*.dmg
+            release-files/*.exe
+            release-files/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
