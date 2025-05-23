@@ -84,6 +84,12 @@ jobs:
           name: windows-build-artifact
           path: release-files/windows
 
+      - name: List downloaded artifacts
+        run: |
+          echo "--- Listing contents of release-files ---"
+          find release-files -ls
+          echo "--- End of listing ---"
+
       - name: Create or update GitHub Release & upload assets
         uses: ncipollo/release-action@v1
         with:
@@ -91,7 +97,7 @@ jobs:
           name: Release ${{ env.RELEASE_TAG }}
           files: |
             release-files/linux/*.AppImage
-            release-files/windows/* Setup *.exe
+            release-files/windows/*.exe
           overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
