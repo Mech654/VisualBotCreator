@@ -42,6 +42,10 @@ jobs:
           git tag v1.0.${{ github.run_number }}
           git push origin v1.0.${{ github.run_number }}
 
+      - name: Fetch tags from remote
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: git fetch --tags
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
