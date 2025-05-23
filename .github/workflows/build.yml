@@ -11,8 +11,6 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    outputs:
-      BASE_TAG_PART: v1.0.${{ github.run_number }}
 
     steps:
       - name: Checkout code
@@ -32,26 +30,6 @@ jobs:
       - name: Build Electron app for Linux
         run: npm run build && npm run dist
 
-      - name: Create and push initial tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: |
-          INITIAL_TAG="v1.0.${{ github.run_number }}.1"
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          if git rev-parse "$INITIAL_TAG" >/dev/null 2>&1; then
-            echo "Initial tag $INITIAL_TAG already exists locally."
-            if ! git ls-remote --tags origin | grep -q "refs/tags/$INITIAL_TAG$"; then
-              echo "Pushing existing local initial tag $INITIAL_TAG to remote."
-              git push origin "$INITIAL_TAG"
-            else
-              echo "Initial tag $INITIAL_TAG already exists on remote."
-            fi
-          else
-            echo "Creating and pushing initial tag $INITIAL_TAG."
-            git tag "$INITIAL_TAG"
-            git push origin "$INITIAL_TAG"
-          fi
-
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -61,6 +39,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     needs: build-linux
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     env:
-      CURRENT_RELEASE_TAG: ${{ needs.build-linux.outputs.BASE_TAG_PART }}.1
+      RELEASE_TAG: v${{ github.run_id }}
 
     steps:
       - name: Download Linux build artifact
@@ -105,22 +84,14 @@ jobs:
           name: windows-build-artifact
           path: release-files/windows
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Create or update GitHub Release & upload assets
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ env.CURRENT_RELEASE_TAG }}
-          name: Release ${{ env.CURRENT_RELEASE_TAG }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.CURRENT_RELEASE_TAG }}
+          tag: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
           files: |
             release-files/linux/*.AppImage
             release-files/windows/* Setup *.exe
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
