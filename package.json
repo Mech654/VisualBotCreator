@@ -2,8 +2,8 @@
   "name": "visualbotcreator",
   "version": "1.0.0",
   "description": "An awesome software to create and manage your own bots.",
-  "main": "dist/main.js",
   "type": "module",
+  "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "node cross_platform/dev-runner.js",
@@ -109,7 +109,7 @@
       "dist/**/*",
       "package.json"
     ],
-    "main": "dist/main.js",
     "publish": null
   }
+  
 }
