@@ -9,10 +9,10 @@ on:
     paths: ['**']
 
 jobs:
-  build-linux: # Renamed from build
+  build-linux:
     runs-on: ubuntu-latest
     outputs:
-      BASE_TAG_PART: v1.0.${{ github.run_number }} # Output base part of the tag
+      BASE_TAG_PART: v1.0.${{ github.run_number }}
 
     steps:
       - name: Checkout code
@@ -35,7 +35,7 @@ jobs:
       - name: Create and push initial tag
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          INITIAL_TAG="v1.0.${{ github.run_number }}.1" # Tag for the first attempt of the release job
+          INITIAL_TAG="v1.0.${{ github.run_number }}.1"
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           if git rev-parse "$INITIAL_TAG" >/dev/null 2>&1; then
@@ -51,17 +51,16 @@ jobs:
             git tag "$INITIAL_TAG"
             git push origin "$INITIAL_TAG"
           fi
-        # No id needed here as we use job outputs
 
       - name: Upload Linux build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-build-artifact # Specific name for Linux artifact
+          name: linux-build-artifact
           path: dist/
 
   build-windows:
     runs-on: windows-latest
-    needs: build-linux # Optional: can run in parallel if tag creation is not a hard dependency for starting this build
+    needs: build-linux
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -83,15 +82,15 @@ jobs:
       - name: Upload Windows build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-build-artifact # Specific name for Windows artifact
+          name: windows-build-artifact
           path: dist/
 
   release:
-    needs: [build-linux, build-windows] # Depends on both builds
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && needs.build-linux.outputs.BASE_TAG_PART != '' # Ensure release only on master push and if base tag is available
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     env:
-      CURRENT_RELEASE_TAG: ${{ needs.build-linux.outputs.BASE_TAG_PART }}.${{ github.run_attempt }}
+      CURRENT_RELEASE_TAG: ${{ needs.build-linux.outputs.BASE_TAG_PART }}.1
 
     steps:
       - name: Download Linux build artifact
@@ -119,7 +118,7 @@ jobs:
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.CURRENT_RELEASE_TAG }} # Use the same dynamic tag
+          tag_name: ${{ env.CURRENT_RELEASE_TAG }}
           files: |
             release-files/linux/*.AppImage
             release-files/windows/* Setup *.exe
