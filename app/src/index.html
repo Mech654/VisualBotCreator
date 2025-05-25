@@ -8,8 +8,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;"
     />
     <title>Bot Creator - Dashboard</title>
-    <link rel="icon" type="image/png" href="/assets/images/mascot.png" />
-    <!-- Prevent FOUC with inline styles -->
+    <link rel="icon" type="image/png" href="./assets/images/mascot.png" />
     <style>
       .js-loading {
         opacity: 0;
@@ -18,24 +17,20 @@
         transition: opacity 0.3s ease-in;
       }
     </style>
-    <!-- Use regular stylesheet instead of preload with inline handlers -->
-    <link rel="stylesheet" href="/styles/index.css" />
-    <!-- CSS will be injected by webpack in dev mode -->
-    <script type="module" src="/index.js"></script>
+    <link rel="stylesheet" href="./styles/index.css" />
+    <script type="module" src="./index.js"></script>
   </head>
   <body class="dashboard-page js-loading">
-    <!-- Page Transition Overlay -->
     <div class="page-transition">
       <div class="transition-content">
-        <img src="/assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
+        <img src="./assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
         <span class="transition-message">Loading...</span>
       </div>
     </div>
 
-    <!-- Side Panel -->
     <div class="side-panel">
       <div class="logo">
-        <img src="/assets/images/mascot.png" alt="Mascot" class="logo-icon" />
+        <img src="./assets/images/mascot.png" alt="Mascot" class="logo-icon" />
         <span class="logo-text">Bot Creator</span>
       </div>
       <nav class="menu">
@@ -66,7 +61,6 @@
       </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
       <div class="dashboard-container">
         <div class="section">
@@ -82,7 +76,6 @@
             </div>
           </div>
 
-          <!-- Bot Schema Row -->
           <div class="bot-schemas-grid">
             <div class="schema-card">
               <div class="schema-icon">💬</div>
@@ -170,14 +163,12 @@
             <span class="section-subtitle text-secondary">4 bots</span>
           </div>
 
-          <!-- Bot List -->
           <div class="bot-list">
             <!-- Bot cards will be dynamically inserted here by index.ts -->
           </div>
 
-          <!-- Empty State (Hidden by default) -->
           <div class="empty-state" style="display: none">
-            <img src="/assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
+            <img src="./assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
             <h3 class="empty-message">You haven't created any bots yet</h3>
             <p class="empty-description text-secondary">
               Start by creating your first bot from a template or from scratch

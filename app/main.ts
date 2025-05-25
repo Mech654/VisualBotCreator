@@ -37,7 +37,7 @@ const connections: Connection[] = [];
 
 function createWindow(): void {
   const iconPath = path.join(app.getAppPath(), 'dist', 'src', 'assets', 'images', 'mascot.png');
-  Menu.setApplicationMenu(null);
+  //Menu.setApplicationMenu(null);
 
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -81,6 +81,8 @@ function createWindow(): void {
   } else {
     console.log('Electron is running in production mode, loading from file');
     mainWindow.loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'));
+    mainWindow.webContents.openDevTools();
+
   }
 }
 
