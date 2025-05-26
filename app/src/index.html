@@ -8,7 +8,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;"
     />
     <title>Bot Creator - Dashboard</title>
-    <link rel="icon" type="image/png" href="./assets/images/mascot.png" />
+    <link rel="icon" type="image/png" href="assets/images/mascot.png" />
     <style>
       .js-loading {
         opacity: 0;
@@ -17,20 +17,20 @@
         transition: opacity 0.3s ease-in;
       }
     </style>
-    <link rel="stylesheet" href="./styles/index.css" />
-    <script type="module" src="./index.js"></script>
+    <link rel="stylesheet" href="styles/index.css" />
+    <script type="module" src="index.js"></script>
   </head>
   <body class="dashboard-page js-loading">
     <div class="page-transition">
       <div class="transition-content">
-        <img src="./assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
+        <img src="assets/images/mascot.png" alt="Loading Mascot" class="transition-icon" />
         <span class="transition-message">Loading...</span>
       </div>
     </div>
 
     <div class="side-panel">
       <div class="logo">
-        <img src="./assets/images/mascot.png" alt="Mascot" class="logo-icon" />
+        <img src="assets/images/mascot.png" alt="Mascot" class="logo-icon" />
         <span class="logo-text">Bot Creator</span>
       </div>
       <nav class="menu">
@@ -164,11 +164,10 @@
           </div>
 
           <div class="bot-list">
-            <!-- Bot cards will be dynamically inserted here by index.ts -->
-          </div>
+            </div>
 
           <div class="empty-state" style="display: none">
-            <img src="./assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
+            <img src="assets/images/mascot.png" alt="Empty State Mascot" class="empty-icon" />
             <h3 class="empty-message">You haven't created any bots yet</h3>
             <p class="empty-description text-secondary">
               Start by creating your first bot from a template or from scratch
