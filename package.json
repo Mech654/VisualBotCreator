@@ -12,7 +12,7 @@
     "dev:electron": "cross-env NODE_ENV=development nodemon",
     "dev:restart": "cross-env NODE_ENV=development node restart.js",
     "dev:quick": "concurrently -n electron \"cross-env NODE_ENV=development ELECTRON_ARGS='--no-sandbox' node restart.js\"",
-    "build": "npm run clean && tsc && npm run copy-assets",
+    "build": "npm run clean && tsc && npm run copy-assets && shx mv dist/preload.js dist/preload-esm.mjs",
     "watch": "tsc -w",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",

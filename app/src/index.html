@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' ws:;"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws:;"
     />
     <title>Bot Creator - Dashboard</title>
     <link rel="icon" type="image/png" href="assets/images/mascot.png" />
@@ -18,7 +18,8 @@
       }
     </style>
     <link rel="stylesheet" href="styles/index.css" />
-    <script type="module" src="index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script type="module" src="js/index.js"></script>
   </head>
   <body class="dashboard-page js-loading">
     <div class="page-transition">
