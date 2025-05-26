@@ -1,14 +1,13 @@
-import '../scss/builder.scss';
 declare const module: any;
 
-import { initUiSetup } from './builder/services/canvasService/uiSetup';
-import { initPanelControls } from './builder/utils/panelControls';
-import { initCanvasInteractions } from './builder/services/canvasService/canvasInteractions';
-import { initNodeManagement } from './builder/services/nodeService/nodeManagement';
-import { initProjectManagement } from './builder/services/projectService/projectManagement';
-import { initializeNodes } from './builder/services/nodeService/nodeState';
-import { initDraggableNodes } from './builder/services/dragDropService/dragDropService';
-import { getNodes } from './builder/services/nodeService/nodeState';
+import { initUiSetup } from './builder/services/canvasService/uiSetup.js';
+import { initPanelControls } from './builder/utils/panelControls.js';
+import { initCanvasInteractions } from './builder/services/canvasService/canvasInteractions.js';
+import { initNodeManagement } from './builder/services/nodeService/nodeManagement.js';
+import { initProjectManagement } from './builder/services/projectService/projectManagement.js';
+import { initializeNodes } from './builder/services/nodeService/nodeState.js';
+import { initDraggableNodes } from './builder/services/dragDropService/dragDropService.js';
+import { getNodes } from './builder/services/nodeService/nodeState.js';
 
 interface Window {
   nodeSystem: {

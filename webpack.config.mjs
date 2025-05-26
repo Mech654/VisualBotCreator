@@ -25,6 +25,27 @@ export default {
   resolve: {
     extensions: ['.ts', '.js'],
     mainFields: ['browser', 'module', 'main'],
+    plugins: [
+      // Custom resolver to handle .js imports pointing to .ts files
+      {
+        apply(resolver) {
+          const target = resolver.ensureHook('resolve');
+          resolver
+            .getHook('before-resolve')
+            .tapAsync('TypeScriptModuleResolver', (request, resolveContext, callback) => {
+              if (request.request && request.request.endsWith('.js')) {
+                const tsRequest = request.request.replace(/\.js$/, '.ts');
+                const newRequest = {
+                  ...request,
+                  request: tsRequest,
+                };
+                return resolver.doResolve(target, newRequest, null, resolveContext, callback);
+              }
+              callback();
+            });
+        },
+      },
+    ],
     // Add fallbacks for Node.js built-in modules
     fallback: {
       "module": false,
