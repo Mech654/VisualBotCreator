@@ -46,7 +46,7 @@ function createWindow(): void {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.resolve(projectRoot, 'dist', 'preload.js'),
+      preload: path.resolve(projectRoot, 'dist', 'preload-esm.mjs'),
       webSecurity: true,
       sandbox: false,
     },

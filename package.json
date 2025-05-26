@@ -36,7 +36,7 @@
     "build:preload": "tsc --project preload.tsconfig.json",
     "dev:preload": "tsc-watch --project preload.tsconfig.json --onSuccess \"shx mv dist/preload.js dist/preload-esm.mjs\"",
     "restart:debug": "cross-env RESTART_DELAY=0 NODEMON_RESTART=true NODE_ENV=development node restart.js",
-    "dist": "electron-builder"
+    "dist": "npm run build && electron-builder"
   },
   "author": "",
   "license": "MIT",
