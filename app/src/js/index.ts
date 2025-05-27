@@ -13,6 +13,21 @@ interface ActionItem {
 document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.remove('js-loading');
 
+  document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const page = item.getAttribute('data-page');
+      if (page) {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        if (page === 'builder') {
+          showPageTransition('builder.html');
+        } else if (page === 'dashboard') {
+          showPageTransition('index.html');
+        }
+      }
+    });
+  });
+
   const botList = document.querySelector('.bot-list') as HTMLElement;
   const emptyState = document.querySelector('.empty-state') as HTMLElement;
   const countElement = document.querySelector('.section-subtitle');
