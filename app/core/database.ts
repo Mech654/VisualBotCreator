@@ -11,8 +11,9 @@ let dbPath: string;
 function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      // Use Electron's userData directory for a writable DB location
-      const baseDir = app.getPath('userData');
+      // Use app.getAppPath() to get the application directory, then go to project root
+      const appPath = app.getAppPath();
+      const baseDir = path.resolve(appPath);
       if (!fs.existsSync(baseDir)) {
         fs.mkdirSync(baseDir, { recursive: true });
       }

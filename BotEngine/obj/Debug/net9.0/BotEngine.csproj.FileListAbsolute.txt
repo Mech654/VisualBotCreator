@@ -1,0 +1,15 @@
+/home/eagle/Documents/2VSC/BotEngine/bin/Debug/net9.0/BotEngine
+/home/eagle/Documents/2VSC/BotEngine/bin/Debug/net9.0/BotEngine.deps.json
+/home/eagle/Documents/2VSC/BotEngine/bin/Debug/net9.0/BotEngine.runtimeconfig.json
+/home/eagle/Documents/2VSC/BotEngine/bin/Debug/net9.0/BotEngine.dll
+/home/eagle/Documents/2VSC/BotEngine/bin/Debug/net9.0/BotEngine.pdb
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.GeneratedMSBuildEditorConfig.editorconfig
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.AssemblyInfoInputs.cache
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.AssemblyInfo.cs
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.csproj.CoreCompileInputs.cache
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.sourcelink.json
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.dll
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/refint/BotEngine.dll
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.pdb
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/BotEngine.genruntimeconfig.cache
+/home/eagle/Documents/2VSC/BotEngine/obj/Debug/net9.0/ref/BotEngine.dll
