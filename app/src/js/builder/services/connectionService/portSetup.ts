@@ -1,8 +1,8 @@
-import { NodeInstance, ConnectionMode } from '../../models/types';
-import { PortCategory, PortType } from '../../../../../core/base';
-import { getConnectionState, setConnectionState, CONNECTION_COLORS } from './connectionState';
-import { showConnectionFeedback, checkPortsCompatibility } from './connectionUtils';
-import { createConnection, cancelConnectionDrawing } from './connectionLifecycle';
+import { NodeInstance, ConnectionMode } from '../../models/types.js';
+import { PortCategory, PortType } from '../../../../../core/base.js';
+import { getConnectionState, setConnectionState, CONNECTION_COLORS } from './connectionState.js';
+import { showConnectionFeedback, checkPortsCompatibility } from './connectionUtils.js';
+import { createConnection, cancelConnectionDrawing } from './connectionLifecycle.js';
 
 declare const LeaderLine: any;
 

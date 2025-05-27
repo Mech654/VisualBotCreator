@@ -1,6 +1,6 @@
-import { ConnectionInstance, ConnectionMode } from '../../models/types';
-import { PortCategory, PortType } from '../../../../../core/base';
-import { getConnectionState, setConnectionState, CONNECTION_COLORS } from './connectionState';
+import { ConnectionInstance, ConnectionMode } from '../../models/types.js';
+import { PortCategory, PortType } from '../../../../../core/base.js';
+import { getConnectionState, setConnectionState, CONNECTION_COLORS } from './connectionState.js';
 
 declare const LeaderLine: any;
 

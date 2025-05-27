@@ -1,5 +1,5 @@
 // Utility functions for node UI updates and event listeners
-import { NodeInstance } from '../../models/types';
+import { NodeInstance } from '../../models/types.js';
 
 /**
  * Update the node's DOM element content based on its properties.

@@ -1,4 +1,4 @@
-import { NodeRectangle } from '../models/types';
+import { NodeRectangle } from '../models/types.js';
 
 export const GRID_SIZE = 20;
 

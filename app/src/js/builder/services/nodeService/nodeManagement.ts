@@ -1,7 +1,7 @@
-import { exitTransition } from '../../utils/transitions';
-import { deleteNode } from './nodeService';
-import { showNotification } from '../../utils/notifications';
-import { removeNodeById } from './nodeState';
+import { exitTransition } from '../../utils/transitions.js';
+import { deleteNode } from './nodeService.js';
+import { showNotification } from '../../utils/notifications.js';
+import { removeNodeById } from './nodeState.js';
 
 export function initNodeManagement(): void {
   document.addEventListener('keydown', e => {

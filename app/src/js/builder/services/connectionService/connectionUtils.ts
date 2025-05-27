@@ -1,5 +1,5 @@
-import { PortCategory, PortType } from '../../../../../core/base';
-import { PORT_TYPE_COMPATIBILITY } from './connectionState';
+import { PortCategory, PortType } from '../../../../../core/base.js';
+import { PORT_TYPE_COMPATIBILITY } from './connectionState.js';
 
 export function showConnectionFeedback(
   portElement: HTMLElement,

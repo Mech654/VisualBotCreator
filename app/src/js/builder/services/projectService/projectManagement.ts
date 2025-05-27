@@ -1,14 +1,14 @@
-import { exportConnections, clearConnections } from '../connectionService/connectionService';
-import { createNodeInstance } from '../nodeService/nodeService';
-import { initDraggableNodes } from '../dragDropService/dragDropService';
-import { showNotification } from '../../utils/notifications';
+import { exportConnections, clearConnections } from '../connectionService/connectionService.js';
+import { createNodeInstance } from '../nodeService/nodeService.js';
+import { initDraggableNodes } from '../dragDropService/dragDropService.js';
+import { showNotification } from '../../utils/notifications.js';
 import {
   enterTransition,
   staggerAnimation,
   createRippleEffect,
   addAttentionAnimation,
-} from '../../utils/transitions';
-import { getNodes, addNode, setNodes } from '../nodeService/nodeState';
+} from '../../utils/transitions.js';
+import { getNodes, addNode, setNodes } from '../nodeService/nodeState.js';
 declare global {
   interface Window {
     electron?: {

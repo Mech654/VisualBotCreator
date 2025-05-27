@@ -6,8 +6,8 @@ import {
   showPageTransition,
   typeText,
   exitTransition,
-} from '../../utils/transitions';
-import { populateComponentsPanel } from '../componentService/componentPanel';
+} from '../../utils/transitions.js';
+import { populateComponentsPanel } from '../componentService/componentPanel.js';
 
 declare const LeaderLine: any;
 

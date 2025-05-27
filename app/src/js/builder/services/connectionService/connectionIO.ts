@@ -1,5 +1,5 @@
-import { PortCategory } from '../../../../../core/base';
-import { createConnection, connections } from './connectionLifecycle';
+import { PortCategory } from '../../../../../core/base.js';
+import { createConnection, connections } from './connectionLifecycle.js';
 
 export function exportConnections(): Record<string, any>[] {
   return connections.map(connection => ({

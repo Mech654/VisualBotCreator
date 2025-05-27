@@ -30,6 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initDraggableNodes(getNodes(), getNodes());
 });
 
-if (module && module.hot) {
+if (typeof module !== 'undefined' && module.hot) {
   module.hot.accept();
 }
