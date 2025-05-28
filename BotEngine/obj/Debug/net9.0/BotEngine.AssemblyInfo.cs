@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BotEngine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5eb061746b708b63ad2d5b336e493e16e7ed7e32")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78284b2c8fe8d3a55fcac9eaf9d3db682c03c6dd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BotEngine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BotEngine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
