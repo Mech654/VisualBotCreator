@@ -7,6 +7,7 @@ export interface MessageNodeProperties extends NodeProperties {
   delay?: number;
   variableName?: string;
   nodeContent?: string;
+  language?: string;
 }
 
 export class MessageNode extends Node {
@@ -25,6 +26,7 @@ export class MessageNode extends Node {
     properties.message = properties.message || 'Enter your message here...';
     properties.delay = properties.delay || 500;
     properties.variableName = properties.variableName || 'message';
+    properties.language = properties.language || 'JavaScript'; 
     const message = properties.message || '';
     let displayText = message;
     if (displayText.length > 50) {

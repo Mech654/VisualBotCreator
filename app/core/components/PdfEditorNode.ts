@@ -7,6 +7,7 @@ export interface PdfEditorNodeProperties extends NodeProperties {
   locator?: string;
   nodeContent?: string;
   title?: string;
+  language?: string;
 }
 
 export class PdfEditorNode extends Node {
@@ -25,6 +26,7 @@ export class PdfEditorNode extends Node {
       pdfPath: properties.pdfPath || '',
       newText: properties.newText || '',
       locator: properties.locator || '',
+      language: properties.language || 'JavaScript',
     };
 
     pdfEditorProps.nodeContent = generatePdfEditorPreview(pdfEditorProps);

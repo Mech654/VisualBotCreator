@@ -6,6 +6,7 @@ export interface MathNodeProperties extends NodeProperties {
   expression: string;
   variables?: Record<string, number>;
   nodeContent?: string;
+  language?: string;
 }
 
 export class MathNode extends Node {
@@ -24,6 +25,7 @@ export class MathNode extends Node {
       properties.expression = 'a + b';
     }
     properties.variables = properties.variables || {};
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
     super(id, 'math', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

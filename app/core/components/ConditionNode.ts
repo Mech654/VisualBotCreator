@@ -5,6 +5,7 @@ export interface ConditionNodeProperties extends NodeProperties {
   title?: string;
   condition?: string;
   nodeContent?: string;
+  language?: string;
 }
 
 export class ConditionNode extends Node {
@@ -18,10 +19,11 @@ export class ConditionNode extends Node {
   static override shownProperties = ['condition'];
 
   constructor(id: string, properties: ConditionNodeProperties = {}) {
-    super(id, 'condition', properties);
     properties.title = properties.title || 'Condition';
     properties.condition = properties.condition || 'value == true';
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
+    super(id, 'condition', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addInput(new Port('value', 'Value to Check', 'any', 'condition'));
     this.addOutput(new Port('true', 'True', 'control', 'condition'));

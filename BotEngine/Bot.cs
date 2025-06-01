@@ -6,8 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
+using Dapper;
 using System.Linq;
-
 
 namespace BotEngine
 {
@@ -26,22 +26,20 @@ namespace BotEngine
         private void Run(string startId)
         {
             dynamic nodeObj = GetNodeObj(startId);
-
-            switch (nodeObj.language)
+            switch (nodeObj.properities.language)
             {
-            case "C#":
-                ExecuteCSharpNode(nodeObj);
-                break;
-            case "Python":
-                ExecutePythonNode(nodeObj);
-                break;
-            case "JavaScript":
-                ExecuteJavaScriptNode(nodeObj);
-                break;
-            default:
-                throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
+                case "C#":
+                    ExecuteCSharpNode(nodeObj);
+                    break;
+                case "Python":
+                    ExecutePythonNode(nodeObj);
+                    break;
+                case "JavaScript":
+                    ExecuteJavaScriptNode(nodeObj);
+                    break;
+                default:
+                    throw new NotSupportedException($"Language {nodeObj.properities.language} is not supported.");
             }
-
 
             if (RAM.Count > 0)
             {
@@ -55,33 +53,19 @@ namespace BotEngine
 
         private dynamic GetNodeObj(string nodeId)
         {
-            // Use Microsoft.Data.Sqlite as the best SQLite library for .NET
-            var dbPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory).FullName, "VisualBotCreator.db");
+            var dbPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? "", "VisualBotCreator.db");
             var connectionString = $"Data Source={dbPath}";
 
-            using (var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString))
-            {
+            using var connection = new SqliteConnection(connectionString);
             connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = "SELECT Definition FROM Nodes WHERE NodeId = @nodeId LIMIT 1";
-                command.Parameters.AddWithValue("@nodeId", nodeId);
+            
+            var definitionJson = connection.QuerySingleOrDefault<string>(
+                "SELECT Definition FROM Nodes WHERE NodeId = @nodeId LIMIT 1", 
+                new { nodeId });
 
-                using (var reader = command.ExecuteReader())
-                {
-                if (reader.Read())
-                {
-                    var definitionJson = reader.GetString(0);
-                    // Use Newtonsoft.Json for dynamic parsing
-                    return JsonConvert.DeserializeObject(definitionJson);
-                }
-                else
-                {
-                    throw new Exception($"Node with NodeId '{nodeId}' not found in database.");
-                }
-                }
-            }
-            }
+            return definitionJson != null 
+                ? JsonConvert.DeserializeObject(definitionJson)! 
+                : throw new Exception($"Node with NodeId '{nodeId}' not found in database.");
         }
 
         private void ExecuteCSharpNode(dynamic nodeObj)
@@ -96,7 +80,7 @@ namespace BotEngine
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            
+
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
@@ -104,7 +88,7 @@ namespace BotEngine
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
-            string responseJson = process.StandardOutput.ReadLine();
+            string? responseJson = process.StandardOutput.ReadLine();
             if (!string.IsNullOrEmpty(responseJson))
             {
                 var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
@@ -113,7 +97,7 @@ namespace BotEngine
                     RAM[nodeObj.id.ToString()] = responseDict;
                 }
             }
-            
+
             process.StandardInput.Close();
             process.WaitForExit();
         }
@@ -138,7 +122,7 @@ namespace BotEngine
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
-            string responseJson = process.StandardOutput.ReadLine();
+            string? responseJson = process.StandardOutput.ReadLine();
             if (!string.IsNullOrEmpty(responseJson))
             {
                 var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
@@ -172,7 +156,7 @@ namespace BotEngine
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
-            string responseJson = process.StandardOutput.ReadLine();
+            string? responseJson = process.StandardOutput.ReadLine();
             if (!string.IsNullOrEmpty(responseJson))
             {
                 var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
@@ -184,7 +168,6 @@ namespace BotEngine
             
             process.StandardInput.Close();
             process.WaitForExit();
-            
         }
     }
 }

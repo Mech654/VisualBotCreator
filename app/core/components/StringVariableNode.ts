@@ -5,6 +5,7 @@ export interface StringVariableNodeProperties extends NodeProperties {
   value?: string;
   title?: string;
   nodeContent?: string;
+  language?: string;
 }
 
 export class StringVariableNode extends Node {
@@ -21,6 +22,7 @@ export class StringVariableNode extends Node {
   constructor(id: string, properties: StringVariableNodeProperties = {}) {
     properties.title = properties.title || 'String Variable';
     properties.value = properties.value || '';
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<span class="variable-string">${properties.value}</span>`;
     super(id, 'stringvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

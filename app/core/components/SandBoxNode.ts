@@ -5,6 +5,7 @@ export interface SandBoxNodeProperties extends NodeProperties {
   jsCode?: string;
   nodeContent?: string;
   title?: string;
+  language?: string;
 }
 
 export class SandBoxNode extends Node {
@@ -21,6 +22,7 @@ export class SandBoxNode extends Node {
   constructor(id: string, properties: Partial<SandBoxNodeProperties> = {}) {
     const sandBoxProps: SandBoxNodeProperties = {
       jsCode: properties.jsCode || 'return input1 + input2;',
+      language: properties.language || 'JavaScript',
     };
 
     sandBoxProps.nodeContent = generateSandBoxPreview(sandBoxProps);

@@ -7,6 +7,7 @@ export interface TerminalNodeProperties extends NodeProperties {
   platform?: 'linux' | 'windows' | 'auto';
   nodeContent?: string;
   title?: string;
+  language?: string;
 }
 
 export class TerminalNode extends Node {
@@ -25,6 +26,7 @@ export class TerminalNode extends Node {
       command: properties.command || '',
       workingDirectory: properties.workingDirectory || '',
       platform: properties.platform || 'auto',
+      language: properties.language || 'JavaScript',
     };
 
     terminalProps.nodeContent = generateTerminalPreview(terminalProps);

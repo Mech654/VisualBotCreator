@@ -1,6 +1,11 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.Data.Sqlite;
+using Dapper;
 
 namespace BotEngine
 {
@@ -8,7 +13,113 @@ namespace BotEngine
     {
         static void Main(string[] args)
         {
+            var list = CheckRunCondition();
+            foreach (var startNodeId in list)
+            {
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    var bot = new Bot(startNodeId);
+                    Console.WriteLine($"Bot started with StartNodeId: {startNodeId}");
+                });
+            }
+        }
+
+
+        private static List<string> CheckRunCondition()
+        {
+            var startNodeIds = new List<string>();
             
+            try
+            {
+                var dbPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? "", "VisualBotCreator.db");
+                var connectionString = $"Data Source={dbPath}";
+
+                using var connection = new SqliteConnection(connectionString);
+                connection.Open();
+
+                var allRunConditions = connection.Query<dynamic>(
+                    "SELECT BotId, Key, Value FROM RunConditions"
+                ).ToList();
+
+                var now = DateTime.Now;
+                var validBotIds = new HashSet<string>();
+
+                foreach (var condition in allRunConditions)
+                {
+                    string botId = condition.BotId;
+                    string key = condition.Key;
+                    string value = condition.Value;
+
+                    bool conditionMet = false;
+
+                    switch (key)
+                    {
+                        case "Time of Day (HH:MM)":
+                            if (TimeSpan.TryParse(value, out var targetTime))
+                            {
+                                var currentTime = now.TimeOfDay;
+                                conditionMet = Math.Abs((currentTime - targetTime).TotalMinutes) <= 1;
+                            }
+                            break;
+
+                        case "Day of Week":
+                            var currentDayName = now.DayOfWeek.ToString();
+                            conditionMet = string.Equals(value, currentDayName, StringComparison.OrdinalIgnoreCase);
+                            break;
+
+                        case "Specific Date (YYYY-MM-DD)":
+                            var parts = value.Split(' ');
+                            var datePart = parts[0];
+                            
+                            if (DateTime.TryParse(datePart, out var targetDate))
+                            {
+                                if (parts.Length > 1 && TimeSpan.TryParse(parts[1], out var specificTime))
+                                {
+                                    var targetDateTime = targetDate.Date + specificTime;
+                                    conditionMet = Math.Abs((now - targetDateTime).TotalMinutes) <= 1;
+                                }
+                                else
+                                {
+                                    conditionMet = now.Date == targetDate.Date;
+                                }
+                            }
+                            break;
+                    }
+
+                    if (conditionMet)
+                    {
+                        validBotIds.Add(botId);
+                    }
+                }
+
+                foreach (var botId in validBotIds)
+                {
+                    var isBotEnabled = connection.QuerySingleOrDefault<int>(
+                        "SELECT enabled FROM Bots WHERE Id = @botId",
+                        new { botId }
+                    );
+
+                    if (isBotEnabled == 1)
+                    {
+                        var startNodes = connection.Query<string>(
+                            @"SELECT NodeId FROM Nodes 
+                              WHERE BotId = @botId 
+                              AND JSON_EXTRACT(Definition, '$.type') = 'start'",
+                            new { botId }
+                        ).ToList();
+
+                        startNodeIds.AddRange(startNodes);
+                    }
+                }
+
+                Console.WriteLine($"Found {startNodeIds.Count} start nodes from {validBotIds.Count} bots with satisfied conditions");
+                return startNodeIds;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CheckRunCondition: {ex.Message}");
+                return new List<string>();
+            }
         }
     }
 }
