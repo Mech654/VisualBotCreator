@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj": {}
+    "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj": {}
   },
   "projects": {
-    "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj": {
+    "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj",
+        "projectUniqueName": "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj",
         "projectName": "BotEngine",
-        "projectPath": "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj",
-        "packagesPath": "/home/eagle/.nuget/packages/",
-        "outputPath": "/home/eagle/Documents/2VSC/BotEngine/obj/",
+        "projectPath": "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj",
+        "packagesPath": "/home/blazing/.nuget/packages/",
+        "outputPath": "/home/blazing/Documents/VisualBotCreator/BotEngine/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/eagle/.nuget/NuGet/NuGet.Config"
+          "/home/blazing/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
