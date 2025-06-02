@@ -84,14 +84,27 @@ export class SandBoxNode extends Node {
           Date,
           RegExp,
           console: {
-            log: (...args: any[]) => console.log('[SandBox]', ...args)
-          }
+            log: (...args: any[]) => console.log('[SandBox]', ...args),
+          },
         };
 
         // Create a function with the user's code
         const userFunction = new Function(
-          'input1', 'input2', 'input3', 'input4', 'input5',
-          'Math', 'String', 'Number', 'Boolean', 'Array', 'Object', 'JSON', 'Date', 'RegExp', 'console',
+          'input1',
+          'input2',
+          'input3',
+          'input4',
+          'input5',
+          'Math',
+          'String',
+          'Number',
+          'Boolean',
+          'Array',
+          'Object',
+          'JSON',
+          'Date',
+          'RegExp',
+          'console',
           jsCode
         );
 
@@ -117,7 +130,6 @@ export class SandBoxNode extends Node {
 
         status = true;
       }
-
     } catch (error) {
       result = `JavaScript Error: ${error}`;
       status = false;

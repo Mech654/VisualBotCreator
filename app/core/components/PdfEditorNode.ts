@@ -67,7 +67,6 @@ export class PdfEditorNode extends Node {
         // This would call the actual PDF editing library to modify the file in place
         status = true;
       }
-
     } catch (error) {
       status = false;
     }

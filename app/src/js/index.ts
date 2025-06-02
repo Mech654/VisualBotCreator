@@ -486,12 +486,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
               }
 
-              const toggleBtn = document.getElementById(
-                `swal-toggle-btn-${sanitizedBotIdForDOM}`
-              );
-              const statusSpan = document.getElementById(
-                `swal-bot-status-${sanitizedBotIdForDOM}`
-              );
+              const toggleBtn = document.getElementById(`swal-toggle-btn-${sanitizedBotIdForDOM}`);
+              const statusSpan = document.getElementById(`swal-bot-status-${sanitizedBotIdForDOM}`);
               if (toggleBtn && statusSpan) {
                 toggleBtn.addEventListener('click', async () => {
                   const idForStatusChange: string = currentCommittedId;
@@ -533,9 +529,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               const attachDeleteListeners = () => {
                 listContainer.querySelectorAll('.swal-delete-rc-btn').forEach(btn => {
                   btn.addEventListener('click', async ev => {
-                    const index = parseInt(
-                      (ev.currentTarget as HTMLElement).dataset.index || '-1'
-                    );
+                    const index = parseInt((ev.currentTarget as HTMLElement).dataset.index || '-1');
                     if (index > -1 && index < currentRunConditions.length) {
                       const conditionToDelete = currentRunConditions[index];
                       currentRunConditions.splice(index, 1);
@@ -650,7 +644,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                   `swal-date-time-extra-${sanitizedBotIdForDOM}`
                 );
                 if (dateTimeExtraContainer) {
-                  if (selectedKey === 'Time of Day (HH:MM)' || selectedKey === 'Specific Date (YYYY-MM-DD)') {
+                  if (
+                    selectedKey === 'Time of Day (HH:MM)' ||
+                    selectedKey === 'Specific Date (YYYY-MM-DD)'
+                  ) {
                     dateTimeExtraContainer.style.display = 'block';
                   } else {
                     dateTimeExtraContainer.style.display = 'none';

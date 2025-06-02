@@ -71,10 +71,10 @@ export class TerminalNode extends Node {
       } else {
         // Determine platform
         const detectedPlatform = platform === 'auto' ? this.detectPlatform() : platform;
-        
+
         // Process command based on platform
         const processedCommand = this.processCommandForPlatform(command, detectedPlatform);
-        
+
         // Execute command (this would call the actual process execution)
         // For now, simulate execution
         output = `[${detectedPlatform.toUpperCase()}] Executed: ${processedCommand}`;
@@ -85,7 +85,6 @@ export class TerminalNode extends Node {
         exitCode = 0;
         status = true;
       }
-
     } catch (error) {
       output = `Error executing command: ${error}`;
       exitCode = 1;

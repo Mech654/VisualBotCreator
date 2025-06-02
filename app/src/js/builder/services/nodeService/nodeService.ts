@@ -3,7 +3,10 @@ import { generateNodeHtml } from './nodeRenderer.js';
 import { snapToGrid } from '../../utils/grid.js';
 import { updateConnections } from '../connectionService/connectionService.js';
 import { checkCollision } from '../dragDropService/dragDropService.js';
-import { initNodeConnections, removeNodeConnections } from '../connectionService/connectionService.js';
+import {
+  initNodeConnections,
+  removeNodeConnections,
+} from '../connectionService/connectionService.js';
 import { updateNodeElementContent, setupPropertyEventListeners } from './nodeUI.js';
 
 // Store node positions for collision detection
