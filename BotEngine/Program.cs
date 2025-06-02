@@ -31,7 +31,7 @@ namespace BotEngine
             
             try
             {
-                var dbPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? "", "VisualBotCreator.db");
+                var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VisualBotCreator.db");
                 var connectionString = $"Data Source={dbPath}";
 
                 using var connection = new SqliteConnection(connectionString);
@@ -50,6 +50,8 @@ namespace BotEngine
                     string key = condition.Key;
                     string value = condition.Value;
 
+                    Console.WriteLine($"Checking condition - BotId: {botId}, Key: {key}, Value: {value}");
+
                     bool conditionMet = false;
 
                     switch (key)
@@ -59,12 +61,17 @@ namespace BotEngine
                             {
                                 var currentTime = now.TimeOfDay;
                                 conditionMet = Math.Abs((currentTime - targetTime).TotalMinutes) <= 1;
+                                Console.WriteLine($"Time check: Current={currentTime}, Target={targetTime}, Met={conditionMet}");
                             }
                             break;
 
                         case "Day of Week":
                             var currentDayName = now.DayOfWeek.ToString();
-                            conditionMet = string.Equals(value, currentDayName, StringComparison.OrdinalIgnoreCase);
+                            var currentDayNumber = ((int)now.DayOfWeek == 0 ? 7 : (int)now.DayOfWeek).ToString(); // Convert Sunday=0 to Sunday=7
+                            Console.WriteLine($"Day check: Current='{currentDayName}' (Day {currentDayNumber}), Value='{value}'");
+                            conditionMet = string.Equals(value, currentDayName, StringComparison.OrdinalIgnoreCase) || 
+                                          string.Equals(value, currentDayNumber);
+                            Console.WriteLine($"Day condition met: {conditionMet}");
                             break;
 
                         case "Specific Date (YYYY-MM-DD)":

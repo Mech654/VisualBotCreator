@@ -411,19 +411,19 @@
     ]
   },
   "packageFolders": {
-    "/home/blazing/.nuget/packages/": {}
+    "/home/eagle/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj",
+      "projectUniqueName": "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj",
       "projectName": "BotEngine",
-      "projectPath": "/home/blazing/Documents/VisualBotCreator/BotEngine/BotEngine.csproj",
-      "packagesPath": "/home/blazing/.nuget/packages/",
-      "outputPath": "/home/blazing/Documents/VisualBotCreator/BotEngine/obj/",
+      "projectPath": "/home/eagle/Documents/2VSC/BotEngine/BotEngine.csproj",
+      "packagesPath": "/home/eagle/.nuget/packages/",
+      "outputPath": "/home/eagle/Documents/2VSC/BotEngine/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/blazing/.nuget/NuGet/NuGet.Config"
+        "/home/eagle/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
