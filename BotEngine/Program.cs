@@ -18,8 +18,8 @@ namespace BotEngine
             {
                 System.Threading.Tasks.Task.Run(() =>
                 {
-                    var bot = new Bot(startNodeId);
                     Console.WriteLine($"Bot started with StartNodeId: {startNodeId}");
+                    var bot = new Bot(startNodeId);
                 });
             }
         }
