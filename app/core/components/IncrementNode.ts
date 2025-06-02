@@ -4,6 +4,7 @@ import { ComponentCategory } from '../nodeSystem.js';
 export interface IncrementNodeProperties extends NodeProperties {
   incrementBy?: number;
   nodeContent?: string;
+  language?: string;
 }
 
 export class IncrementNode extends Node {
@@ -20,6 +21,7 @@ export class IncrementNode extends Node {
   constructor(id: string, properties: IncrementNodeProperties = {}) {
     properties.incrementBy = properties.incrementBy || 1;
     properties.title = properties.title || 'Increment';
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${properties.incrementBy}</span></div>`;
     super(id, 'increment', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

@@ -3,6 +3,7 @@ import { ComponentCategory } from '../nodeSystem.js';
 
 interface StartNodeProperties extends NodeProperties {
   nodeContent?: string;
+  language?: string;
 }
 
 export class StartNode extends Node {
@@ -19,6 +20,7 @@ export class StartNode extends Node {
   constructor(id: string, properties: StartNodeProperties = {}) {
     properties.title = properties.title || 'Start';
     properties.nodeContent = 'Bot conversation starts here';
+    properties.language = properties.language || 'JavaScript';
     super(id, 'start', properties);
     this.addOutput(new Port('next', 'Next', 'control', 'next'));
   }

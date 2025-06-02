@@ -10,6 +10,7 @@ export interface OptionsNodeProperties extends NodeProperties {
   title?: string;
   options?: Option[];
   nodeContent?: string;
+  language?: string;
 }
 
 export class OptionsNode extends Node {
@@ -25,6 +26,7 @@ export class OptionsNode extends Node {
 
   constructor(id: string, properties: OptionsNodeProperties = {}) {
     properties.title = properties.title || 'Options';
+    properties.language = properties.language || 'JavaScript';
     properties.options = properties.options || [
       { text: 'Option 1', value: 'option1' },
       { text: 'Option 2', value: 'option2' },

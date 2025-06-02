@@ -5,6 +5,7 @@ export interface BooleanVariableNodeProperties extends NodeProperties {
   value?: boolean;
   title?: string;
   nodeContent?: string;
+  language?: string;
 }
 
 export class BooleanVariableNode extends Node {
@@ -21,6 +22,7 @@ export class BooleanVariableNode extends Node {
   constructor(id: string, properties: BooleanVariableNodeProperties = {}) {
     properties.title = properties.title || 'Boolean Variable';
     properties.value = typeof properties.value === 'boolean' ? properties.value : false;
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<span class=\"variable-boolean\">${properties.value ? 'true' : 'false'}</span>`;
     super(id, 'booleanvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

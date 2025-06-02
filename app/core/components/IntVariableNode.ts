@@ -5,6 +5,7 @@ export interface IntVariableNodeProperties extends NodeProperties {
   value?: number;
   title?: string;
   nodeContent?: string;
+  language?: string;
 }
 
 export class IntVariableNode extends Node {
@@ -21,6 +22,7 @@ export class IntVariableNode extends Node {
   constructor(id: string, properties: IntVariableNodeProperties = {}) {
     properties.title = properties.title || 'Int Variable';
     properties.value = typeof properties.value === 'number' ? properties.value : 0;
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = `<span class=\"variable-int\">${properties.value}</span>`;
     super(id, 'intvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

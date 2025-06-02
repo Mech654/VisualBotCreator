@@ -63,3 +63,26 @@ release/
 VisualBotCreator.db
 VisualBotCreator.db-wal
 VisualBotCreator.db-shm
+
+# .NET/C# build artifacts and auto-generated files
+*.sln
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+*.deps.json
+*.runtimeconfig.json
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.assets.cache
+*.csproj.AssemblyReference.cache
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+project.assets.json
+project.nuget.cache

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Terminal window -->
+  <rect x="2" y="3" width="20" height="18" rx="2" ry="2"/>
+  
+  <!-- Window header -->
+  <line x1="2" y1="7" x2="22" y2="7"/>
+  
+  <!-- Window controls (dots) -->
+  <circle cx="5" cy="5" r="0.5" fill="currentColor"/>
+  <circle cx="7" cy="5" r="0.5" fill="currentColor"/>
+  <circle cx="9" cy="5" r="0.5" fill="currentColor"/>
+  
+  <!-- Command prompt arrow -->
+  <polyline points="6,12 8,14 6,16"/>
+  
+  <!-- Cursor line -->
+  <line x1="10" y1="14" x2="14" y2="14" stroke-width="1.5"/>
+  
+  <!-- Additional terminal lines to show activity -->
+  <line x1="6" y1="18" x2="18" y2="18" stroke-width="1" opacity="0.6"/>
+</svg>

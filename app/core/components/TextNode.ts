@@ -8,6 +8,7 @@ export interface TextNodeProperties extends NodeProperties {
   color?: string;
   nodeContent?: string;
   title?: string;
+  language?: string;
 }
 
 export class TextNode extends Node {
@@ -26,6 +27,7 @@ export class TextNode extends Node {
       fontSize: properties.fontSize || 16,
       bold: properties.bold || false,
       color: properties.color || '#000000',
+      language: properties.language || 'JavaScript',
     };
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
     super(id, 'text', textNodeProps);

@@ -3,6 +3,7 @@ import { ComponentCategory } from '../nodeSystem.js';
 
 export interface Base64NodeProperties extends NodeProperties {
   nodeContent?: string;
+  language?: string;
 }
 
 export class Base64Node extends Node {
@@ -18,6 +19,7 @@ export class Base64Node extends Node {
 
   constructor(id: string, properties: Base64NodeProperties = {}) {
     properties.title = properties.title || 'Base64';
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = 'Encodes input to Base64';
     super(id, 'base64', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

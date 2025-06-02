@@ -7,6 +7,7 @@ export interface RandomNodeProperties extends NodeProperties {
   type?: 'integer' | 'float' | 'boolean' | 'string';
   length?: number;
   nodeContent?: string;
+  language?: string;
 }
 
 export class RandomNode extends Node {
@@ -24,6 +25,7 @@ export class RandomNode extends Node {
     properties.max = properties.max ?? 100;
     properties.type = properties.type || 'integer';
     properties.length = properties.length ?? 10;
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent = generateRandomNodeContent(properties);
     super(id, 'random', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));

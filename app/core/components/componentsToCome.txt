@@ -1,0 +1,10 @@
+# VISUAL BOT CREATOR - FUTURE COMPONENT IDEAS
+# ============================================
+# Clean list of general-purpose components to expand bot building capabilities
+
+
+1. Delay
+2. Regex
+3. DateTime 
+4. HttpRequest 
+
