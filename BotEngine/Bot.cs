@@ -119,13 +119,9 @@ namespace BotEngine
 
         private dynamic GetNodeObj(string nodeId)
         {
-            var currentDir = Directory.GetCurrentDirectory();
-            Console.WriteLine($"[GetNodeObj] Current directory: {currentDir}");
-            
+            var currentDir = Directory.GetCurrentDirectory();4            
             var dbPath = Path.Combine(currentDir, "..", "VisualBotCreator.db");
             var fullDbPath = Path.GetFullPath(dbPath);
-            Console.WriteLine($"[GetNodeObj] Database path: {fullDbPath}");
-            Console.WriteLine($"[GetNodeObj] Database exists: {File.Exists(fullDbPath)}");
             
             if (!File.Exists(fullDbPath))
             {
@@ -133,7 +129,6 @@ namespace BotEngine
             }
             
             var connectionString = $"Data Source={fullDbPath}";
-            Console.WriteLine($"[GetNodeObj] Connection string: {connectionString}");
             Console.WriteLine($"[GetNodeObj] Searching for NodeId: {nodeId}");
 
             // Check if database file is locked

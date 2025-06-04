@@ -22,6 +22,7 @@ namespace BotEngine
                     var bot = new Bot(startNodeId);
                 });
             }
+            System.Threading.Thread.Sleep(10000);
         }
 
 
