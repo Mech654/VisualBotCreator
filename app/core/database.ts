@@ -154,6 +154,7 @@ async function saveNode(
         })),
       })),
     });
+    console.log('[DATABASE] Saving node:', node.id, 'for bot:', botId);
     return new Promise((resolve, reject) => {
       db.run(
         `

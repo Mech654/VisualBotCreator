@@ -209,7 +209,39 @@ function setupIpcHandlers(): void {
         );
 
         if (existingConnectionToPort) {
-          // Remove the existing connection
+          // Remove the existing connection from both ports
+          const existingSourceNode = nodeInstances.get(existingConnectionToPort.fromNodeId);
+          if (existingSourceNode) {
+            const existingSourcePort = existingSourceNode.outputs.find(
+              output => output.id === existingConnectionToPort.fromPortId
+            );
+            if (existingSourcePort) {
+              const connIndex = existingSourcePort.connectedTo.findIndex(
+                conn =>
+                  conn.fromNodeId === existingConnectionToPort.fromNodeId &&
+                  conn.fromPortId === existingConnectionToPort.fromPortId &&
+                  conn.toNodeId === existingConnectionToPort.toNodeId &&
+                  conn.toPortId === existingConnectionToPort.toPortId
+              );
+              if (connIndex !== -1) {
+                existingSourcePort.connectedTo.splice(connIndex, 1);
+              }
+            }
+          }
+
+          // Remove from target port
+          const existingTargetIndex = targetPort.connectedTo.findIndex(
+            conn =>
+              conn.fromNodeId === existingConnectionToPort.fromNodeId &&
+              conn.fromPortId === existingConnectionToPort.fromPortId &&
+              conn.toNodeId === existingConnectionToPort.toNodeId &&
+              conn.toPortId === existingConnectionToPort.toPortId
+          );
+          if (existingTargetIndex !== -1) {
+            targetPort.connectedTo.splice(existingTargetIndex, 1);
+          }
+
+          // Remove the existing connection from global array
           connections.splice(connections.indexOf(existingConnectionToPort), 1);
         }
 
@@ -217,8 +249,9 @@ function setupIpcHandlers(): void {
         const connection = new Connection(fromNodeId, fromPortId, toNodeId, toPortId);
         connections.push(connection);
 
-        // Add connection reference to ports
+        // Add connection reference to both ports
         sourcePort.connectedTo.push(connection);
+        targetPort.connectedTo.push(connection);
 
         return {
           fromNodeId,
@@ -272,6 +305,8 @@ function setupIpcHandlers(): void {
 
         // Also remove from port references
         const sourceNode = nodeInstances.get(fromNodeId);
+        const targetNode = nodeInstances.get(toNodeId);
+        
         if (sourceNode) {
           const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
           if (sourcePort) {
@@ -285,6 +320,23 @@ function setupIpcHandlers(): void {
 
             if (connIndex !== -1) {
               sourcePort.connectedTo.splice(connIndex, 1);
+            }
+          }
+        }
+
+        if (targetNode) {
+          const targetPort = targetNode.inputs.find(input => input.id === toPortId);
+          if (targetPort) {
+            const connIndex = targetPort.connectedTo.findIndex(
+              conn =>
+                conn.fromNodeId === fromNodeId &&
+                conn.fromPortId === fromPortId &&
+                conn.toNodeId === toNodeId &&
+                conn.toPortId === toPortId
+            );
+
+            if (connIndex !== -1) {
+              targetPort.connectedTo.splice(connIndex, 1);
             }
           }
         }

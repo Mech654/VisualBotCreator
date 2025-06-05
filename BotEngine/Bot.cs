@@ -28,7 +28,7 @@ namespace BotEngine
         private void Run(string startId)
         {
             Console.WriteLine($"[Run] Running bot with StartNodeId: {startId}");
-            dynamic nodeObj = null;
+            dynamic? nodeObj = null;
             try
             {
                 nodeObj = GetNodeObj(startId);
@@ -41,9 +41,10 @@ namespace BotEngine
                 Console.WriteLine($"[Run] StackTrace: {ex.StackTrace}");
                 throw;
             }
-            Console.WriteLine($"[Run] Loaded node: id={nodeObj.id}, type={nodeObj.type}, language={nodeObj.language}");
+            Console.WriteLine($"[Run] Loaded node: type={nodeObj.type}, language={nodeObj.properties?.language}");
 
-            switch (nodeObj.language)
+            var language = (string?)nodeObj.properties?.language ?? "";
+            switch (language)
             {
             case "C#":
                 Console.WriteLine($"[Run] Executing C# node: {nodeObj.type}");
@@ -62,23 +63,49 @@ namespace BotEngine
                 throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
             }
 
+            Console.WriteLine($"[Run] ===== Checking navigation after {nodeObj.type} node =====");
+            
             if (RAM.Count > 0)
             {
-            var lastNode = RAM.Last();
-            Console.WriteLine($"[Run] Node {lastNode.Key} executed. Output: {JsonConvert.SerializeObject(lastNode.Value)}");
-            if (lastNode.Value.TryGetValue("NextNodeId", out var nextNodeId) && !string.IsNullOrEmpty(nextNodeId))
-            {
-                Console.WriteLine($"[Run] Proceeding to next node: {nextNodeId}");
-                Run(nextNodeId);
+                var lastNode = RAM.Last();
+                Console.WriteLine($"[Run] {lastNode.Key} executed successfully");
+                
+                // Check if the response has a NextNodeId
+                if (lastNode.Value.TryGetValue("NextNodeId", out var nextNodeId) && !string.IsNullOrEmpty(nextNodeId))
+                {
+                    Console.WriteLine($"[Run] Found NextNodeId in response: {nextNodeId}");
+                    Run(nextNodeId);
+                }
+                else
+                {
+                    Console.WriteLine("[Run] No NextNodeId in response, checking node outputs...");
+                    // Check the node definition for connected outputs
+                    var nextNode = GetNextNodeFromOutputs(nodeObj);
+                    if (!string.IsNullOrEmpty(nextNode))
+                    {
+                        Console.WriteLine($"[Run] Found connected next node: {nextNode}");
+                        Run(nextNode);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[Run] No connected nodes found. Execution finished.");
+                    }
+                }
             }
             else
             {
-                Console.WriteLine("[Run] No NextNodeId found. Execution finished.");
-            }
-            }
-            else
-            {
-            Console.WriteLine("[Run] No output in RAM. Execution finished.");
+                Console.WriteLine("[Run] No output stored in RAM, checking node outputs...");
+                // Check the node definition for connected outputs
+                var nextNode = GetNextNodeFromOutputs(nodeObj);
+                if (!string.IsNullOrEmpty(nextNode))
+                {
+                    Console.WriteLine($"[Run] Found connected next node: {nextNode}");
+                    Run(nextNode);
+                }
+                else
+                {
+                    Console.WriteLine("[Run] No connected nodes found. Execution finished.");
+                }
             }
         }
 
@@ -119,7 +146,7 @@ namespace BotEngine
 
         private dynamic GetNodeObj(string nodeId)
         {
-            var currentDir = Directory.GetCurrentDirectory();4            
+            var currentDir = Directory.GetCurrentDirectory();           
             var dbPath = Path.Combine(currentDir, "..", "VisualBotCreator.db");
             var fullDbPath = Path.GetFullPath(dbPath);
             
@@ -228,17 +255,17 @@ namespace BotEngine
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properities);
+            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
-            string responseJson = process.StandardOutput.ReadLine();
+            string? responseJson = process.StandardOutput.ReadLine();
             if (!string.IsNullOrEmpty(responseJson))
             {
                 var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
                 if (responseDict != null)
                 {
-                    RAM[nodeObj.id.ToString()] = responseDict;
+                    RAM[nodeObj.type.ToString()] = responseDict;
                 }
             }
             
@@ -262,17 +289,17 @@ namespace BotEngine
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properities);
+            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
-            string responseJson = process.StandardOutput.ReadLine();
+            string? responseJson = process.StandardOutput.ReadLine();
             if (!string.IsNullOrEmpty(responseJson))
             {
                 var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
                 if (responseDict != null)
                 {
-                    RAM[nodeObj.id.ToString()] = responseDict;
+                    RAM[nodeObj.type.ToString()] = responseDict;
                 }
             }
             
@@ -282,13 +309,13 @@ namespace BotEngine
 
         private void ExecuteJavaScriptNode(dynamic nodeObj)
         {
-            Console.WriteLine($"[ExecuteJavaScriptNode] Current directory: {Directory.GetCurrentDirectory()}");
-            Console.WriteLine($"[ExecuteJavaScriptNode] Looking for file: {nodeObj.type}.js");
-            
             var jsFilePath = Path.Combine("processes", "node", $"{nodeObj.type}.js");
-            var fullJsPath = Path.GetFullPath(jsFilePath);
-            Console.WriteLine($"[ExecuteJavaScriptNode] Full JS file path: {fullJsPath}");
-            Console.WriteLine($"[ExecuteJavaScriptNode] JS file exists: {File.Exists(fullJsPath)}");
+            
+            if (!File.Exists(jsFilePath))
+            {
+                Console.WriteLine($"[ExecuteJavaScriptNode] ERROR: File not found: {jsFilePath}");
+                return;
+            }
             
             var startInfo = new ProcessStartInfo()
             {
@@ -301,41 +328,110 @@ namespace BotEngine
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-
-            Console.WriteLine($"[ExecuteJavaScriptNode] Starting process: node {jsFilePath}");
-            Console.WriteLine($"[ExecuteJavaScriptNode] Working directory: {startInfo.WorkingDirectory}");
             
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properities);
-            Console.WriteLine($"[ExecuteJavaScriptNode] Sending data: {dataToSend}");
+            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
+            Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Input: {dataToSend}");
             
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
+            process.StandardInput.Close(); // Close stdin to trigger the 'end' event in Node.js
 
-            string responseJson = process.StandardOutput.ReadLine();
-            string errorOutput = process.StandardError.ReadToEnd();
+            string? responseJson = process.StandardOutput.ReadLine();
+            string? errorOutput = process.StandardError.ReadToEnd();
+            Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Response: {responseJson}");
             
-            Console.WriteLine($"[ExecuteJavaScriptNode] Response: {responseJson}");
             if (!string.IsNullOrEmpty(errorOutput))
             {
-                Console.WriteLine($"[ExecuteJavaScriptNode] Error output: {errorOutput}");
+                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Error: {errorOutput}");
             }
             
             if (!string.IsNullOrEmpty(responseJson))
             {
-                var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
-                if (responseDict != null)
+                try
                 {
-                    RAM[nodeObj.id.ToString()] = responseDict;
+                    // First try to deserialize as dynamic to handle mixed types
+                    var responseDynamic = JsonConvert.DeserializeObject(responseJson);
+                    var responseDict = new Dictionary<string, string>();
+                    
+                    if (responseDynamic is Newtonsoft.Json.Linq.JObject jObj)
+                    {
+                        foreach (var prop in jObj.Properties())
+                        {
+                            responseDict[prop.Name] = prop.Value?.ToString() ?? "";
+                        }
+                    }
+                    
+                    if (responseDict.Count > 0)
+                    {
+                        RAM[nodeObj.type.ToString()] = responseDict;
+                        Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Stored in RAM: {string.Join(", ", responseDict.Select(kv => $"{kv.Key}={kv.Value}"))}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Failed to parse response: {ex.Message}");
                 }
             }
+            else
+            {
+                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | No response received");
+            }
             
-            process.StandardInput.Close();
             process.WaitForExit();
             
-            Console.WriteLine($"[ExecuteJavaScriptNode] Process exit code: {process.ExitCode}");
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Process exited with code: {process.ExitCode}");
+            }
+        }
+
+        private string? GetNextNodeFromOutputs(dynamic nodeObj)
+        {
+            try
+            {
+                Console.WriteLine($"[GetNextNodeFromOutputs] Checking outputs for node: {nodeObj.type}");
+                
+                if (nodeObj.outputs != null)
+                {
+                    Console.WriteLine($"[GetNextNodeFromOutputs] Found {nodeObj.outputs.Count} outputs");
+                    
+                    foreach (var output in nodeObj.outputs)
+                    {
+                        Console.WriteLine($"[GetNextNodeFromOutputs] Checking output: {output.id} ({output.label})");
+                        
+                        if (output.connectedTo != null && output.connectedTo.Count > 0)
+                        {
+                            Console.WriteLine($"[GetNextNodeFromOutputs] Output has {output.connectedTo.Count} connections");
+                            
+                            var connection = output.connectedTo[0];
+                            if (connection.toNodeId != null)
+                            {
+                                var nextNodeId = connection.toNodeId.ToString();
+                                Console.WriteLine($"[GetNextNodeFromOutputs] Found next node: {nextNodeId}");
+                                return nextNodeId;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[GetNextNodeFromOutputs] Output '{output.id}' has no connections");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[GetNextNodeFromOutputs] Node has no outputs");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetNextNodeFromOutputs] Error extracting next node: {ex.Message}");
+            }
+            
+            Console.WriteLine($"[GetNextNodeFromOutputs] No connected nodes found");
+            return null;
         }
     }
 }
