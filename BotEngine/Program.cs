@@ -13,16 +13,32 @@ namespace BotEngine
     {
         static void Main(string[] args)
         {
-            var list = CheckRunCondition();
-            foreach (var startNodeId in list)
+            Console.WriteLine("BotEngine started. Press Ctrl+C to stop.");
+            
+            while (true)
             {
-                System.Threading.Tasks.Task.Run(() =>
+                try
                 {
-                    Console.WriteLine($"Bot started with StartNodeId: {startNodeId}");
-                    var bot = new Bot(startNodeId);
-                });
+                    var list = CheckRunCondition();
+                    foreach (var startNodeId in list)
+                    {
+                        System.Threading.Tasks.Task.Run(() =>
+                        {
+                            Console.WriteLine($"Bot started with StartNodeId: {startNodeId}");
+                            var bot = new Bot(startNodeId);
+                        });
+                    }
+                    
+                    // Wait 60 seconds before checking conditions again
+                    System.Threading.Thread.Sleep(60000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in main loop: {ex.Message}");
+                    // Wait a bit before retrying to avoid rapid error loops
+                    System.Threading.Thread.Sleep(5000);
+                }
             }
-            System.Threading.Thread.Sleep(10000);
         }
 
 

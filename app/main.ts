@@ -203,48 +203,6 @@ function setupIpcHandlers(): void {
           );
         }
 
-        // Check for existing connections to the input port
-        const existingConnectionToPort = connections.find(
-          conn => conn.toNodeId === toNodeId && conn.toPortId === toPortId
-        );
-
-        if (existingConnectionToPort) {
-          // Remove the existing connection from both ports
-          const existingSourceNode = nodeInstances.get(existingConnectionToPort.fromNodeId);
-          if (existingSourceNode) {
-            const existingSourcePort = existingSourceNode.outputs.find(
-              output => output.id === existingConnectionToPort.fromPortId
-            );
-            if (existingSourcePort) {
-              const connIndex = existingSourcePort.connectedTo.findIndex(
-                conn =>
-                  conn.fromNodeId === existingConnectionToPort.fromNodeId &&
-                  conn.fromPortId === existingConnectionToPort.fromPortId &&
-                  conn.toNodeId === existingConnectionToPort.toNodeId &&
-                  conn.toPortId === existingConnectionToPort.toPortId
-              );
-              if (connIndex !== -1) {
-                existingSourcePort.connectedTo.splice(connIndex, 1);
-              }
-            }
-          }
-
-          // Remove from target port
-          const existingTargetIndex = targetPort.connectedTo.findIndex(
-            conn =>
-              conn.fromNodeId === existingConnectionToPort.fromNodeId &&
-              conn.fromPortId === existingConnectionToPort.fromPortId &&
-              conn.toNodeId === existingConnectionToPort.toNodeId &&
-              conn.toPortId === existingConnectionToPort.toPortId
-          );
-          if (existingTargetIndex !== -1) {
-            targetPort.connectedTo.splice(existingTargetIndex, 1);
-          }
-
-          // Remove the existing connection from global array
-          connections.splice(connections.indexOf(existingConnectionToPort), 1);
-        }
-
         // Create new connection
         const connection = new Connection(fromNodeId, fromPortId, toNodeId, toPortId);
         connections.push(connection);
