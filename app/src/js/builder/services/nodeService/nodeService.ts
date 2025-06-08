@@ -160,7 +160,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
   }
 
   // Always skip these
-  const alwaysSkip = ['id', 'nodeContent', 'flowType'];
+  const alwaysSkip = ['id', 'nodeContent', 'flowType', 'language'];
 
   let properties: [string, any][];
   if (shownProps) {
