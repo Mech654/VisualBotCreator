@@ -497,6 +497,19 @@ function setupIpcHandlers(): void {
       return { success: false, error: (error as Error).message || 'Unknown error' };
     }
   });
+
+  ipcMain.handle('node:clearAll', async () => {
+    try {
+      // Clear all node instances and connections
+      nodeInstances.clear();
+      connections.length = 0;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error clearing all nodes:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
 }
 
 /**

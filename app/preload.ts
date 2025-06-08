@@ -19,6 +19,7 @@ interface NodeSystemAPI {
     toPortId: string
   ) => Promise<any>;
   getNodeConnections: (nodeId: string) => Promise<any[]>;
+  clearAllNodes: () => Promise<{ success: boolean; error?: string }>;
 }
 
 interface UtilsAPI {
@@ -95,6 +96,12 @@ contextBridge.exposeInMainWorld('nodeSystem', {
   getNodeConnections: (nodeId: string) => {
     return ipcRenderer.invoke('connection:getForNode', nodeId);
   },
+
+  // clear all nodes
+  clearAllNodes: () => {
+    return ipcRenderer.invoke('node:clearAll');
+  },
+
 } as NodeSystemAPI);
 
 contextBridge.exposeInMainWorld('utils', {

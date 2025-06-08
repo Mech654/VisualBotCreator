@@ -59,6 +59,10 @@ export function showPageTransition(
   setTimeout(() => {
     window.location.href = destination;
   }, delay);
+
+  if (window && (window as any).nodeSystem?.clearAllNodes) {
+    (window as any).nodeSystem.clearAllNodes();
+  }
 }
 
 /**
