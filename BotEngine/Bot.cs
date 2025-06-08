@@ -27,7 +27,7 @@ namespace BotEngine
 
         private void Run(string startId)
         {
-            Console.WriteLine($"[Run] Running bot with StartNodeId: {startId}");
+            Console.WriteLine($"[Run] Running Node: {startId}");
             dynamic? nodeObj = null;
             try
             {
@@ -41,29 +41,23 @@ namespace BotEngine
                 Console.WriteLine($"[Run] StackTrace: {ex.StackTrace}");
                 throw;
             }
-            Console.WriteLine($"[Run] Loaded node: type={nodeObj.type}, language={nodeObj.properties?.language}");
 
             var language = (string?)nodeObj.properties?.language ?? "";
             switch (language)
             {
             case "C#":
-                Console.WriteLine($"[Run] Executing C# node: {nodeObj.type}");
                 ExecuteCSharpNode(nodeObj);
                 break;
             case "Python":
-                Console.WriteLine($"[Run] Executing Python node: {nodeObj.type}");
                 ExecutePythonNode(nodeObj);
                 break;
             case "JavaScript":
-                Console.WriteLine($"[Run] Executing JavaScript node: {nodeObj.type}");
                 ExecuteJavaScriptNode(nodeObj);
                 break;
             default:
                 Console.WriteLine($"[Run] Unsupported language: {nodeObj.language}");
                 throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
             }
-
-            Console.WriteLine($"[Run] ===== Checking navigation after {nodeObj.type} node =====");
             
             if (RAM.Count > 0)
             {
@@ -83,7 +77,6 @@ namespace BotEngine
                     var nextNode = GetNextNodeFromOutputs(nodeObj);
                     if (!string.IsNullOrEmpty(nextNode))
                     {
-                        Console.WriteLine($"[Run] Found connected next node: {nextNode}");
                         Run(nextNode);
                     }
                     else
@@ -159,77 +152,49 @@ namespace BotEngine
             Console.WriteLine($"[GetNodeObj] Searching for NodeId: {nodeId}");
 
             // Check if database file is locked
+            try { using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)){}}  //find an alternative way to check later this looks silly :/
+            catch (Exception ex) { Console.WriteLine($"[GetNodeObj] Warning: Cannot open database file for reading: {ex.Message}");}
+
             try
             {
-                using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString))
                 {
-                    Console.WriteLine("[GetNodeObj] Database file can be opened for reading");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[GetNodeObj] Warning: Cannot open database file for reading: {ex.Message}");
-            }                try
-                {
-                    Console.WriteLine("[GetNodeObj] Creating and opening database connection...");
-                    using (var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString))
+                    connection.Open();
+
+                    var sql = "SELECT Definition FROM Nodes WHERE NodeId = @nodeId LIMIT 1";
+                    var definitionJson = connection.QueryFirstOrDefault<string>(sql, new { nodeId });
+
+                    if (!string.IsNullOrEmpty(definitionJson))
                     {
-                        connection.Open();
-                        Console.WriteLine("[GetNodeObj] Database connection opened successfully");
-                        
-                        // First, let's check if the table exists and has data
-                        Console.WriteLine("[GetNodeObj] Checking if Nodes table exists...");
-                        var tableExists = connection.QueryFirstOrDefault<int>("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Nodes'");
-                        Console.WriteLine($"[GetNodeObj] Nodes table exists: {tableExists > 0}");
-                        
-                        if (tableExists > 0)
+                        //Console.WriteLine($"[GetNodeObj] Found node definition: {definitionJson}");  //find a better way to print object later
+
+                        try
                         {
-                            var totalCount = connection.QueryFirstOrDefault<int>("SELECT COUNT(*) FROM Nodes");
-                            Console.WriteLine($"[GetNodeObj] Total nodes in database: {totalCount}");
-                            
-                            // Check if our specific node exists
-                            var nodeExists = connection.QueryFirstOrDefault<int>("SELECT COUNT(*) FROM Nodes WHERE NodeId = @nodeId", new { nodeId });
-                            Console.WriteLine($"[GetNodeObj] Node with ID '{nodeId}' exists: {nodeExists > 0}");
+                            var nodeObj = JsonConvert.DeserializeObject(definitionJson);
+                            return nodeObj!;
                         }
-                        
-                        Console.WriteLine($"[GetNodeObj] Executing query with Dapper for NodeId: {nodeId}");
-                        var sql = "SELECT Definition FROM Nodes WHERE NodeId = @nodeId LIMIT 1";
-                        Console.WriteLine($"[GetNodeObj] About to execute SQL: {sql}");
-                        var definitionJson = connection.QueryFirstOrDefault<string>(sql, new { nodeId });
-                        Console.WriteLine($"[GetNodeObj] Query completed successfully, result is null: {definitionJson == null}");
-                        
-                        if (!string.IsNullOrEmpty(definitionJson))
+                        catch (Exception ex)
                         {
-                            Console.WriteLine($"[GetNodeObj] Found node definition: {definitionJson}");
-                            
-                            try
-                            {
-                                var nodeObj = JsonConvert.DeserializeObject(definitionJson);
-                                Console.WriteLine("[GetNodeObj] JSON deserialization successful");
-                                return nodeObj!;
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"[GetNodeObj] JSON deserialization failed: {ex.Message}");
-                                throw new Exception($"Failed to deserialize node definition: {ex.Message}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"[GetNodeObj] No node found with NodeId: {nodeId}");
-                            
-                            // Let's see what nodes are actually in the database
-                            Console.WriteLine("[GetNodeObj] Listing first 5 NodeIds in database:");
-                            var sampleNodes = connection.Query<string>("SELECT NodeId FROM Nodes LIMIT 5");
-                            foreach (var sampleNodeId in sampleNodes)
-                            {
-                                Console.WriteLine($"[GetNodeObj] - {sampleNodeId}");
-                            }
-                            
-                            throw new Exception($"Node with NodeId '{nodeId}' not found in database.");
+                            Console.WriteLine($"[GetNodeObj] JSON deserialization failed: {ex.Message}");
+                            throw new Exception($"Failed to deserialize node definition: {ex.Message}");
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"[GetNodeObj] No node found with NodeId: {nodeId}");
+
+                        // Let's see what nodes are actually in the database
+                        Console.WriteLine("[GetNodeObj] Listing first 5 NodeIds in database:");
+                        var sampleNodes = connection.Query<string>("SELECT NodeId FROM Nodes LIMIT 5");
+                        foreach (var sampleNodeId in sampleNodes)
+                        {
+                            Console.WriteLine($"[GetNodeObj] - {sampleNodeId}");
+                        }
+
+                        throw new Exception($"Node with NodeId '{nodeId}' not found in database.");
+                    }
                 }
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"[GetNodeObj] Database operation failed: {ex.Message}");
@@ -333,7 +298,6 @@ namespace BotEngine
             process.Start();
 
             var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
-            Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Input: {dataToSend}");
             
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
@@ -341,8 +305,7 @@ namespace BotEngine
 
             string? responseJson = process.StandardOutput.ReadLine();
             string? errorOutput = process.StandardError.ReadToEnd();
-            Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Response: {responseJson}");
-            
+
             if (!string.IsNullOrEmpty(errorOutput))
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Error: {errorOutput}");
@@ -367,7 +330,6 @@ namespace BotEngine
                     if (responseDict.Count > 0)
                     {
                         RAM[nodeObj.type.ToString()] = responseDict;
-                        Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Stored in RAM: {string.Join(", ", responseDict.Select(kv => $"{kv.Key}={kv.Value}"))}");
                     }
                 }
                 catch (Exception ex)
@@ -391,26 +353,17 @@ namespace BotEngine
         private string? GetNextNodeFromOutputs(dynamic nodeObj)
         {
             try
-            {
-                Console.WriteLine($"[GetNextNodeFromOutputs] Checking outputs for node: {nodeObj.type}");
-                
+            {                
                 if (nodeObj.outputs != null)
-                {
-                    Console.WriteLine($"[GetNextNodeFromOutputs] Found {nodeObj.outputs.Count} outputs");
-                    
+                {                    
                     foreach (var output in nodeObj.outputs)
-                    {
-                        Console.WriteLine($"[GetNextNodeFromOutputs] Checking output: {output.id} ({output.label})");
-                        
+                    {                        
                         if (output.connectedTo != null && output.connectedTo.Count > 0)
                         {
-                            Console.WriteLine($"[GetNextNodeFromOutputs] Output has {output.connectedTo.Count} connections");
-                            
                             var connection = output.connectedTo[0];
                             if (connection.toNodeId != null)
                             {
                                 var nextNodeId = connection.toNodeId.ToString();
-                                Console.WriteLine($"[GetNextNodeFromOutputs] Found next node: {nextNodeId}");
                                 return nextNodeId;
                             }
                         }
