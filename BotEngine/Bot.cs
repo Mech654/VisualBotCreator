@@ -272,10 +272,81 @@ namespace BotEngine
             process.WaitForExit();
         }
 
+        // you migt want to see how the json looks like:
+        /*
+        Example node JSON structure for inputs and outputs:
+
+        {
+            "inputs": [
+                {
+                    "id": "previous",
+                    "label": "Previous",
+                    "dataType": "control",
+                    "category": "flow",
+                    "connectedTo": [
+                        {
+                            "fromNodeId": "node-1749545766614-218",
+                            "fromPortId": "next",
+                            "toNodeId": "node-1749545783180-128",
+                            "toPortId": "previous"
+                        }
+                    ]
+                },
+                {
+                    "id": "textInput",
+                    "label": "Text Input",
+                    "dataType": "string",
+                    "category": "data",
+                    "propertyKey": "text",
+                    "connectedTo": []  // unused port
+                }
+            ],
+            "outputs": [
+                {
+                    "id": "next",
+                    "label": "Next",
+                    "dataType": "control",
+                    "category": "flow",
+                    "connectedTo": [
+                        {
+                            "fromNodeId": "node-1749545783180-128",
+                            "fromPortId": "next",
+                            "toNodeId": "node-1749545799087-870",
+                            "toPortId": "previous"
+                        }
+                    ]
+                },
+                {
+                    "id": "textOutput",
+                    "label": "Text Output",
+                    "dataType": "string",
+                    "category": "data",
+                    "propertyKey": "text",
+                    "connectedTo": [
+                        {
+                            "fromNodeId": "node-1749545783180-128",
+                            "fromPortId": "textOutput",
+                            "toNodeId": "node-1749545799087-870",
+                            "toPortId": "value"
+                        }
+                    ]
+                },
+                {
+                    "id": "length",
+                    "label": "Length",
+                    "dataType": "number",
+                    "category": "data",
+                    "propertyKey": "text",
+                    "connectedTo": []
+                }
+            ]
+        }
+        */
+
         private string PrepareNodeExecutionData(dynamic nodeObj)
         {
             var runtimeInputs = new Dictionary<string, object>();
-            
+
             if (nodeObj.inputs != null)
             {
                 foreach (var input in nodeObj.inputs)
@@ -285,7 +356,7 @@ namespace BotEngine
                         var connection = input.connectedTo[0];
                         var sourceNodeId = connection.fromNodeId?.ToString();
                         var sourcePortId = connection.fromPortId?.ToString();
-                        
+
                         if (!string.IsNullOrEmpty(sourceNodeId) && !string.IsNullOrEmpty(sourcePortId))
                         {
                             foreach (var ramEntry in RAM)
@@ -336,6 +407,7 @@ namespace BotEngine
             process.Start();
 
             var dataToSend = PrepareNodeExecutionData(nodeObj);
+            Console.WriteLine("Sending data: " + dataToSend);
 
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
