@@ -94,7 +94,38 @@ function setupIpcHandlers(): void {
       { type, id, properties }: { type: string; id: string; properties: NodeProperties }
     ) => {
       try {
+        // Check if we're updating an existing node
+        const existingNode = nodeInstances.get(id);
+        let preservedConnections: { inputs: Connection[], outputs: Connection[] } | null = null;
+        
+        if (existingNode) {
+          // Preserve connections from the existing node
+          preservedConnections = {
+            inputs: existingNode.inputs.flatMap(input => input.connectedTo),
+            outputs: existingNode.outputs.flatMap(output => output.connectedTo)
+          };
+        }
+
         const node = NodeFactory.createNode(type, id, properties);
+        
+        if (preservedConnections && existingNode) {
+          // Restore input connections
+          preservedConnections.inputs.forEach(connection => {
+            const targetPort = node.inputs.find(input => input.id === connection.toPortId);
+            if (targetPort) {
+              targetPort.connectedTo.push(connection);
+            }
+          });
+          
+          // Restore output connections
+          preservedConnections.outputs.forEach(connection => {
+            const sourcePort = node.outputs.find(output => output.id === connection.fromPortId);
+            if (sourcePort) {
+              sourcePort.connectedTo.push(connection);
+            }
+          });
+        }
+        
         nodeInstances.set(id, node);
 
         return {
