@@ -1,13 +1,8 @@
-// Remove all imports of SweetAlert2. It is now loaded via <script> in index.html
-
 declare global {
-  // Remove the explicit type and use 'var' to match the global.d.ts declaration if present
-  // If this still fails, remove this block entirely and rely on the global.d.ts declaration
 }
 
-// SweetAlert2 dashboard modal custom CSS setup
 export function setupSwalDashboardModalStyle() {
-  if (document.getElementById('swal-dashboard-style')) return; // Prevent duplicate style
+  if (document.getElementById('swal-dashboard-style')) return;
 
   const swalStyle = document.createElement('style');
   swalStyle.id = 'swal-dashboard-style';

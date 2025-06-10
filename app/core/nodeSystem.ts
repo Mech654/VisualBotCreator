@@ -131,7 +131,6 @@ export class NodeFactory {
 
 export { Node, Port, Connection };
 
-// Initialize component discovery
 NodeFactory.discoverComponents().catch(err => {
   console.error('Failed to discover components:', err);
 });

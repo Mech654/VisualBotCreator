@@ -357,7 +357,6 @@ app
   .whenReady()
   .then(async () => {
     await initDatabase();
-    // ...create windows, menus, etc.
   })
   .catch(err => {
     console.error('Initialization error:', err);

@@ -28,7 +28,7 @@ interface UtilsAPI {
 }
 
 interface BotConfigAPI {
-  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>; // Updated parameters
+  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>;
   changeDescription: (
     botId: string,
     newDescription: string
@@ -98,12 +98,10 @@ contextBridge.exposeInMainWorld('nodeSystem', {
     return ipcRenderer.invoke('connection:getForNode', nodeId);
   },
 
-  // clear all nodes
   clearAllNodes: () => {
     return ipcRenderer.invoke('node:clearAll');
   },
 
-  // delete individual node
   deleteNode: (nodeId: string) => {
     return ipcRenderer.invoke('node:delete', nodeId);
   },
@@ -118,7 +116,6 @@ contextBridge.exposeInMainWorld('utils', {
 // Expose database functions for bot configurations
 contextBridge.exposeInMainWorld('botconfig', {
   changeName: (oldId: string, newId: string) => {
-    // Updated parameters
     console.log('[PRELOAD] botconfig:changeName called with:', { oldId, newId });
     return ipcRenderer.invoke('botconfig:changeName', oldId, newId);
   },
@@ -143,9 +140,8 @@ contextBridge.exposeInMainWorld('database', {
   getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
   setBotEnabled: (botId: string, enabled: boolean) =>
     ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
-  // Note: Exposing changeNameDb directly, ensure UI uses botconfig.changeName for consistency if business logic differs
   changeNameDb: (oldId: string, newId: string) =>
-    ipcRenderer.invoke('database:changeName', oldId, newId), // Updated parameters
+    ipcRenderer.invoke('database:changeName', oldId, newId), 
   changeDescriptionDb: (botId: string, newDescription: string) =>
     ipcRenderer.invoke('database:changeDescription', botId, newDescription),
   changeStatusDb: (botId: string, newStatus: boolean) =>

@@ -45,7 +45,6 @@ async function fetchAvailableComponents() {
       });
     }
 
-    // Remove empty categories
     Object.keys(categories).forEach(cat => {
       if (categories[cat].length === 0) delete categories[cat];
     });

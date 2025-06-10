@@ -19,7 +19,7 @@ export function getNodes(): HTMLElement[] {
  * Set the nodes array to a new list of nodes
  */
 export function setNodes(newNodes: HTMLElement[]): void {
-  nodes.length = 0; // Clear existing nodes
+  nodes.length = 0;
   nodes.push(...newNodes); // Add new nodes
 }
 
@@ -37,5 +37,5 @@ export function removeNodeById(nodeId: string): void {
  * Initialize nodes tracking
  */
 export function initializeNodes(): void {
-  nodes.length = 0; // Clear any existing nodes
+  nodes.length = 0;
 }

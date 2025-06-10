@@ -13,7 +13,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-// Clear the terminal and show starting message
 console.clear();
 console.log('⏳ Starting development environment...\n');
 

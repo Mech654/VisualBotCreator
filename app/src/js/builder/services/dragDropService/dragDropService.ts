@@ -10,15 +10,12 @@ declare const interact: any;
  * Initialize Interact.js draggable for nodes
  */
 export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]): void {
-  // Initialize each node with interact.js
   nodes.forEach(node => {
-    // Store initial position for each node
     updateNodePosition(node);
 
-    // Make node selectable
     node.addEventListener('mousedown', async e => {
       const target = e.target as HTMLElement;
-      if (target.closest('.port')) return; // Don't select when clicking on ports
+      if (target.closest('.port')) return;
 
       // Select the node
       document.querySelectorAll('.node').forEach(n => n.classList.remove('node-selected'));

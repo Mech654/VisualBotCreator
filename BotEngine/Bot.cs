@@ -152,7 +152,7 @@ namespace BotEngine
             Console.WriteLine($"[GetNodeObj] Searching for NodeId: {nodeId}");
 
             // Check if database file is locked
-            try { using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { } }  //find an alternative way to check later this looks silly :/
+            try { using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { } }
             catch (Exception ex) { Console.WriteLine($"[GetNodeObj] Warning: Cannot open database file for reading: {ex.Message}"); }
 
             try
@@ -166,8 +166,6 @@ namespace BotEngine
 
                     if (!string.IsNullOrEmpty(definitionJson))
                     {
-                        //Console.WriteLine($"[GetNodeObj] Found node definition: {definitionJson}");  //find a better way to print object later
-
                         try
                         {
                             var nodeObj = JsonConvert.DeserializeObject(definitionJson);
@@ -271,77 +269,6 @@ namespace BotEngine
             process.StandardInput.Close();
             process.WaitForExit();
         }
-
-        // you migt want to see how the json looks like:
-        /*
-        Example node JSON structure for inputs and outputs:
-
-        {
-            "inputs": [
-                {
-                    "id": "previous",
-                    "label": "Previous",
-                    "dataType": "control",
-                    "category": "flow",
-                    "connectedTo": [
-                        {
-                            "fromNodeId": "node-1749545766614-218",
-                            "fromPortId": "next",
-                            "toNodeId": "node-1749545783180-128",
-                            "toPortId": "previous"
-                        }
-                    ]
-                },
-                {
-                    "id": "textInput",
-                    "label": "Text Input",
-                    "dataType": "string",
-                    "category": "data",
-                    "propertyKey": "text",
-                    "connectedTo": []  // unused port
-                }
-            ],
-            "outputs": [
-                {
-                    "id": "next",
-                    "label": "Next",
-                    "dataType": "control",
-                    "category": "flow",
-                    "connectedTo": [
-                        {
-                            "fromNodeId": "node-1749545783180-128",
-                            "fromPortId": "next",
-                            "toNodeId": "node-1749545799087-870",
-                            "toPortId": "previous"
-                        }
-                    ]
-                },
-                {
-                    "id": "textOutput",
-                    "label": "Text Output",
-                    "dataType": "string",
-                    "category": "data",
-                    "propertyKey": "text",
-                    "connectedTo": [
-                        {
-                            "fromNodeId": "node-1749545783180-128",
-                            "fromPortId": "textOutput",
-                            "toNodeId": "node-1749545799087-870",
-                            "toPortId": "value"
-                        }
-                    ]
-                },
-                {
-                    "id": "length",
-                    "label": "Length",
-                    "dataType": "number",
-                    "category": "data",
-                    "propertyKey": "text",
-                    "connectedTo": []
-                }
-            ]
-        }
-        */
 
         private string PrepareNodeExecutionData(dynamic nodeObj)
         {

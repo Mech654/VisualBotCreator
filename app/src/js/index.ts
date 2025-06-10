@@ -9,7 +9,6 @@ interface ActionItem {
   danger?: boolean;
 }
 
-// Remove js-loading class when CSS is loaded
 document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.remove('js-loading');
 
@@ -79,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           `;
           botList.appendChild(card);
         });
-        // Attach listeners after rendering
         attachBotCardListeners();
       }
     } catch (err) {
@@ -134,7 +132,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       case 'duplicate':
         const notification = document.createElement('div');
-        notification.className = 'notification';
         notification.className = 'notification';
         notification.innerHTML = `<span>✅</span> Bot "${botName}" duplicated successfully!`;
         document.body.appendChild(notification);
@@ -257,7 +254,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
 
           const botNameElement = card.querySelector('.bot-name');
-          // const botName = botNameElement?.textContent || 'Bot'; // botName will be actualBotId now for display
           const botDescriptionElement = card.querySelector('.bot-description');
           const botDescription = botDescriptionElement?.textContent || '';
           const botStatus = card.querySelector('.status-text')?.textContent || '';
@@ -314,11 +310,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           const initialRunCondHtmlForSwal = renderRunConditionsToList(currentRunConditions);
 
-          let initialModalIdForSwalDisplay: string = actualBotId; // Used for display and updates within modal
+          let initialModalIdForSwalDisplay: string = actualBotId;
           let currentCommittedId: string = initialModalIdForSwalDisplay || '';
 
           window.Swal.fire({
-            title: `<span style='font-size:2em;'>${initialModalIdForSwalDisplay}</span>`, // Use actualBotId for title
+            title: `<span style='font-size:2em;'>${initialModalIdForSwalDisplay}</span>`,
             html: `
               <div class='swal-bot-details-grid'>
                 <div class='swal-detail-category'>
@@ -392,12 +388,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 nameInput.addEventListener('blur', async () => {
                   const newIdCandidate = nameInput.value.trim();
                   if (!newIdCandidate) {
-                    nameInput.value = currentCommittedId; // Prevent empty ID
+                    nameInput.value = currentCommittedId;
                     window.Swal.fire('Error', 'ID cannot be empty.', 'error');
                     return;
                   }
                   if (newIdCandidate === currentCommittedId) {
-                    // No change, do nothing
                     return;
                   }
 
@@ -434,7 +429,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (swalTitle)
                           swalTitle.innerHTML = `<span style='font-size:2em;'>${newIdCandidate}</span>`;
 
-                        // Update the reference ID for subsequent changes in this modal session
                         currentCommittedId = newIdCandidate;
                         initialModalIdForSwalDisplay = newIdCandidate;
                       } else {
@@ -495,7 +489,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                   statusSpan.textContent = isActive ? 'Offline' : 'Active';
                   toggleBtn.textContent = isActive ? 'Off' : 'On';
                   toggleBtn.style.background = isActive ? '#ccc' : '#4caf50';
-                  // Update status on the card as well
                   const cardStatusDot = botCardElement.querySelector('.status-dot');
                   const cardStatusText = botCardElement.querySelector('.status-text');
                   if (cardStatusDot && cardStatusText) {
@@ -544,7 +537,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                           );
                         } catch (err) {
                           console.error('Error deleting run condition:', err);
-                          // Optionally add it back to currentRunConditions or show error to user
                         }
                       }
                       updateAndRenderList();
@@ -552,7 +544,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   });
                 });
               };
-              updateAndRenderList(); // Initial call to attach listeners
+              updateAndRenderList();
 
               if (addBtn) {
                 addBtn.addEventListener('click', () => {
@@ -607,10 +599,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                       errorMsg = 'Minute must be 00-59.';
                     }
                     if (valid && (hour || minute)) {
-                      value = datePart; // Start with only the date part
+                      value = datePart;
                       if (hour) value += ` ${hour.padStart(2, '0')}`;
                       if (minute && hour) value += `:${minute.padStart(2, '0')}`;
-                      else if (minute && !hour) value += ` 00:${minute.padStart(2, '0')}`; // Default hour if only minute provided
+                      else if (minute && !hour) value += ` 00:${minute.padStart(2, '0')}`;
                     }
                   }
 
@@ -626,7 +618,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         updateAndRenderList();
                       } catch (err) {
                         console.error('Error saving run condition:', err);
-                        // Handle error, maybe revert UI change or show message
                       }
                     } else {
                       updateAndRenderList();
@@ -656,7 +647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               };
 
               keySelect.addEventListener('change', handleDateTimeExtraFields);
-              handleDateTimeExtraFields(); // Initial call to set visibility
+              handleDateTimeExtraFields();
             },
           });
         });
@@ -664,6 +655,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Initial setup for Swal modals
   setupSwalDashboardModalStyle();
 });

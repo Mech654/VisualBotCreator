@@ -92,9 +92,7 @@ export async function loadComponentIcons(componentTypes: string[]): Promise<void
   }
 }
 
-// Initialize with a set of fallback emoji icons
 export function initializeDefaultIcons(): void {
-  // Using SVG text elements with emoji as fallback
   const createEmojiSvg = (emoji: string) => {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
       <text x="12" y="14" font-size="14" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
@@ -113,5 +111,4 @@ export function initializeDefaultIcons(): void {
   registerIcon('random', createEmojiSvg('🎲'));
 }
 
-// Initialize default icons
 initializeDefaultIcons();

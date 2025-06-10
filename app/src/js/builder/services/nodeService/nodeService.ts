@@ -332,16 +332,10 @@ export async function deleteNode(nodeElement: HTMLElement): Promise<void> {
   const nodeId = nodeElement.dataset.nodeId;
 
   if (nodeId) {
-    // Remove connections from frontend
     removeNodeConnections(nodeId);
-
-    // Remove from DOM
     nodeElement.remove();
-
-    // Remove from position tracking
     nodePositions.delete(nodeElement);
 
-    // Remove from backend nodeInstances Map
     try {
       const result = await window.nodeSystem.deleteNode(nodeId);
       if (!result.success) {
