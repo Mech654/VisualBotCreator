@@ -328,14 +328,29 @@ export async function createNodeInstance(
 /**
  * Delete a node and remove its connections
  */
-export function deleteNode(nodeElement: HTMLElement): void {
+export async function deleteNode(nodeElement: HTMLElement): Promise<void> {
   const nodeId = nodeElement.dataset.nodeId;
 
   if (nodeId) {
+    // Remove connections from frontend
     removeNodeConnections(nodeId);
 
+    // Remove from DOM
     nodeElement.remove();
 
+    // Remove from position tracking
     nodePositions.delete(nodeElement);
+
+    // Remove from backend nodeInstances Map
+    try {
+      const result = await window.nodeSystem.deleteNode(nodeId);
+      if (!result.success) {
+        console.error('Failed to delete node from backend:', result.error);
+      } else {
+        console.log(`Node ${nodeId} successfully deleted from backend`);
+      }
+    } catch (error) {
+      console.error('Error calling backend deleteNode:', error);
+    }
   }
 }

@@ -8,11 +8,16 @@ export function initNodeManagement(): void {
     if (e.key === 'Delete') {
       const selectedNode = document.querySelector('.node-selected') as HTMLElement;
       if (selectedNode) {
-        exitTransition(selectedNode, 'scale', 200).then(() => {
+        exitTransition(selectedNode, 'scale', 200).then(async () => {
           const nodeId = selectedNode.id;
-          deleteNode(selectedNode);
-          removeNodeById(nodeId);
-          showNotification('Node deleted', 'info');
+          try {
+            await deleteNode(selectedNode);
+            removeNodeById(nodeId);
+            showNotification('Node deleted', 'info');
+          } catch (error) {
+            console.error('Error deleting node:', error);
+            showNotification('Failed to delete node', 'error');
+          }
         });
       }
     }

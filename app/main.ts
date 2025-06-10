@@ -510,6 +510,68 @@ function setupIpcHandlers(): void {
       return { success: false, error: (error as Error).message || 'Unknown error' };
     }
   });
+
+  // Delete individual node from backend
+  ipcMain.handle('node:delete', async (event, nodeId: string) => {
+    try {
+      const node = nodeInstances.get(nodeId);
+      if (!node) {
+        return { success: false, error: `Node not found with id: ${nodeId}` };
+      }
+
+      // Remove the node from the backend storage
+      nodeInstances.delete(nodeId);
+
+      // Remove any connections that involve this node
+      const nodeConnections = connections.filter(
+        conn => conn.fromNodeId === nodeId || conn.toNodeId === nodeId
+      );
+
+      // Remove connections from the connections array
+      for (let i = connections.length - 1; i >= 0; i--) {
+        const conn = connections[i];
+        if (conn.fromNodeId === nodeId || conn.toNodeId === nodeId) {
+          connections.splice(i, 1);
+        }
+      }
+
+      // Clean up port references in remaining nodes
+      nodeConnections.forEach(connection => {
+        const sourceNode = nodeInstances.get(connection.fromNodeId);
+        const targetNode = nodeInstances.get(connection.toNodeId);
+
+        if (sourceNode) {
+          const sourcePort = sourceNode.outputs.find(output => output.id === connection.fromPortId);
+          if (sourcePort) {
+            sourcePort.connectedTo = sourcePort.connectedTo.filter(
+              conn => !(conn.fromNodeId === connection.fromNodeId && 
+                       conn.fromPortId === connection.fromPortId &&
+                       conn.toNodeId === connection.toNodeId &&
+                       conn.toPortId === connection.toPortId)
+            );
+          }
+        }
+
+        if (targetNode) {
+          const targetPort = targetNode.inputs.find(input => input.id === connection.toPortId);
+          if (targetPort) {
+            targetPort.connectedTo = targetPort.connectedTo.filter(
+              conn => !(conn.fromNodeId === connection.fromNodeId && 
+                       conn.fromPortId === connection.fromPortId &&
+                       conn.toNodeId === connection.toNodeId &&
+                       conn.toPortId === connection.toPortId)
+            );
+          }
+        }
+      });
+
+      console.log(`Node ${nodeId} deleted from backend. Remaining nodes: ${nodeInstances.size}`);
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting node:', error);
+      return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
 }
 
 /**

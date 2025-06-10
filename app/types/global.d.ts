@@ -39,6 +39,8 @@ interface NodeSystemAPI {
     toPortId: string
   ) => Promise<any>;
   getNodeConnections?: (nodeId: string) => Promise<any[]>;
+  clearAllNodes?: () => Promise<{ success: boolean; error?: string }>;
+  deleteNode?: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
   /**
    * Returns the Node class (constructor) for a given type string, or undefined if not found.
    */

@@ -20,6 +20,7 @@ interface NodeSystemAPI {
   ) => Promise<any>;
   getNodeConnections: (nodeId: string) => Promise<any[]>;
   clearAllNodes: () => Promise<{ success: boolean; error?: string }>;
+  deleteNode: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 interface UtilsAPI {
@@ -102,6 +103,10 @@ contextBridge.exposeInMainWorld('nodeSystem', {
     return ipcRenderer.invoke('node:clearAll');
   },
 
+  // delete individual node
+  deleteNode: (nodeId: string) => {
+    return ipcRenderer.invoke('node:delete', nodeId);
+  },
 } as NodeSystemAPI);
 
 contextBridge.exposeInMainWorld('utils', {
