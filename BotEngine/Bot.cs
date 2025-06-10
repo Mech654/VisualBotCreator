@@ -45,25 +45,25 @@ namespace BotEngine
             var language = (string?)nodeObj.properties?.language ?? "";
             switch (language)
             {
-            case "C#":
-                ExecuteCSharpNode(nodeObj);
-                break;
-            case "Python":
-                ExecutePythonNode(nodeObj);
-                break;
-            case "JavaScript":
-                ExecuteJavaScriptNode(nodeObj);
-                break;
-            default:
-                Console.WriteLine($"[Run] Unsupported language: {nodeObj.language}");
-                throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
+                case "C#":
+                    ExecuteCSharpNode(nodeObj);
+                    break;
+                case "Python":
+                    ExecutePythonNode(nodeObj);
+                    break;
+                case "JavaScript":
+                    ExecuteJavaScriptNode(nodeObj);
+                    break;
+                default:
+                    Console.WriteLine($"[Run] Unsupported language: {nodeObj.language}");
+                    throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
             }
-            
+
             if (RAM.Count > 0)
             {
                 var lastNode = RAM.Last();
                 Console.WriteLine($"[Run] {lastNode.Key} executed successfully");
-                
+
                 // Check if the response has a NextNodeId
                 if (lastNode.Value.TryGetValue("NextNodeId", out var nextNodeId) && !string.IsNullOrEmpty(nextNodeId))
                 {
@@ -105,7 +105,7 @@ namespace BotEngine
         private void TestDatabaseConnection(string fullDbPath)
         {
             Console.WriteLine("[TestDB] Testing database connection and listing nodes...");
-            
+
             try
             {
                 var connectionString = $"Data Source={fullDbPath}";
@@ -113,15 +113,15 @@ namespace BotEngine
                 {
                     connection.Open();
                     Console.WriteLine("[TestDB] Database connection successful");
-                    
+
                     // First, check the schema
                     var schema = connection.QueryFirstOrDefault<string>("SELECT sql FROM sqlite_master WHERE type='table' AND name='Nodes'");
                     Console.WriteLine($"[TestDB] Nodes table schema: {schema}");
-                    
+
                     // Count total nodes
                     var count = connection.QueryFirstOrDefault<int>("SELECT COUNT(*) FROM Nodes");
                     Console.WriteLine($"[TestDB] Total nodes in database: {count}");
-                    
+
                     // List first 5 node IDs
                     var nodeIds = connection.Query<string>("SELECT NodeId FROM Nodes LIMIT 5");
                     Console.WriteLine("[TestDB] Sample NodeIds:");
@@ -139,21 +139,21 @@ namespace BotEngine
 
         private dynamic GetNodeObj(string nodeId)
         {
-            var currentDir = Directory.GetCurrentDirectory();           
+            var currentDir = Directory.GetCurrentDirectory();
             var dbPath = Path.Combine(currentDir, "..", "VisualBotCreator.db");
             var fullDbPath = Path.GetFullPath(dbPath);
-            
+
             if (!File.Exists(fullDbPath))
             {
                 throw new Exception($"Database file not found at: {fullDbPath}");
             }
-            
+
             var connectionString = $"Data Source={fullDbPath}";
             Console.WriteLine($"[GetNodeObj] Searching for NodeId: {nodeId}");
 
             // Check if database file is locked
-            try { using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)){}}  //find an alternative way to check later this looks silly :/
-            catch (Exception ex) { Console.WriteLine($"[GetNodeObj] Warning: Cannot open database file for reading: {ex.Message}");}
+            try { using (var fileStream = File.Open(fullDbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { } }  //find an alternative way to check later this looks silly :/
+            catch (Exception ex) { Console.WriteLine($"[GetNodeObj] Warning: Cannot open database file for reading: {ex.Message}"); }
 
             try
             {
@@ -216,11 +216,11 @@ namespace BotEngine
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            
+
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
+            var dataToSend = PrepareNodeExecutionData(nodeObj);
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
@@ -233,7 +233,7 @@ namespace BotEngine
                     RAM[nodeObj.type.ToString()] = responseDict;
                 }
             }
-            
+
             process.StandardInput.Close();
             process.WaitForExit();
         }
@@ -254,7 +254,7 @@ namespace BotEngine
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
+            var dataToSend = PrepareNodeExecutionData(nodeObj);
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
 
@@ -267,21 +267,59 @@ namespace BotEngine
                     RAM[nodeObj.type.ToString()] = responseDict;
                 }
             }
-            
+
             process.StandardInput.Close();
             process.WaitForExit();
+        }
+
+        private string PrepareNodeExecutionData(dynamic nodeObj)
+        {
+            var runtimeInputs = new Dictionary<string, object>();
+            
+            if (nodeObj.inputs != null)
+            {
+                foreach (var input in nodeObj.inputs)
+                {
+                    if (input.connectedTo != null && input.connectedTo.Count > 0)
+                    {
+                        var connection = input.connectedTo[0];
+                        var sourceNodeId = connection.fromNodeId?.ToString();
+                        var sourcePortId = connection.fromPortId?.ToString();
+                        
+                        if (!string.IsNullOrEmpty(sourceNodeId) && !string.IsNullOrEmpty(sourcePortId))
+                        {
+                            foreach (var ramEntry in RAM)
+                            {
+                                if (ramEntry.Value.ContainsKey(sourcePortId))
+                                {
+                                    runtimeInputs[input.id.ToString()] = ramEntry.Value[sourcePortId];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            var executionData = new
+            {
+                properties = nodeObj.properties,
+                runtimeInputs = runtimeInputs
+            };
+
+            return JsonConvert.SerializeObject(executionData);
         }
 
         private void ExecuteJavaScriptNode(dynamic nodeObj)
         {
             var jsFilePath = Path.Combine("processes", "node", $"{nodeObj.type}.js");
-            
+
             if (!File.Exists(jsFilePath))
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] ERROR: File not found: {jsFilePath}");
                 return;
             }
-            
+
             var startInfo = new ProcessStartInfo()
             {
                 FileName = "node",
@@ -293,12 +331,12 @@ namespace BotEngine
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            
+
             var process = new Process() { StartInfo = startInfo };
             process.Start();
 
-            var dataToSend = JsonConvert.SerializeObject(nodeObj.properties);
-            
+            var dataToSend = PrepareNodeExecutionData(nodeObj);
+
             process.StandardInput.WriteLine(dataToSend);
             process.StandardInput.Flush();
             process.StandardInput.Close(); // Close stdin to trigger the 'end' event in Node.js
@@ -310,7 +348,7 @@ namespace BotEngine
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Error: {errorOutput}");
             }
-            
+
             if (!string.IsNullOrEmpty(responseJson))
             {
                 try
@@ -318,7 +356,7 @@ namespace BotEngine
                     // First try to deserialize as dynamic to handle mixed types
                     var responseDynamic = JsonConvert.DeserializeObject(responseJson);
                     var responseDict = new Dictionary<string, string>();
-                    
+
                     if (responseDynamic is Newtonsoft.Json.Linq.JObject jObj)
                     {
                         foreach (var prop in jObj.Properties())
@@ -326,7 +364,7 @@ namespace BotEngine
                             responseDict[prop.Name] = prop.Value?.ToString() ?? "";
                         }
                     }
-                    
+
                     if (responseDict.Count > 0)
                     {
                         RAM[nodeObj.type.ToString()] = responseDict;
@@ -341,9 +379,9 @@ namespace BotEngine
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | No response received");
             }
-            
+
             process.WaitForExit();
-            
+
             if (process.ExitCode != 0)
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Process exited with code: {process.ExitCode}");
@@ -353,11 +391,11 @@ namespace BotEngine
         private string? GetNextNodeFromOutputs(dynamic nodeObj)
         {
             try
-            {                
+            {
                 if (nodeObj.outputs != null)
-                {                    
+                {
                     foreach (var output in nodeObj.outputs)
-                    {                        
+                    {
                         if (output.connectedTo != null && output.connectedTo.Count > 0)
                         {
                             var connection = output.connectedTo[0];
@@ -382,7 +420,7 @@ namespace BotEngine
             {
                 Console.WriteLine($"[GetNextNodeFromOutputs] Error extracting next node: {ex.Message}");
             }
-            
+
             Console.WriteLine($"[GetNextNodeFromOutputs] No connected nodes found");
             return null;
         }
