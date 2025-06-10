@@ -264,7 +264,7 @@ function setupIpcHandlers(): void {
         // Also remove from port references
         const sourceNode = nodeInstances.get(fromNodeId);
         const targetNode = nodeInstances.get(toNodeId);
-        
+
         if (sourceNode) {
           const sourcePort = sourceNode.outputs.find(output => output.id === fromPortId);
           if (sourcePort) {
@@ -544,10 +544,13 @@ function setupIpcHandlers(): void {
           const sourcePort = sourceNode.outputs.find(output => output.id === connection.fromPortId);
           if (sourcePort) {
             sourcePort.connectedTo = sourcePort.connectedTo.filter(
-              conn => !(conn.fromNodeId === connection.fromNodeId && 
-                       conn.fromPortId === connection.fromPortId &&
-                       conn.toNodeId === connection.toNodeId &&
-                       conn.toPortId === connection.toPortId)
+              conn =>
+                !(
+                  conn.fromNodeId === connection.fromNodeId &&
+                  conn.fromPortId === connection.fromPortId &&
+                  conn.toNodeId === connection.toNodeId &&
+                  conn.toPortId === connection.toPortId
+                )
             );
           }
         }
@@ -556,10 +559,13 @@ function setupIpcHandlers(): void {
           const targetPort = targetNode.inputs.find(input => input.id === connection.toPortId);
           if (targetPort) {
             targetPort.connectedTo = targetPort.connectedTo.filter(
-              conn => !(conn.fromNodeId === connection.fromNodeId && 
-                       conn.fromPortId === connection.fromPortId &&
-                       conn.toNodeId === connection.toNodeId &&
-                       conn.toPortId === connection.toPortId)
+              conn =>
+                !(
+                  conn.fromNodeId === connection.fromNodeId &&
+                  conn.fromPortId === connection.fromPortId &&
+                  conn.toNodeId === connection.toNodeId &&
+                  conn.toPortId === connection.toPortId
+                )
             );
           }
         }

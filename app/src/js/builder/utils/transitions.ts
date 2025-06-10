@@ -64,13 +64,12 @@ export function showPageTransition(
 
   if (window && (window as any).nodeSystem?.clearAllNodes) {
     (window as any).nodeSystem.clearAllNodes();
-    
+
     // Also clear frontend connections and node tracking
     clearConnections();
     initializeNodes();
   }
 }
-
 
 /**
  * Creates a transition for an element entering the DOM
