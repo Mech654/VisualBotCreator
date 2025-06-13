@@ -2,9 +2,14 @@ import { BaseProcessor } from './BaseProcessor.js';
 import { execSync } from 'child_process';
 
 class TerminalProcessor extends BaseProcessor {
-  process(properties) {
-    let command = this.getProperty(properties, 'command');
-    const workingDirectory = this.getProperty(properties, 'workingDirectory');
+  process(executionData) {
+    // Extract properties and runtimeInputs from the execution data
+    const properties = executionData.properties || {};
+    const runtimeInputs = executionData.runtimeInputs || {};
+    
+    // Check runtimeInputs first (from connected nodes), then fall back to properties
+    let command = runtimeInputs.command || this.getProperty(properties, 'command');
+    const workingDirectory = runtimeInputs.workingDirectory || this.getProperty(properties, 'workingDirectory');
 
     if (!command) {
       return {
@@ -14,7 +19,7 @@ class TerminalProcessor extends BaseProcessor {
       };
     }
 
-    command = this.substituteVariables(command, properties);
+    command = this.substituteVariables(command, { ...properties, ...runtimeInputs });
 
     const execOptions = {};
     if (workingDirectory) {

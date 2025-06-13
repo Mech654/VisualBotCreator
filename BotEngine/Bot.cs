@@ -343,6 +343,8 @@ namespace BotEngine
             string? responseJson = process.StandardOutput.ReadLine();
             string? errorOutput = process.StandardError.ReadToEnd();
 
+            Console.WriteLine($"Response JSON: {responseJson}");
+
             if (!string.IsNullOrEmpty(errorOutput))
             {
                 Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Error: {errorOutput}");
