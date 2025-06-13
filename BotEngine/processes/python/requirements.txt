@@ -1,0 +1,4 @@
+# PDF processing requirements for PdfEditorProcessor
+PyPDF2>=3.0.0
+reportlab>=4.0.0
+PyMuPDF>=1.23.0

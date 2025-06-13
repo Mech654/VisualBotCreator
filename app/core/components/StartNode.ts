@@ -1,7 +1,7 @@
 import { Node, Port, NodeProperties } from '../base.js';
 import { ComponentCategory } from '../nodeSystem.js';
 
-interface StartNodeProperties extends NodeProperties {
+export interface StartNodeProperties extends NodeProperties {
   nodeContent?: string;
   language?: string;
 }

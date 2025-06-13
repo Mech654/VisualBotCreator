@@ -26,7 +26,7 @@ export class PdfEditorNode extends Node {
       pdfPath: properties.pdfPath || '',
       newText: properties.newText || '',
       locator: properties.locator || '',
-      language: properties.language || 'JavaScript',
+      language: properties.language || 'Python',
     };
 
     pdfEditorProps.nodeContent = generatePdfEditorPreview(pdfEditorProps);
