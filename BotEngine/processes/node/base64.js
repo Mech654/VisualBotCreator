@@ -23,12 +23,16 @@ class Base64Processor extends BaseProcessor {
         base64 = '';
       }
 
-      return {
+      const result = {
         output: `Encoded to Base64: ${base64}`,
         base64: base64,
         exitCode: 0,
         status: true,
       };
+      
+      console.error('[Base64Processor] Returning result:', JSON.stringify(result));
+      
+      return result;
     } catch (error) {
       console.error('[Base64Processor] Error during processing:', error.message);
 

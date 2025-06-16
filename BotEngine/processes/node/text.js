@@ -7,12 +7,11 @@ class TextProcessor extends BaseProcessor {
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
       
-      // Get the node properties
-      const nodeProperties = properties.properties || {};
-      const text = runtimeInputs.textInput || nodeProperties.text || 'Sample text';
-      const fontSize = nodeProperties.fontSize || 16;
-      const bold = nodeProperties.bold || false;
-      const color = nodeProperties.color || '#000000';
+      // Get text properties, checking runtimeInputs first, then properties
+      const text = runtimeInputs.textInput || this.getProperty(properties, 'text', 'Sample text');
+      const fontSize = this.getProperty(properties, 'fontSize', 16);
+      const bold = this.getProperty(properties, 'bold', false);
+      const color = this.getProperty(properties, 'color', '#000000');
 
       let processedText = text;
       
@@ -24,7 +23,7 @@ class TextProcessor extends BaseProcessor {
       // In a real application, you might apply font size and color styling
       const textLength = text.length;
 
-      return {
+      const responseData = {
         output: `Text processed: "${text}" (length: ${textLength})`,
         textOutput: processedText,
         length: textLength,
@@ -35,6 +34,10 @@ class TextProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
       };
+      
+      console.error('[TextProcessor] Returning result:', JSON.stringify(responseData));
+      
+      return responseData;
     } catch (error) {
       console.error('[TextProcessor] Error during processing:', error.message);
 

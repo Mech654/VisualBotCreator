@@ -7,12 +7,11 @@ class RandomProcessor extends BaseProcessor {
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
       
-      // Get the node properties and runtime inputs
-      const nodeProperties = properties.properties || {};
-      const min = runtimeInputs.min !== undefined ? Number(runtimeInputs.min) : (nodeProperties.min ?? 1);
-      const max = runtimeInputs.max !== undefined ? Number(runtimeInputs.max) : (nodeProperties.max ?? 100);
-      const type = nodeProperties.type || 'integer';
-      const length = nodeProperties.length ?? 10;
+      // Get the random generation parameters, checking runtimeInputs first, then properties
+      const min = runtimeInputs.min !== undefined ? Number(runtimeInputs.min) : Number(this.getProperty(properties, 'min', 1));
+      const max = runtimeInputs.max !== undefined ? Number(runtimeInputs.max) : Number(this.getProperty(properties, 'max', 100));
+      const type = this.getProperty(properties, 'type', 'integer');
+      const length = Number(this.getProperty(properties, 'length', 10));
       const seed = runtimeInputs.seed;
 
       // If seed is provided, use it (simple seeded random)
@@ -61,12 +60,16 @@ class RandomProcessor extends BaseProcessor {
           output = `Random value: ${value} (range: ${min}-${max})`;
       }
 
-      return {
+      const responseData = {
         output: output,
         value: value,
         exitCode: 0,
         status: true,
       };
+      
+      console.error('[RandomProcessor] Returning result:', JSON.stringify(responseData));
+      
+      return responseData;
     } catch (error) {
       console.error('[RandomProcessor] Error during processing:', error.message);
 

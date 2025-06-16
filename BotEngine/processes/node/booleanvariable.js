@@ -7,17 +7,17 @@ class BooleanVariableProcessor extends BaseProcessor {
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
       
-      // Get the node properties
-      const nodeProperties = properties.properties || {};
-      const value = typeof nodeProperties.value === 'boolean' ? nodeProperties.value : false;
+      // Get the value, checking runtimeInputs first, then properties
+      const value = runtimeInputs.value !== undefined ? runtimeInputs.value : this.getProperty(properties, 'value', false);
+      const boolValue = typeof value === 'boolean' ? value : Boolean(value);
 
       return {
-        output: `Boolean value: ${value ? 'true' : 'false'}`,
-        value: value,
+        output: `Boolean value: ${boolValue}`,
+        value: boolValue,
         exitCode: 0,
         status: true,
-        // Include all node properties so they can be accessed by propertyKey
-        ...nodeProperties
+        // Include all properties so they can be accessed by propertyKey
+        ...properties
       };
     } catch (error) {
       console.error('[BooleanVariableProcessor] Error during processing:', error.message);

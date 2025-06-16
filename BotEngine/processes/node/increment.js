@@ -8,9 +8,8 @@ class IncrementProcessor extends BaseProcessor {
       const runtimeInputs = executionData.runtimeInputs || {};
       
       // Get the increment value and input number
-      const nodeProperties = properties.properties || {};
-      const incrementBy = nodeProperties.incrementBy || 1;
-      const inputNumber = runtimeInputs.number || 0;
+      const incrementBy = runtimeInputs.incrementBy || this.getProperty(properties, 'incrementBy', 1);
+      const inputNumber = runtimeInputs.number || this.getProperty(properties, 'number', 0);
 
       // Ensure both values are numbers
       const numToIncrement = typeof inputNumber === 'number' ? inputNumber : parseFloat(String(inputNumber)) || 0;
@@ -18,12 +17,16 @@ class IncrementProcessor extends BaseProcessor {
       
       const result = numToIncrement + incrementValue;
 
-      return {
+      const responseData = {
         output: `Incremented ${numToIncrement} by ${incrementValue} = ${result}`,
         result: result,
         exitCode: 0,
         status: true,
       };
+      
+      console.error('[IncrementProcessor] Returning result:', JSON.stringify(responseData));
+      
+      return responseData;
     } catch (error) {
       console.error('[IncrementProcessor] Error during processing:', error.message);
 

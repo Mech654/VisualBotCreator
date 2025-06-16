@@ -7,16 +7,15 @@ class MathProcessor extends BaseProcessor {
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
       
-      // Get the node properties
-      const nodeProperties = properties.properties || {};
-      const expression = runtimeInputs.expression || nodeProperties.expression || 'a + b';
+      // Get the expression, checking runtimeInputs first, then properties
+      const expression = runtimeInputs.expression || this.getProperty(properties, 'expression', 'a + b');
       
-      // Build scope with variables
-      const scope = { ...nodeProperties.variables };
+      // Build scope with variables from properties and runtimeInputs
+      const scope = { ...properties };
       
-      // Add runtime inputs as variables
+      // Add runtime inputs as variables (these take precedence)
       Object.keys(runtimeInputs).forEach(key => {
-        if (key !== 'previous' && key !== 'expression') {
+        if (key !== 'expression') {
           const value = Number(runtimeInputs[key] || 0);
           scope[key] = isNaN(value) ? 0 : value;
         }
@@ -33,13 +32,17 @@ class MathProcessor extends BaseProcessor {
         result = 0;
       }
 
-      return {
+      const responseData = {
         output: error ? `Math error: ${error}` : `Math result: ${result}`,
         result: result,
         error: error,
         exitCode: error ? 1 : 0,
         status: !error,
       };
+      
+      console.error('[MathProcessor] Returning result:', JSON.stringify(responseData));
+      
+      return responseData;
     } catch (error) {
       console.error('[MathProcessor] Error during processing:', error.message);
 

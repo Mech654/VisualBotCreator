@@ -1,25 +1,23 @@
 import { BaseProcessor } from './BaseProcessor.js';
 
 class StringVariableProcessor extends BaseProcessor {
-  process(properties) {
+  process(executionData) {
     try {
-      console.error('[StringVariableProcessor] Received properties:', JSON.stringify(properties, null, 2));
+      // Extract properties and runtimeInputs from the execution data
+      const properties = executionData.properties || {};
+      const runtimeInputs = executionData.runtimeInputs || {};
       
-      // Get the node properties from the execution data
-      const nodeProperties = properties.properties || {};
+      // Get the value, checking runtimeInputs first, then properties
+      const value = runtimeInputs.value || this.getProperty(properties, 'value', '');
       
-      // Return all properties so they can be accessed dynamically by their propertyKey
-      const result = {
-        output: nodeProperties.value || '', // For display/logging
+      return {
+        output: value, // For display/logging
+        value: value,
         exitCode: 0,
         status: true,
-        // Include all node properties so they can be accessed by propertyKey
-        ...nodeProperties
+        // Include all properties so they can be accessed by propertyKey
+        ...properties
       };
-      
-      console.error('[StringVariableProcessor] Returning result:', JSON.stringify(result));
-      
-      return result;
     } catch (error) {
       console.error('[StringVariableProcessor] Error during processing:', error.message);
 
