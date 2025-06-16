@@ -1,9 +1,12 @@
 import { BaseProcessor } from './BaseProcessor.js';
 
 class BinaryConverterProcessor extends BaseProcessor {
-  process(properties) {
+  process(executionData) {
     try {
-      const inputValue = this.getProperty(properties, 'input', '');
+      const properties = executionData.properties || {};
+      const runtimeInputs = executionData.runtimeInputs || {};
+      
+      const inputValue = runtimeInputs.input || this.getProperty(properties, 'input', '');
       
       // Validate input
       if (inputValue === '') {
