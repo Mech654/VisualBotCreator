@@ -38,18 +38,18 @@ export default {
           resolver
             .getHook('before-resolve')
             .tapAsync('TypeScriptModuleResolver', (request, resolveContext, callback) => {
-              if (
+                if (
                 typeof request.request === 'string' &&
                 request.request.length > 0 &&
                 request.request.endsWith('.js')
-              ) {
+                ) {
                 const tsRequest = request.request.replace(/\.js$/, '.ts');
                 const newRequest = {
                   ...request,
                   request: tsRequest,
                 };
                 return resolver.doResolve(target, newRequest, null, resolveContext, callback);
-              }
+                }
               callback();
             });
         },

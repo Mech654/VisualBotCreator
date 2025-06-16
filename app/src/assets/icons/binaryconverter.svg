@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="binaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6c5ce7" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#4834d4" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="url(#binaryGradient)"/>
+  
+  <!-- Binary representation: 0010 pattern -->
+  <text x="16" y="21" font-family="monospace" font-size="13" font-weight="bold" fill="white" text-anchor="middle">0010</text>
+  
+  <!-- Border -->
+  <rect width="32" height="32" rx="6" fill="none" stroke="white" stroke-width="1" stroke-opacity="0.3"/>
+</svg>
