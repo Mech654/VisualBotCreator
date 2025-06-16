@@ -15,7 +15,9 @@ import { ComponentCategory } from './nodeSystem.js';
  * 8. Event Listeners - Connect UI controls to update node properties
  * 9. Process Method - Implement the node's behavior/functionality
  * 10. Register Node - Add your node to the system (in nodeSystem.ts)
- * ----------------------------------
+ * 
+ * IMPORTANT: Nodes include a 'language' property that determines which runtime
+ * processor handles execution (JavaScript, Python, or C#).
  */
 
 /**
@@ -34,6 +36,12 @@ export interface GuideNodeProperties extends NodeProperties {
    * This is what appears in the node body on the canvas
    */
   nodeContent?: string;
+
+  /**
+   * Language property - indicates the runtime language for the node processor
+   * This is used by the bot engine to determine which language processor to use
+   */
+  language?: string;
 
   /**
    * Add any other custom properties your node needs
@@ -143,6 +151,8 @@ export class GuideNode extends Node {
                 <input type="number" class="property-input guide-number-input" 
                        value="${this.properties.someNumber || 0}">
             </div>
+            
+            <!-- Language property is predefined and not user-editable -->
             
             <div class="property-item" data-tooltip="Toggle some feature">
                 <div class="property-label">Some Flag</div>

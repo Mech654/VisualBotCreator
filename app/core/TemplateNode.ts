@@ -3,6 +3,7 @@ import { ComponentCategory } from './nodeSystem.js';
 
 export interface TemplateNodeProperties extends NodeProperties {
   nodeContent?: string;
+  language?: string;
   // exampleProperty?: string;
 }
 
@@ -19,6 +20,7 @@ export class TemplateNode extends Node {
 
   constructor(id: string, properties: TemplateNodeProperties = {}) {
     properties.title = properties.title || 'Template Node';
+    properties.language = properties.language || 'JavaScript';
     properties.nodeContent =
       properties.nodeContent || '<div class="template-node-content">Template</div>';
     super(id, 'template', properties);
