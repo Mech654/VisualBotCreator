@@ -3,6 +3,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import CopyPlugin from 'copy-webpack-plugin';
+import process from 'process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
@@ -28,12 +29,20 @@ export default {
     plugins: [
       // Custom resolver to handle .js imports pointing to .ts files
       {
+        /**
+         * @param {import('enhanced-resolve').Resolver} resolver
+         * @returns {void}
+         */
         apply(resolver) {
           const target = resolver.ensureHook('resolve');
           resolver
             .getHook('before-resolve')
             .tapAsync('TypeScriptModuleResolver', (request, resolveContext, callback) => {
-              if (request.request && request.request.endsWith('.js')) {
+              if (
+                typeof request.request === 'string' &&
+                request.request.length > 0 &&
+                request.request.endsWith('.js')
+              ) {
                 const tsRequest = request.request.replace(/\.js$/, '.ts');
                 const newRequest = {
                   ...request,
@@ -48,24 +57,24 @@ export default {
     ],
     // Add fallbacks for Node.js built-in modules
     fallback: {
-      "module": false,
-      "path": false,
-      "os": false,
-      "fs": false,
-      "crypto": false,
-      "stream": false,
-      "buffer": false,
-      "http": false,
-      "https": false,
-      "zlib": false,
-      "util": false,
-      "net": false,
-      "tls": false,
-      "url": false,
-      "querystring": false,
-      "assert": false,
-      "constants": false,
-    }
+      module: false,
+      path: false,
+      os: false,
+      fs: false,
+      crypto: false,
+      stream: false,
+      buffer: false,
+      http: false,
+      https: false,
+      zlib: false,
+      util: false,
+      net: false,
+      tls: false,
+      url: false,
+      querystring: false,
+      assert: false,
+      constants: false,
+    },
   },
   module: {
     rules: [
@@ -75,7 +84,7 @@ export default {
           loader: 'ts-loader',
           options: {
             transpileOnly: isDev, // Faster builds in development
-          }
+          },
         },
         exclude: /node_modules/,
       },
@@ -104,8 +113,8 @@ export default {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({ 
-      filename: 'styles/[name].css'
+    new MiniCssExtractPlugin({
+      filename: 'styles/[name].css',
     }),
     isDev && new webpack.HotModuleReplacementPlugin(),
     new CopyPlugin({
@@ -140,14 +149,14 @@ export default {
       rewrites: [
         { from: /^\/$/, to: '/src/index.html' },
         { from: /^\/index\.html$/, to: '/index.html' },
-        { from: /^\/builder\.html$/, to: '/builder.html' }
-      ]
+        { from: /^\/builder\.html$/, to: '/builder.html' },
+      ],
     },
     hot: true, // Enable HMR
     liveReload: false, // Disable live reload when using HMR
     client: {
       webSocketURL: 'auto://0.0.0.0:0/ws',
       progress: true,
-    }
+    },
   },
 };

@@ -30,7 +30,7 @@
       "typeAssertions": "preserve"
     }]
   },
-  "ignorePatterns": ["dist/**", "node_modules/**", "*.js"]
+  "ignorePatterns": ["dist/**", "node_modules/**", "*.js", "*.mjs"]
 }
 
 

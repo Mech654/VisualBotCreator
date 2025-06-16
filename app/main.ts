@@ -1,28 +1,9 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import {
-  Node,
-  NodeProperties,
-  Connection,
-  PortCategory,
-  PortType,
-  PORT_CATEGORIES,
-} from './core/base.js';
-import { NodeFactory } from './core/nodeSystem.js';
-import {
-  initDatabase,
-  saveAllNodes,
-  getAllBots,
-  getRunConditions,
-  setBotEnabled,
-  changeNameDb,
-  changeDescriptionDb,
-  changeStatusDb,
-  addOrUpdateBotConditionDb,
-  deleteBotConditionDb,
-} from './core/database.js';
+import { Node, Connection, PortCategory, PortType, PORT_CATEGORIES } from './core/base.js';
+import { initDatabase } from './core/database.js';
 import { setupIpcHandlers } from './ipcs.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,20 +35,28 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    const startUrl = process.env.ELECTRON_START_URL || 'http://localhost:4000/src/index.html';
+    const startUrl =
+      typeof process.env.ELECTRON_START_URL === 'string' &&
+      process.env.ELECTRON_START_URL.trim() !== ''
+        ? process.env.ELECTRON_START_URL
+        : 'http://localhost:4000/src/index.html';
+
+    // eslint-disable-next-line no-console
     console.log(`Electron is running in development mode, loading from ${startUrl}`);
 
     let retryCount = 0;
     const maxRetries = 5;
     const retryInterval = 1500;
 
-    const loadApp = () => {
+    const loadApp = (): void => {
       mainWindow.loadURL(startUrl).catch(err => {
         retryCount++;
         if (retryCount <= maxRetries) {
+          // eslint-disable-next-line no-console
           console.log(`Connection to dev server failed, retrying (${retryCount}/${maxRetries})...`);
           setTimeout(loadApp, retryInterval);
         } else {
+          // eslint-disable-next-line no-console
           console.error('Failed to connect to webpack dev server after multiple attempts', err);
           // Fallback to loading from file system
           mainWindow
@@ -80,8 +69,11 @@ function createWindow(): void {
     loadApp();
     mainWindow.webContents.openDevTools();
   } else {
+    // eslint-disable-next-line no-console
     console.log('Electron is running in production mode, loading from file');
-    mainWindow.loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'));
+    mainWindow
+      .loadFile(path.join(projectRoot, 'dist', 'src', 'index.html'))
+      .catch(e => console.error('Failed to load file:', e));
     mainWindow.webContents.openDevTools();
   }
 }
@@ -107,17 +99,19 @@ export function arePortTypesCompatible(sourceType: string, targetType: string): 
   if (sourceIsFlow && targetIsFlow) {
     return true;
   }
-  if (sourceType === PortType.ANY || targetType === PortType.ANY) {
+  if ((sourceType as PortType) === PortType.ANY || (targetType as PortType) === PortType.ANY) {
     return true;
   }
   if (sourceType === targetType) {
     return true;
   }
-  const compatibleTypes = PORT_TYPE_COMPATIBILITY[sourceType as PortType] || [];
+  const compatibleTypes = Array.isArray(PORT_TYPE_COMPATIBILITY[sourceType as PortType])
+    ? PORT_TYPE_COMPATIBILITY[sourceType as PortType]
+    : [];
   return compatibleTypes.includes(targetType as PortType);
 }
 
-async function main() {
+async function main(): Promise<void> {
   try {
     await initDatabase();
     createWindow();
@@ -127,8 +121,10 @@ async function main() {
   }
 }
 
-app.whenReady().then(() => {
-  main();
+void app.whenReady().then(() => {
+  main().catch(err => {
+    console.error('Error in main():', err);
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

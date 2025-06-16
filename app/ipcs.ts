@@ -1,15 +1,7 @@
 import { ipcMain } from 'electron';
-import {
-  Node,
-  NodeProperties,
-  Connection,
-  PortCategory,
-  PortType,
-  PORT_CATEGORIES,
-} from './core/base.js';
+import { Node, NodeProperties, Connection } from './core/base.js';
 import { NodeFactory } from './core/nodeSystem.js';
 import {
-  initDatabase,
   saveAllNodes,
   getAllBots,
   getRunConditions,
@@ -26,10 +18,7 @@ export function setupIpcHandlers(): void {
   // Handle node creation requests
   ipcMain.handle(
     'node:create',
-    async (
-      event,
-      { type, id, properties }: { type: string; id: string; properties: NodeProperties }
-    ) => {
+    (event, { type, id, properties }: { type: string; id: string; properties: NodeProperties }) => {
       try {
         // Check if we're updating an existing node
         const existingNode = nodeInstances.get(id);
@@ -90,17 +79,17 @@ export function setupIpcHandlers(): void {
   );
 
   // Get all available node types
-  ipcMain.handle('node:getTypes', async () => {
+  ipcMain.handle('node:getTypes', () => {
     return NodeFactory.getNodeTypes();
   });
 
   // Get all registered node types with metadata
-  ipcMain.handle('node:getRegisteredTypes', async () => {
+  ipcMain.handle('node:getRegisteredTypes', () => {
     return NodeFactory.getRegisteredTypes();
   });
 
   // Get node by ID
-  ipcMain.handle('node:getById', async (event, id: string) => {
+  ipcMain.handle('node:getById', (event, id: string) => {
     const node = nodeInstances.get(id);
     if (!node) {
       throw new Error(`Node not found with id: ${id}`);
@@ -126,7 +115,7 @@ export function setupIpcHandlers(): void {
   // Create a connection between nodes
   ipcMain.handle(
     'connection:create',
-    async (
+    (
       event,
       {
         fromNodeId,
@@ -197,7 +186,7 @@ export function setupIpcHandlers(): void {
   // Delete a connection
   ipcMain.handle(
     'connection:delete',
-    async (
+    (
       event,
       {
         fromNodeId,
@@ -222,9 +211,6 @@ export function setupIpcHandlers(): void {
         if (connectionIndex === -1) {
           throw new Error('Connection not found');
         }
-
-        // Get the connection before removing it
-        const connection = connections[connectionIndex];
 
         // Remove the connection
         connections.splice(connectionIndex, 1);
@@ -278,7 +264,7 @@ export function setupIpcHandlers(): void {
   );
 
   // Get connections for a node
-  ipcMain.handle('connection:getForNode', async (event, nodeId: string) => {
+  ipcMain.handle('connection:getForNode', (event, nodeId: string) => {
     try {
       const nodeConnections = connections.filter(
         conn => conn.fromNodeId === nodeId || conn.toNodeId === nodeId
@@ -305,9 +291,10 @@ export function setupIpcHandlers(): void {
   });
 
   // Expose getAllBots via IPC
-  ipcMain.handle('database:getAllBots', async () => {
+  ipcMain.handle('database:getAllBots', async (): Promise<unknown[]> => {
     try {
-      return await getAllBots();
+      const bots: unknown[] = await getAllBots();
+      return bots;
     } catch (error) {
       console.error('Error in getAllBots IPC handler:', error);
       return [];
@@ -335,11 +322,9 @@ export function setupIpcHandlers(): void {
   // Expose changeNameDb via IPC
   // This is a direct database function exposure, consider using the botconfig namespaced one for business logic
   ipcMain.handle('database:changeName', async (event, oldId: string, newId: string) => {
-    // Changed parameters
     try {
-      // Directly calling the refactored database function
       const result = await changeNameDb(oldId, newId);
-      return result; // Return the {success, error} object
+      return result;
     } catch (error) {
       console.error('Error in database:changeName IPC handler:', error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -397,20 +382,18 @@ export function setupIpcHandlers(): void {
 
   // Bot configuration IPC handlers
   ipcMain.handle('botconfig:changeName', async (event, oldId: string, newId: string) => {
-    // Changed parameters
     try {
+      // eslint-disable-next-line no-console
       console.log('[MAIN] Received botconfig:changeName IPC request:', { oldId, newId });
-      // Call the refactored database function which now handles Id and Name update
       const result = await changeNameDb(oldId, newId);
 
       if (result.success) {
+        // eslint-disable-next-line no-console
         console.log('[MAIN] Successfully updated bot Id/Name in database to:', newId);
-        // Optional: Verification step can be added here if needed,
-        // but the database function already checks for this.changes
       } else {
         console.warn('[MAIN] Failed to update bot Id/Name in database:', result.error);
       }
-      return result; // Return the {success, error} object from changeNameDb
+      return result;
     } catch (error) {
       console.error('Error changing bot Id/Name:', error);
       return {
@@ -466,9 +449,8 @@ export function setupIpcHandlers(): void {
     }
   });
 
-  ipcMain.handle('node:clearAll', async () => {
+  ipcMain.handle('node:clearAll', () => {
     try {
-      // Clear all node instances and connections
       nodeInstances.clear();
       connections.length = 0;
 
@@ -480,22 +462,19 @@ export function setupIpcHandlers(): void {
   });
 
   // Delete individual node from backend
-  ipcMain.handle('node:delete', async (event, nodeId: string) => {
+  ipcMain.handle('node:delete', (event, nodeId: string) => {
     try {
       const node = nodeInstances.get(nodeId);
       if (!node) {
         return { success: false, error: `Node not found with id: ${nodeId}` };
       }
 
-      // Remove the node from the backend storage
       nodeInstances.delete(nodeId);
 
-      // Remove any connections that involve this node
       const nodeConnections = connections.filter(
         conn => conn.fromNodeId === nodeId || conn.toNodeId === nodeId
       );
 
-      // Remove connections from the connections array
       for (let i = connections.length - 1; i >= 0; i--) {
         const conn = connections[i];
         if (conn.fromNodeId === nodeId || conn.toNodeId === nodeId) {
@@ -503,7 +482,6 @@ export function setupIpcHandlers(): void {
         }
       }
 
-      // Clean up port references in remaining nodes
       nodeConnections.forEach(connection => {
         const sourceNode = nodeInstances.get(connection.fromNodeId);
         const targetNode = nodeInstances.get(connection.toNodeId);
@@ -539,6 +517,7 @@ export function setupIpcHandlers(): void {
         }
       });
 
+      // eslint-disable-next-line no-console
       console.log(`Node ${nodeId} deleted from backend. Remaining nodes: ${nodeInstances.size}`);
       return { success: true };
     } catch (error) {
