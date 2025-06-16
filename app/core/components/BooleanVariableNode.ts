@@ -20,22 +20,23 @@ export class BooleanVariableNode extends Node {
   static override shownProperties = ['value'];
 
   constructor(id: string, properties: BooleanVariableNodeProperties = {}) {
-    properties.title = properties.title || 'Boolean Variable';
+    properties.title = typeof properties.title === 'string' ? properties.title : 'Boolean Variable';
     properties.value = typeof properties.value === 'boolean' ? properties.value : false;
-    properties.language = properties.language || 'JavaScript';
-    properties.nodeContent = `<span class=\"variable-boolean\">${properties.value ? 'true' : 'false'}</span>`;
+    properties.language =
+      typeof properties.language === 'string' ? properties.language : 'JavaScript';
+    properties.nodeContent = `<span class="variable-boolean">${(typeof properties.value === 'boolean' ? properties.value : false) ? 'true' : 'false'}</span>`;
     super(id, 'booleanvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('value', 'Value', 'boolean', 'value'));
   }
 
-  updateNodeContent() {
-    this.properties.nodeContent = `<span class=\"variable-boolean\">${this.properties.value ? 'true' : 'false'}</span>`;
-    return this.properties.nodeContent;
+  updateNodeContent(): string {
+    this.properties.nodeContent = `<span class="variable-boolean">${(typeof this.properties.value === 'boolean' ? this.properties.value : false) ? 'true' : 'false'}</span>`;
+    return this.properties.nodeContent as string;
   }
 
-  process(): Record<string, any> {
-    return { value: this.properties.value };
+  process(): { value: boolean } {
+    return { value: typeof this.properties.value === 'boolean' ? this.properties.value : false };
   }
 }

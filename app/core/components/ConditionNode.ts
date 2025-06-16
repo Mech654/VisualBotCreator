@@ -63,7 +63,7 @@ export class ConditionNode extends Node {
       } else {
         result = Boolean(valueToCheck);
       }
-    } catch (error) {
+    } catch {
       result = false;
     }
     return { result };
