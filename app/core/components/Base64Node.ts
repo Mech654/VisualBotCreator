@@ -18,8 +18,9 @@ export class Base64Node extends Node {
   static override shownProperties: string[] = [];
 
   constructor(id: string, properties: Base64NodeProperties = {}) {
-    properties.title = properties.title || 'Base64';
-    properties.language = properties.language || 'JavaScript';
+    properties.title = typeof properties.title === 'string' ? properties.title : 'Base64';
+    properties.language =
+      typeof properties.language === 'string' ? properties.language : 'JavaScript';
     properties.nodeContent = 'Encodes input to Base64';
     super(id, 'base64', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -28,17 +29,17 @@ export class Base64Node extends Node {
     this.addOutput(new Port('base64', 'Base64', 'string', 'base64'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = 'Encodes input to Base64';
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const value = inputValues['value'] ?? '';
+  process(inputValues: Record<string, unknown>): Record<string, string> {
+    const value: string = typeof inputValues['value'] === 'string' ? inputValues['value'] : '';
     let base64 = '';
     try {
       base64 = typeof value === 'string' ? btoa(unescape(encodeURIComponent(value))) : '';
-    } catch (e) {
+    } catch {
       base64 = '';
     }
     return { base64 };

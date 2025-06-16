@@ -3,8 +3,6 @@ import { BaseProcessor } from './BaseProcessor.js';
 class BinaryConverterProcessor extends BaseProcessor {
   process(properties) {
     try {
-      // Get properties with defaults
-      const conversionType = this.getProperty(properties, 'conversionType', 'toBinary');
       const inputValue = this.getProperty(properties, 'input', '');
       
       // Validate input
@@ -17,15 +15,24 @@ class BinaryConverterProcessor extends BaseProcessor {
       }
       
       let outputValue = '';
+      let detectedType = '';
       
-      // Perform conversion based on type
-      if (conversionType === 'toBinary') {
+      // Always auto-detect the input type
+      // If input looks like binary (only 0s, 1s, and spaces)
+      if (/^[01\s]+$/.test(inputValue)) {
+        detectedType = 'fromBinary';
+      } else {
+        detectedType = 'toBinary';
+      }
+      
+      // Perform conversion based on detected type
+      if (detectedType === 'toBinary') {
         outputValue = this.textToBinary(inputValue);
-      } else if (conversionType === 'fromBinary') {
+      } else if (detectedType === 'fromBinary') {
         outputValue = this.binaryToText(inputValue);
       } else {
         return {
-          output: `Error: Invalid conversion type '${conversionType}'`,
+          output: `Error: Could not determine conversion type`,
           exitCode: 1,
           status: false
         };

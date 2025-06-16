@@ -2,9 +2,9 @@ import { Node, Port, NodeProperties } from '../base.js';
 import { ComponentCategory } from '../nodeSystem.js';
 
 export interface BinaryConverterNodeProperties extends NodeProperties {
-  conversionType?: string; // 'toBinary' or 'fromBinary'
   inputValue?: string;
   outputValue?: string;
+  lastDetectedType?: string; // Just for internal use to know what was detected
   nodeContent?: string;
 }
 
@@ -12,21 +12,15 @@ export class BinaryConverterNode extends Node {
   static metadata = {
     name: 'Binary Converter',
     category: ComponentCategory.DATA,
-    description: 'Converts text to binary or binary to text',
+    description: 'Converts text to binary or binary to text automatically',
     flowType: 'data',
     icon: '⚙️',
   };
 
-  static override shownProperties = ['conversionType', 'inputValue'];
+  static override shownProperties = ['inputValue'];
 
   constructor(id: string, properties: BinaryConverterNodeProperties = {}) {
     super(id, 'binaryconverter', properties);
-    properties.conversionType =
-      properties.conversionType !== null &&
-      properties.conversionType !== undefined &&
-      properties.conversionType !== ''
-        ? properties.conversionType
-        : 'toBinary';
     properties.inputValue =
       properties.inputValue !== null && properties.inputValue !== undefined
         ? properties.inputValue
@@ -35,8 +29,9 @@ export class BinaryConverterNode extends Node {
       properties.outputValue !== null && properties.outputValue !== undefined
         ? properties.outputValue
         : '';
+    properties.lastDetectedType = '';
     properties.nodeContent = `<div class="binary-converter-content">
-            <div class="conversion-type">${properties.conversionType === 'toBinary' ? 'Text → Binary' : 'Binary → Text'}</div>
+            <div class="conversion-type" style="justify-self: center;">Text <span class="conversion-icon">⟳</span> Binary</div>
             <div class="input-preview">${this.truncateText(properties.inputValue || '', 20)}</div>
         </div>`;
 
@@ -53,8 +48,15 @@ export class BinaryConverterNode extends Node {
 
   updateNodeContent(): string {
     const props = this.properties as BinaryConverterNodeProperties;
+    let highlightClass = '';
+
+    const lastType = props.lastDetectedType;
+    if (lastType !== undefined && lastType !== null && lastType !== '') {
+      highlightClass = ` highlight-${lastType}`;
+    }
+
     props.nodeContent = `<div class="binary-converter-content">
-            <div class="conversion-type">${props.conversionType === 'toBinary' ? 'Text → Binary' : 'Binary → Text'}</div>
+            <div class="conversion-type${highlightClass}" style="align">Text <span class="conversion-icon">⟳</span> Binary</div>
             <div class="input-preview">${this.truncateText(props.inputValue !== null && props.inputValue !== undefined ? props.inputValue : '', 20)}</div>
         </div>`;
     return props.nodeContent;
@@ -63,13 +65,9 @@ export class BinaryConverterNode extends Node {
   generatePropertiesPanel(): string {
     const props = this.properties as BinaryConverterNodeProperties;
     return `
-            <div class="property-group-title">Conversion Settings</div>
-            <div class="property-row">
-                <label for="conversionType">Conversion Type:</label>
-                <select id="conversionType" value="${props.conversionType}">
-                    <option value="toBinary" ${props.conversionType === 'toBinary' ? 'selected' : ''}>Text to Binary</option>
-                    <option value="fromBinary" ${props.conversionType === 'fromBinary' ? 'selected' : ''}>Binary to Text</option>
-                </select>
+            <div class="property-group-title">Binary Converter</div>
+            <div class="property-row info-row">
+                <div class="info-message">This node automatically detects and converts between text and binary.</div>
             </div>
             <div class="property-row">
                 <label for="inputValue">Test Input:</label>
@@ -84,17 +82,8 @@ export class BinaryConverterNode extends Node {
   }
 
   setupPropertyEventListeners(panel: HTMLElement): void {
-    const conversionTypeSelect = panel.querySelector('#conversionType') as HTMLSelectElement;
     const inputValueField = panel.querySelector('#inputValue') as HTMLTextAreaElement;
     const testButton = panel.querySelector('#testConvert') as HTMLButtonElement;
-
-    if (conversionTypeSelect !== null && conversionTypeSelect !== undefined) {
-      conversionTypeSelect.addEventListener('change', () => {
-        (this.properties as BinaryConverterNodeProperties).conversionType =
-          conversionTypeSelect.value;
-        this.updateNodeContent();
-      });
-    }
 
     if (inputValueField !== null && inputValueField !== undefined) {
       inputValueField.addEventListener('input', () => {
@@ -114,14 +103,30 @@ export class BinaryConverterNode extends Node {
     const inputValue =
       props.inputValue !== null && props.inputValue !== undefined ? props.inputValue : '';
     let output = '';
+    let detectedType = '';
 
-    if (props.conversionType === 'toBinary') {
+    // Always auto-detect
+    if (inputValue.trim() !== '') {
+      // Check if input looks like binary (only contains 0s, 1s, and spaces)
+      if (/^[01\s]+$/.test(inputValue)) {
+        detectedType = 'fromBinary';
+      } else {
+        detectedType = 'toBinary';
+      }
+    }
+
+    // Store the detected type
+    props.lastDetectedType = detectedType;
+
+    if (detectedType === 'toBinary') {
       output = this.textToBinary(inputValue);
-    } else {
+    } else if (detectedType === 'fromBinary') {
       output = this.binaryToText(inputValue);
     }
 
     props.outputValue = output;
+    this.updateNodeContent(); // Update to s
+    // how the conversion direction
 
     // Update the output preview in the properties panel
     const outputPreview = document.querySelector('.output-preview');
@@ -139,9 +144,20 @@ export class BinaryConverterNode extends Node {
 
   private binaryToText(binary: string): string {
     try {
-      return binary
-        .split(' ')
-        .map(bin => String.fromCharCode(parseInt(bin, 2)))
+      if (!binary || binary.trim() === '') return '';
+
+      // Handle input with or without spaces
+      const binaryGroups = binary.includes(' ') ? binary.split(' ') : binary.match(/.{1,8}/g) || [];
+
+      return binaryGroups
+        .filter(bin => bin.trim() !== '') // Filter out empty strings
+        .map(bin => {
+          const charCode = parseInt(bin, 2);
+          if (isNaN(charCode) || charCode <= 0 || charCode > 127) {
+            throw new Error(`Invalid binary value: ${bin}`);
+          }
+          return String.fromCharCode(charCode);
+        })
         .join('');
     } catch {
       return 'Invalid binary format';
@@ -167,12 +183,29 @@ export class BinaryConverterNode extends Node {
       input = '';
     }
     let output = '';
+    let detectedType = '';
 
-    if (props.conversionType === 'toBinary') {
+    // Always auto-detect
+    if (input.trim() !== '') {
+      // Check if input looks like binary (only contains 0s, 1s, and spaces)
+      if (/^[01\s]+$/.test(input)) {
+        detectedType = 'fromBinary';
+      } else {
+        detectedType = 'toBinary';
+      }
+    }
+
+    // Store the detected type for visual feedback
+    props.lastDetectedType = detectedType;
+
+    if (detectedType === 'toBinary') {
       output = this.textToBinary(input);
-    } else {
+    } else if (detectedType === 'fromBinary') {
       output = this.binaryToText(input);
     }
+
+    // Update the node display to reflect the current operation
+    this.updateNodeContent();
 
     return { output };
   }
