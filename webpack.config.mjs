@@ -41,7 +41,7 @@ export default {
               if (
                 typeof request.request === 'string' &&
                 request.request.length > 0 &&
-                request.request.endsWith('.js')
+                request.request.end5sWith('.js')
               ) {
                 const tsRequest = request.request.replace(/\.js$/, '.ts');
                 const newRequest = {
