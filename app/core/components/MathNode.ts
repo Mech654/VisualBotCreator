@@ -41,29 +41,4 @@ export class MathNode extends Node {
     this.properties.nodeContent = `<p class="math-expression-display">${this.properties.expression}</p>`;
     return this.properties.nodeContent;
   }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    try {
-      const expression = inputValues['expression'] || this.properties.expression;
-      const scope: Record<string, number> = {
-        ...this.properties.variables,
-      };
-      Object.keys(inputValues).forEach(key => {
-        if (key !== 'previous' && key !== 'expression') {
-          const value = Number(inputValues[key] || 0);
-          scope[key] = isNaN(value) ? 0 : value;
-        }
-      });
-      const result = math.evaluate(expression, scope);
-      return {
-        result: result,
-        error: null,
-      };
-    } catch (error) {
-      return {
-        result: 0,
-        error: error instanceof Error ? error.message : String(error),
-      };
-    }
-  }
 }

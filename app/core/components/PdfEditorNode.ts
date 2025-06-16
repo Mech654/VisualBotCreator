@@ -50,31 +50,6 @@ export class PdfEditorNode extends Node {
     this.properties.nodeContent = generatePdfEditorPreview(pdfProps);
     return this.properties.nodeContent;
   }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const pdfPath = inputValues['pdfPath'] || this.properties.pdfPath;
-    const newText = inputValues['newText'] || this.properties.newText;
-    const locator = inputValues['locator'] || this.properties.locator;
-
-    // Process PDF text replacement directly on the file
-    let status = true;
-
-    try {
-      if (!pdfPath || !newText || !locator) {
-        status = false;
-      } else {
-        // Perform direct text replacement in the PDF file
-        // This would call the actual PDF editing library to modify the file in place
-        status = true;
-      }
-    } catch (error) {
-      status = false;
-    }
-
-    return {
-      status,
-    };
-  }
 }
 
 function generatePdfEditorPreview(properties: PdfEditorNodeProperties): string {

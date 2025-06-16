@@ -45,36 +45,6 @@ export class RandomNode extends Node {
     this.properties.nodeContent = generateRandomNodeContent(this.properties);
     return this.properties.nodeContent;
   }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const min = inputValues.min !== undefined ? Number(inputValues.min) : this.properties.min;
-    const max = inputValues.max !== undefined ? Number(inputValues.max) : this.properties.max;
-    const type = this.properties.type;
-    const length = this.properties.length;
-    let value: any;
-    switch (type) {
-      case 'integer':
-        value = Math.floor(Math.random() * (max - min + 1)) + min;
-        break;
-      case 'float':
-        value = Math.random() * (max - min) + min;
-        break;
-      case 'boolean':
-        value = Math.random() >= 0.5;
-        break;
-      case 'string':
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-          result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        value = result;
-        break;
-      default:
-        value = Math.random() * (max - min) + min;
-    }
-    return { value };
-  }
 }
 
 function generateRandomNodeContent(properties: RandomNodeProperties): string {

@@ -34,13 +34,4 @@ export class IncrementNode extends Node {
     this.properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${this.properties.incrementBy}</span></div>`;
     return this.properties.nodeContent;
   }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const inputNumber = typeof inputValues['number'] === 'number' ? inputValues['number'] : 0;
-    const incrementBy = this.properties.incrementBy || 1;
-    const result = inputNumber + incrementBy;
-    return {
-      result: result,
-    };
-  }
 }

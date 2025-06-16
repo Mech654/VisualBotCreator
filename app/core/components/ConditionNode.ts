@@ -34,38 +34,4 @@ export class ConditionNode extends Node {
     this.properties.nodeContent = `<p class="condition-expression">if (${this.properties.condition}) { ... }</p>`;
     return this.properties.nodeContent;
   }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    let result = false;
-    try {
-      const valueToCheck = inputValues['value'];
-      const conditionString = this.properties.condition as string;
-      if (conditionString === 'value == true') {
-        result = valueToCheck === true;
-      } else if (conditionString === 'value == false') {
-        result = valueToCheck === false;
-      } else if (conditionString.includes('==')) {
-        const parts = conditionString.split('==').map(part => part.trim());
-        if (parts[0] === 'value') {
-          result = valueToCheck == parts[1];
-        }
-      } else if (conditionString.includes('>')) {
-        const threshold = parseFloat(conditionString.split('>')[1].trim());
-        result = parseFloat(String(valueToCheck)) > threshold;
-      } else if (conditionString.includes('<')) {
-        const threshold = parseFloat(conditionString.split('<')[1].trim());
-        result = parseFloat(String(valueToCheck)) < threshold;
-      } else if (conditionString.includes('!=')) {
-        const parts = conditionString.split('!=').map(part => part.trim());
-        if (parts[0] === 'value') {
-          result = valueToCheck != parts[1];
-        }
-      } else {
-        result = Boolean(valueToCheck);
-      }
-    } catch {
-      result = false;
-    }
-    return { result };
-  }
 }

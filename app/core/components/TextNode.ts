@@ -26,7 +26,7 @@ export class TextNode extends Node {
       text: properties.text || 'Sample text',
       fontSize: properties.fontSize || 16,
       bold: properties.bold || false,
-      color: properties.color || '#000000',
+      color: properties.color || '#ffffff',
       language: properties.language || 'JavaScript',
     };
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
@@ -42,18 +42,6 @@ export class TextNode extends Node {
     const textProps = this.properties as TextNodeProperties;
     this.properties.nodeContent = generateTextNodePreview(textProps);
     return this.properties.nodeContent;
-  }
-
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const text = inputValues['textInput'] || this.properties.text;
-    let processedText = text;
-    if (this.properties.bold) {
-      processedText = `<strong>${processedText}</strong>`;
-    }
-    return {
-      textOutput: processedText,
-      length: processedText.length,
-    };
   }
 }
 

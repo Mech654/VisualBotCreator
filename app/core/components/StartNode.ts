@@ -29,8 +29,4 @@ export class StartNode extends Node {
     this.properties.nodeContent = 'Bot conversation starts here';
     return this.properties.nodeContent;
   }
-
-  process(): Record<string, any> {
-    return { status: 'started' };
-  }
 }

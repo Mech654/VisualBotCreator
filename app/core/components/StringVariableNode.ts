@@ -34,8 +34,4 @@ export class StringVariableNode extends Node {
     this.properties.nodeContent = `<span class="variable-string">${this.properties.value}</span>`;
     return this.properties.nodeContent;
   }
-
-  process(): Record<string, any> {
-    return { value: this.properties.value };
-  }
 }
