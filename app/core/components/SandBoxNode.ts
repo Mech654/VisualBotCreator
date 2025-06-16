@@ -1,5 +1,6 @@
 import { Node, Port, NodeProperties } from '../base.js';
 import { ComponentCategory } from '../nodeSystem.js';
+import { VM, VMOptions } from 'vm2';
 
 export interface SandBoxNodeProperties extends NodeProperties {
   jsCode?: string;
@@ -21,8 +22,14 @@ export class SandBoxNode extends Node {
 
   constructor(id: string, properties: Partial<SandBoxNodeProperties> = {}) {
     const sandBoxProps: SandBoxNodeProperties = {
-      jsCode: properties.jsCode || 'return input1 + input2;',
-      language: properties.language || 'JavaScript',
+      jsCode:
+        properties.jsCode !== undefined && properties.jsCode !== null
+          ? properties.jsCode
+          : 'return input1 + input2;',
+      language:
+        properties.language !== undefined && properties.language !== null
+          ? properties.language
+          : 'JavaScript',
     };
 
     sandBoxProps.nodeContent = generateSandBoxPreview(sandBoxProps);
@@ -45,15 +52,16 @@ export class SandBoxNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const sandBoxProps = this.properties as SandBoxNodeProperties;
     this.properties.nodeContent = generateSandBoxPreview(sandBoxProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
 
 function generateSandBoxPreview(properties: SandBoxNodeProperties): string {
-  const jsCode = properties.jsCode || 'No code';
+  const jsCode =
+    properties.jsCode !== undefined && properties.jsCode !== null ? properties.jsCode : 'No code';
 
   // Truncate code for display
   let displayCode = jsCode;

@@ -1,5 +1,4 @@
-declare global {
-}
+declare global {}
 
 export function setupSwalDashboardModalStyle() {
   if (document.getElementById('swal-dashboard-style')) return;

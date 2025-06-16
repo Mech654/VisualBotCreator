@@ -23,11 +23,23 @@ export class TextNode extends Node {
 
   constructor(id: string, properties: Partial<TextNodeProperties> = {}) {
     const textNodeProps: TextNodeProperties = {
-      text: properties.text || 'Sample text',
-      fontSize: properties.fontSize || 16,
-      bold: properties.bold || false,
-      color: properties.color || '#ffffff',
-      language: properties.language || 'JavaScript',
+      text:
+        typeof properties.text === 'string' && properties.text.trim() !== ''
+          ? properties.text
+          : 'Sample text',
+      fontSize:
+        typeof properties.fontSize === 'number' && !isNaN(properties.fontSize)
+          ? properties.fontSize
+          : 16,
+      bold: typeof properties.bold === 'boolean' ? properties.bold : false,
+      color:
+        typeof properties.color === 'string' && properties.color.trim() !== ''
+          ? properties.color
+          : '#000000',
+      language:
+        typeof properties.language === 'string' && properties.language.trim() !== ''
+          ? properties.language
+          : 'JavaScript',
     };
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
     super(id, 'text', textNodeProps);
@@ -38,18 +50,17 @@ export class TextNode extends Node {
     this.addOutput(new Port('length', 'Length', 'number', 'text'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const textProps = this.properties as TextNodeProperties;
     this.properties.nodeContent = generateTextNodePreview(textProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
 
 function generateTextNodePreview(properties: TextNodeProperties): string {
   const text = properties.text || 'Sample text';
-  const fontSize = properties.fontSize || 16;
-  const bold = properties.bold || false;
-  const color = properties.color || '#000000';
+  const fontSize = typeof properties.fontSize === 'number' ? properties.fontSize : 16;
+  const bold = typeof properties.bold === 'boolean' ? properties.bold : false;
   let displayText = text;
   if (displayText.length > 50) {
     displayText = displayText.substring(0, 47) + '...';
@@ -64,7 +75,7 @@ function generateTextNodePreview(properties: TextNodeProperties): string {
         <div class="text-node-preview" style="
             font-size: ${fontSize}px;
             font-weight: ${bold ? 'bold' : 'normal'};
-            color: ${color};">
+            color: #FFFFFF;">
             ${displayText}
         </div>
   `;

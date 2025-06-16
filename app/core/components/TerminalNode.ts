@@ -23,10 +23,19 @@ export class TerminalNode extends Node {
 
   constructor(id: string, properties: Partial<TerminalNodeProperties> = {}) {
     const terminalProps: TerminalNodeProperties = {
-      command: properties.command || '',
-      workingDirectory: properties.workingDirectory || '',
+      command:
+        typeof properties.command === 'string' && properties.command.trim() !== ''
+          ? properties.command
+          : '',
+      workingDirectory:
+        typeof properties.workingDirectory === 'string' && properties.workingDirectory.trim() !== ''
+          ? properties.workingDirectory
+          : '',
       platform: properties.platform || 'auto',
-      language: properties.language || 'JavaScript',
+      language:
+        typeof properties.language === 'string' && properties.language.trim() !== ''
+          ? properties.language
+          : 'JavaScript',
     };
 
     terminalProps.nodeContent = generateTerminalPreview(terminalProps);
@@ -47,16 +56,22 @@ export class TerminalNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const terminalProps = this.properties as TerminalNodeProperties;
     this.properties.nodeContent = generateTerminalPreview(terminalProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
 
 function generateTerminalPreview(properties: TerminalNodeProperties): string {
-  const command = properties.command || 'No command';
-  const workingDirectory = properties.workingDirectory || 'Default directory';
+  const command =
+    typeof properties.command === 'string' && properties.command.trim() !== ''
+      ? properties.command
+      : 'No command';
+  const workingDirectory =
+    typeof properties.workingDirectory === 'string' && properties.workingDirectory.trim() !== ''
+      ? properties.workingDirectory
+      : 'Default directory';
   const platform = properties.platform || 'auto';
 
   // Truncate command for display

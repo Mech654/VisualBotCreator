@@ -25,7 +25,12 @@ export class RandomNode extends Node {
     properties.max = properties.max ?? 100;
     properties.type = properties.type || 'integer';
     properties.length = properties.length ?? 10;
-    properties.language = properties.language || 'JavaScript';
+    properties.language =
+      properties.language !== undefined &&
+      properties.language !== null &&
+      properties.language !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = generateRandomNodeContent(properties);
     super(id, 'random', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -41,9 +46,9 @@ export class RandomNode extends Node {
       this.addOutput(new Port('value', 'Random Number', 'number', 'value'));
     }
   }
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = generateRandomNodeContent(this.properties);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
 

@@ -141,7 +141,7 @@ contextBridge.exposeInMainWorld('database', {
   setBotEnabled: (botId: string, enabled: boolean) =>
     ipcRenderer.invoke('database:setBotEnabled', botId, enabled),
   changeNameDb: (oldId: string, newId: string) =>
-    ipcRenderer.invoke('database:changeName', oldId, newId), 
+    ipcRenderer.invoke('database:changeName', oldId, newId),
   changeDescriptionDb: (botId: string, newDescription: string) =>
     ipcRenderer.invoke('database:changeDescription', botId, newDescription),
   changeStatusDb: (botId: string, newStatus: boolean) =>

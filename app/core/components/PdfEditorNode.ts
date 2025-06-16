@@ -23,10 +23,16 @@ export class PdfEditorNode extends Node {
 
   constructor(id: string, properties: Partial<PdfEditorNodeProperties> = {}) {
     const pdfEditorProps: PdfEditorNodeProperties = {
-      pdfPath: properties.pdfPath || '',
-      newText: properties.newText || '',
-      locator: properties.locator || '',
-      language: properties.language || 'Python',
+      pdfPath: properties.pdfPath ?? '',
+      newText: properties.newText ?? '',
+      locator:
+        typeof properties.locator === 'string' && properties.locator.length > 0
+          ? properties.locator
+          : '',
+      language:
+        typeof properties.language === 'string' && properties.language.trim().length > 0
+          ? properties.language
+          : 'JavaScript',
     };
 
     pdfEditorProps.nodeContent = generatePdfEditorPreview(pdfEditorProps);
@@ -45,17 +51,26 @@ export class PdfEditorNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const pdfProps = this.properties as PdfEditorNodeProperties;
     this.properties.nodeContent = generatePdfEditorPreview(pdfProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
 
 function generatePdfEditorPreview(properties: PdfEditorNodeProperties): string {
-  const pdfPath = properties.pdfPath || 'No file selected';
-  const newText = properties.newText || 'No text specified';
-  const locator = properties.locator || 'No locator';
+  const pdfPath =
+    typeof properties.pdfPath === 'string' && properties.pdfPath.trim().length > 0
+      ? properties.pdfPath
+      : 'No file selected';
+  const newText =
+    typeof properties.newText === 'string' && properties.newText.trim().length > 0
+      ? properties.newText
+      : 'No text specified';
+  const locator =
+    typeof properties.locator === 'string' && properties.locator.trim().length > 0
+      ? properties.locator
+      : 'No locator';
 
   // Truncate file path for display
   let displayPath = pdfPath;

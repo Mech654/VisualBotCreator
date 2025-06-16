@@ -20,9 +20,20 @@ export class StringVariableNode extends Node {
   static override shownProperties = ['value'];
 
   constructor(id: string, properties: StringVariableNodeProperties = {}) {
-    properties.title = properties.title || 'String Variable';
-    properties.value = properties.value || '';
-    properties.language = properties.language || 'JavaScript';
+    properties.title =
+      properties.title !== undefined && properties.title !== null && properties.title !== ''
+        ? properties.title
+        : 'String Variable';
+    properties.value =
+      properties.value !== undefined && properties.value !== null && properties.value !== ''
+        ? properties.value
+        : '';
+    properties.language =
+      properties.language !== undefined &&
+      properties.language !== null &&
+      properties.language !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = `<span class="variable-string">${properties.value}</span>`;
     super(id, 'stringvariable', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -30,8 +41,8 @@ export class StringVariableNode extends Node {
     this.addOutput(new Port('value', 'Value', 'string', 'value'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = `<span class="variable-string">${this.properties.value}</span>`;
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }

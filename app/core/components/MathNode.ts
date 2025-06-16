@@ -25,7 +25,10 @@ export class MathNode extends Node {
       properties.expression = 'a + b';
     }
     properties.variables = properties.variables || {};
-    properties.language = properties.language || 'JavaScript';
+    properties.language =
+      typeof properties.language === 'string' && properties.language.trim() !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
     super(id, 'math', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -37,8 +40,8 @@ export class MathNode extends Node {
     this.addOutput(new Port('error', 'Error', 'string', 'expression'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = `<p class="math-expression-display">${this.properties.expression}</p>`;
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 }
