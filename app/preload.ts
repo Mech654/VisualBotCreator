@@ -1,24 +1,24 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 interface NodeSystemAPI {
-  createNode: (type: string, id: string, properties: any) => Promise<any>;
+  createNode: (type: string, id: string, properties: Record<string, unknown>) => Promise<unknown>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
-  getNodeById: (id: string) => Promise<any>;
-  processNode: (id: string, inputs: Record<string, any>) => Promise<any>;
+  getNodeById: (id: string) => Promise<unknown>;
+  processNode: (id: string, inputs: Record<string, unknown>) => Promise<unknown>;
   createConnection: (
     fromNodeId: string,
     fromPortId: string,
     toNodeId: string,
     toPortId: string
-  ) => Promise<any>;
+  ) => Promise<unknown>;
   deleteConnection: (
     fromNodeId: string,
     fromPortId: string,
     toNodeId: string,
     toPortId: string
-  ) => Promise<any>;
-  getNodeConnections: (nodeId: string) => Promise<any[]>;
+  ) => Promise<unknown>;
+  getNodeConnections: (nodeId: string) => Promise<unknown[]>;
   clearAllNodes: () => Promise<{ success: boolean; error?: string }>;
   deleteNode: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
 }
@@ -46,8 +46,8 @@ interface BotConfigAPI {
 }
 
 contextBridge.exposeInMainWorld('nodeSystem', {
-  createNode: (type: string, id: string, properties: any) => {
-    return ipcRenderer.invoke('node:create', { type, id, properties });
+  createNode: (type: string, id: string, properties: Record<string, unknown>) => {
+    return ipcRenderer.invoke('node:create', { type, id, properties }) as Promise<unknown>;
   },
 
   getNodeTypes: () => {
@@ -62,7 +62,7 @@ contextBridge.exposeInMainWorld('nodeSystem', {
     return ipcRenderer.invoke('node:getById', id);
   },
 
-  processNode: (id: string, inputs: Record<string, any>) => {
+  processNode: (id: string, inputs: Record<string, unknown>) => {
     return ipcRenderer.invoke('node:process', { id, inputs });
   },
 
@@ -116,6 +116,7 @@ contextBridge.exposeInMainWorld('utils', {
 // Expose database functions for bot configurations
 contextBridge.exposeInMainWorld('botconfig', {
   changeName: (oldId: string, newId: string) => {
+    // eslint-disable-next-line no-console
     console.log('[PRELOAD] botconfig:changeName called with:', { oldId, newId });
     return ipcRenderer.invoke('botconfig:changeName', oldId, newId);
   },
@@ -134,7 +135,7 @@ contextBridge.exposeInMainWorld('botconfig', {
 } as BotConfigAPI);
 
 contextBridge.exposeInMainWorld('database', {
-  saveAllNodes: (botId: string, nodes: any) =>
+  saveAllNodes: (botId: string, nodes: Record<string, unknown>[]) =>
     ipcRenderer.invoke('database:saveAllNodes', botId, nodes),
   getAllBots: () => ipcRenderer.invoke('database:getAllBots'),
   getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
@@ -154,6 +155,6 @@ contextBridge.exposeInMainWorld('database', {
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
+    invoke: (channel: string, ...args: unknown[]) => ipcRenderer.invoke(channel, ...args),
   },
 });
