@@ -26,10 +26,19 @@ class OptionsProcessor extends BaseProcessor {
         resultPath = `option${selectedOptionIndex + 1}`;
       }
 
+      // Find the next node based on the selected option
+      let nextNodeId = null;
+      if (executionData.outputs) {
+        const outputPort = executionData.outputs.find(output => output.id === resultPath);
+        if (outputPort && outputPort.connectedTo && outputPort.connectedTo.length > 0) {
+          nextNodeId = outputPort.connectedTo[0].toNodeId;
+        }
+      }
+
       // Format options for display
       const optionTexts = options.map((opt, index) => `${index + 1}. ${opt.text}`).join('\n');
 
-      return {
+      const responseData = {
         output: `Options presented:\n${optionTexts}\nSelected: ${selectedOption ? selectedOption.text : 'None'}`,
         selectedOption: selectedOption ? selectedOption.value : null,
         selectedOptionText: selectedOption ? selectedOption.text : null,
@@ -39,6 +48,13 @@ class OptionsProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
       };
+
+      // Add NextNodeId only if this is a flow node and we found a connection
+      if (nextNodeId) {
+        responseData.NextNodeId = nextNodeId;
+      }
+
+      return responseData;
     } catch (error) {
       console.error('[OptionsProcessor] Error during processing:', error.message);
 

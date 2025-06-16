@@ -70,13 +70,30 @@ class ConditionProcessor extends BaseProcessor {
         resultPath = 'false';
       }
 
-      return {
+      // Find the next node based on the condition result
+      let nextNodeId = null;
+      if (executionData.outputs) {
+        const targetOutput = result ? 'true' : 'false';
+        const outputPort = executionData.outputs.find(output => output.id === targetOutput);
+        if (outputPort && outputPort.connectedTo && outputPort.connectedTo.length > 0) {
+          nextNodeId = outputPort.connectedTo[0].toNodeId;
+        }
+      }
+
+      const responseData = {
         output: `Condition "${conditionString}" evaluated to: ${result}`,
         result: result,
         resultPath: resultPath,
         exitCode: 0,
         status: true,
       };
+
+      // Add NextNodeId only if this is a flow node and we found a connection
+      if (nextNodeId) {
+        responseData.NextNodeId = nextNodeId;
+      }
+
+      return responseData;
     } catch (error) {
       console.error('[ConditionProcessor] Error during processing:', error.message);
 

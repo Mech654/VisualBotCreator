@@ -302,7 +302,9 @@ namespace BotEngine
             var executionData = new
             {
                 properties = nodeObj.properties,
-                runtimeInputs = runtimeInputs
+                runtimeInputs = runtimeInputs,
+                inputs = nodeObj.inputs,
+                outputs = nodeObj.outputs
             };
 
             return JsonConvert.SerializeObject(executionData);
@@ -425,5 +427,6 @@ namespace BotEngine
             Console.WriteLine($"[GetNextNodeFromOutputs] No connected nodes found");
             return null;
         }
+
     }
 }
