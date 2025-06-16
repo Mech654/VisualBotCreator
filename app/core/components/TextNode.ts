@@ -61,7 +61,6 @@ function generateTextNodePreview(properties: TextNodeProperties): string {
   const text = properties.text || 'Sample text';
   const fontSize = properties.fontSize || 16;
   const bold = properties.bold || false;
-  const color = properties.color || '#000000';
   let displayText = text;
   if (displayText.length > 50) {
     displayText = displayText.substring(0, 47) + '...';
@@ -76,7 +75,7 @@ function generateTextNodePreview(properties: TextNodeProperties): string {
         <div class="text-node-preview" style="
             font-size: ${fontSize}px;
             font-weight: ${bold ? 'bold' : 'normal'};
-            color: ${color};">
+            color: #FFFFFF;">
             ${displayText}
         </div>
   `;
