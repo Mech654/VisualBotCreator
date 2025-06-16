@@ -6,6 +6,7 @@ export interface BinaryConverterNodeProperties extends NodeProperties {
   outputValue?: string;
   lastDetectedType?: string; // Just for internal use to know what was detected
   nodeContent?: string;
+  language?: string;
 }
 
 export class BinaryConverterNode extends Node {
@@ -21,6 +22,7 @@ export class BinaryConverterNode extends Node {
 
   constructor(id: string, properties: BinaryConverterNodeProperties = {}) {
     super(id, 'binaryconverter', properties);
+    properties.language = properties.language || 'JavaScript';
     properties.inputValue =
       properties.inputValue !== null && properties.inputValue !== undefined
         ? properties.inputValue
