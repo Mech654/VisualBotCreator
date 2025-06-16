@@ -19,9 +19,15 @@ export class IncrementNode extends Node {
   static override shownProperties = ['incrementBy'];
 
   constructor(id: string, properties: IncrementNodeProperties = {}) {
-    properties.incrementBy = properties.incrementBy || 1;
-    properties.title = properties.title || 'Increment';
-    properties.language = properties.language || 'JavaScript';
+    properties.incrementBy =
+      typeof properties.incrementBy === 'number' && !isNaN(properties.incrementBy)
+        ? properties.incrementBy
+        : 1;
+    properties.title = typeof properties.title === 'string' ? properties.title : 'Increment';
+    properties.language =
+      typeof properties.language === 'string' && properties.language.trim() !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${properties.incrementBy}</span></div>`;
     super(id, 'increment', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -30,14 +36,17 @@ export class IncrementNode extends Node {
     this.addOutput(new Port('result', 'Result', 'number', 'incrementBy'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${this.properties.incrementBy}</span></div>`;
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
+  process(inputValues: Record<string, number>): Record<string, number> {
     const inputNumber = typeof inputValues['number'] === 'number' ? inputValues['number'] : 0;
-    const incrementBy = this.properties.incrementBy || 1;
+    const incrementBy =
+      typeof this.properties.incrementBy === 'number' && !isNaN(this.properties.incrementBy)
+        ? this.properties.incrementBy
+        : 1;
     const result = inputNumber + incrementBy;
     return {
       result: result,

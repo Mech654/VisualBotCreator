@@ -23,11 +23,23 @@ export class TextNode extends Node {
 
   constructor(id: string, properties: Partial<TextNodeProperties> = {}) {
     const textNodeProps: TextNodeProperties = {
-      text: properties.text || 'Sample text',
-      fontSize: properties.fontSize || 16,
-      bold: properties.bold || false,
-      color: properties.color || '#000000',
-      language: properties.language || 'JavaScript',
+      text:
+        typeof properties.text === 'string' && properties.text.trim() !== ''
+          ? properties.text
+          : 'Sample text',
+      fontSize:
+        typeof properties.fontSize === 'number' && !isNaN(properties.fontSize)
+          ? properties.fontSize
+          : 16,
+      bold: typeof properties.bold === 'boolean' ? properties.bold : false,
+      color:
+        typeof properties.color === 'string' && properties.color.trim() !== ''
+          ? properties.color
+          : '#000000',
+      language:
+        typeof properties.language === 'string' && properties.language.trim() !== ''
+          ? properties.language
+          : 'JavaScript',
     };
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
     super(id, 'text', textNodeProps);
@@ -38,16 +50,23 @@ export class TextNode extends Node {
     this.addOutput(new Port('length', 'Length', 'number', 'text'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const textProps = this.properties as TextNodeProperties;
     this.properties.nodeContent = generateTextNodePreview(textProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const text = inputValues['textInput'] || this.properties.text;
+  process(inputValues: Record<string, unknown>): Record<string, unknown> {
+    const textInput =
+      typeof inputValues['textInput'] === 'string' ? inputValues['textInput'] : undefined;
+    const text: string =
+      typeof textInput === 'string'
+        ? textInput
+        : typeof this.properties.text === 'string'
+          ? this.properties.text
+          : 'Sample text';
     let processedText = text;
-    if (this.properties.bold) {
+    if (typeof this.properties.bold === 'boolean' && this.properties.bold === true) {
       processedText = `<strong>${processedText}</strong>`;
     }
     return {
@@ -59,8 +78,8 @@ export class TextNode extends Node {
 
 function generateTextNodePreview(properties: TextNodeProperties): string {
   const text = properties.text || 'Sample text';
-  const fontSize = properties.fontSize || 16;
-  const bold = properties.bold || false;
+  const fontSize = typeof properties.fontSize === 'number' ? properties.fontSize : 16;
+  const bold = typeof properties.bold === 'boolean' ? properties.bold : false;
   let displayText = text;
   if (displayText.length > 50) {
     displayText = displayText.substring(0, 47) + '...';

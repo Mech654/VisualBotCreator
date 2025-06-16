@@ -19,9 +19,22 @@ export class ConditionNode extends Node {
   static override shownProperties = ['condition'];
 
   constructor(id: string, properties: ConditionNodeProperties = {}) {
-    properties.title = properties.title || 'Condition';
-    properties.condition = properties.condition || 'value == true';
-    properties.language = properties.language || 'JavaScript';
+    properties.title =
+      properties.title !== undefined && properties.title !== null && properties.title !== ''
+        ? properties.title
+        : 'Condition';
+    properties.condition =
+      properties.condition !== undefined &&
+      properties.condition !== null &&
+      properties.condition !== ''
+        ? properties.condition
+        : 'value == true';
+    properties.language =
+      properties.language !== undefined &&
+      properties.language !== null &&
+      properties.language !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
     super(id, 'condition', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -30,15 +43,15 @@ export class ConditionNode extends Node {
     this.addOutput(new Port('false', 'False', 'control', 'condition'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = `<p class="condition-expression">if (${this.properties.condition}) { ... }</p>`;
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
+  process(inputValues: Record<string, unknown>): Record<string, unknown> {
     let result = false;
     try {
-      const valueToCheck = inputValues['value'];
+      const valueToCheck: unknown = inputValues['value'];
       const conditionString = this.properties.condition as string;
       if (conditionString === 'value == true') {
         result = valueToCheck === true;

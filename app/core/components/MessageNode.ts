@@ -22,11 +22,33 @@ export class MessageNode extends Node {
   static override shownProperties = ['message'];
 
   constructor(id: string, properties: MessageNodeProperties = {}) {
-    properties.title = properties.title || 'Message';
-    properties.message = properties.message || 'Enter your message here...';
-    properties.delay = properties.delay || 500;
-    properties.variableName = properties.variableName || 'message';
-    properties.language = properties.language || 'JavaScript';
+    properties.title =
+      properties.title !== undefined && properties.title !== null && properties.title !== ''
+        ? properties.title
+        : 'Message';
+    properties.message =
+      properties.message !== undefined && properties.message !== null && properties.message !== ''
+        ? properties.message
+        : 'Enter your message here...';
+    properties.delay =
+      properties.delay !== undefined &&
+      properties.delay !== null &&
+      typeof properties.delay === 'number' &&
+      Number.isFinite(properties.delay)
+        ? properties.delay
+        : 500;
+    properties.variableName =
+      properties.variableName !== undefined &&
+      properties.variableName !== null &&
+      properties.variableName !== ''
+        ? properties.variableName
+        : 'message';
+    properties.language =
+      properties.language !== undefined &&
+      properties.language !== null &&
+      properties.language !== ''
+        ? properties.language
+        : 'JavaScript';
     const message = properties.message || '';
     let displayText = message;
     if (displayText.length > 50) {
@@ -58,13 +80,20 @@ export class MessageNode extends Node {
       .replace(/'/g, '&#039;');
     return `<div class="message-bubble">${displayText}</div>`;
   }
-  updateNodeContent() {
-    this.properties.nodeContent = this.formatMessagePreview(this.properties.message || '');
-    return this.properties.nodeContent;
+  updateNodeContent(): string {
+    const message: string =
+      typeof this.properties.message === 'string'
+        ? this.properties.message
+        : String(this.properties.message ?? '');
+    this.properties.nodeContent = this.formatMessagePreview(message);
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const processedMessage = this.properties.message;
+  process(_inputValues: Record<string, unknown>): Record<string, unknown> {
+    const processedMessage: string =
+      typeof this.properties.message === 'string'
+        ? this.properties.message
+        : String(this.properties.message ?? '');
     return {
       messageText: processedMessage,
     };

@@ -1,5 +1,6 @@
 import { Node, Port, NodeProperties } from '../base.js';
 import { ComponentCategory } from '../nodeSystem.js';
+import { VM, VMOptions } from 'vm2';
 
 export interface SandBoxNodeProperties extends NodeProperties {
   jsCode?: string;
@@ -21,8 +22,14 @@ export class SandBoxNode extends Node {
 
   constructor(id: string, properties: Partial<SandBoxNodeProperties> = {}) {
     const sandBoxProps: SandBoxNodeProperties = {
-      jsCode: properties.jsCode || 'return input1 + input2;',
-      language: properties.language || 'JavaScript',
+      jsCode:
+        properties.jsCode !== undefined && properties.jsCode !== null
+          ? properties.jsCode
+          : 'return input1 + input2;',
+      language:
+        properties.language !== undefined && properties.language !== null
+          ? properties.language
+          : 'JavaScript',
     };
 
     sandBoxProps.nodeContent = generateSandBoxPreview(sandBoxProps);
@@ -45,21 +52,26 @@ export class SandBoxNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const sandBoxProps = this.properties as SandBoxNodeProperties;
     this.properties.nodeContent = generateSandBoxPreview(sandBoxProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const jsCode = inputValues['jsCode'] || this.properties.jsCode;
-    const input1 = inputValues['input1'];
-    const input2 = inputValues['input2'];
-    const input3 = inputValues['input3'];
-    const input4 = inputValues['input4'];
-    const input5 = inputValues['input5'];
+  process(inputValues: Record<string, unknown>): Record<string, unknown> {
+    const jsCode: string =
+      typeof inputValues['jsCode'] === 'string'
+        ? inputValues['jsCode']
+        : typeof this.properties.jsCode === 'string'
+          ? this.properties.jsCode
+          : '';
+    const input1: unknown = inputValues['input1'];
+    const input2: unknown = inputValues['input2'];
+    const input3: unknown = inputValues['input3'];
+    const input4: unknown = inputValues['input4'];
+    const input5: unknown = inputValues['input5'];
 
-    let result: any = null;
+    let result: unknown = null;
     let status = true;
 
     try {
@@ -67,71 +79,52 @@ export class SandBoxNode extends Node {
         result = 'Error: No JavaScript code provided';
         status = false;
       } else {
-        // Create a safe execution context
-        const sandbox = {
-          input1,
-          input2,
-          input3,
-          input4,
-          input5,
-          Math,
-          String,
-          Number,
-          Boolean,
-          Array,
-          Object,
-          JSON,
-          Date,
-          RegExp,
-          console: {
-            log: (...args: any[]) => console.log('[SandBox]', ...args),
+        // Create a safe execution context with explicit type casting
+        const options: VMOptions = {
+          timeout: 1000,
+          sandbox: {
+            input1,
+            input2,
+            input3,
+            input4,
+            input5,
+            Math,
+            String,
+            Number,
+            Boolean,
+            Array,
+            Object,
+            JSON,
+            Date,
+            RegExp,
           },
         };
+        const vmInstance = new VM(options);
 
-        // Create a function with the user's code
-        const userFunction = new Function(
-          'input1',
-          'input2',
-          'input3',
-          'input4',
-          'input5',
-          'Math',
-          'String',
-          'Number',
-          'Boolean',
-          'Array',
-          'Object',
-          'JSON',
-          'Date',
-          'RegExp',
-          'console',
-          jsCode
-        );
+        // Wrap user code in a function for argument passing
+        const wrappedCode = `
+          (function(input1, input2, input3, input4, input5, Math, String, Number, Boolean, Array, Object, JSON, Date, RegExp, console) {
+            ${jsCode}
+          })(input1, input2, input3, input4, input5, Math, String, Number, Boolean, Array, Object, JSON, Date, RegExp, undefined)
+        `;
 
-        // Execute the user's code with the sandbox context
-        result = userFunction.call(
-          null,
-          sandbox.input1,
-          sandbox.input2,
-          sandbox.input3,
-          sandbox.input4,
-          sandbox.input5,
-          sandbox.Math,
-          sandbox.String,
-          sandbox.Number,
-          sandbox.Boolean,
-          sandbox.Array,
-          sandbox.Object,
-          sandbox.JSON,
-          sandbox.Date,
-          sandbox.RegExp,
-          sandbox.console
-        );
+        result = vmInstance.run(wrappedCode);
 
         status = true;
       }
     } catch (error) {
-      result = `JavaScript Error: ${error}`;
+      let errorMsg = 'Unknown error';
+      if (typeof error === 'string') {
+        errorMsg = error;
+      } else if (
+        error !== null &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof (error as { message?: unknown }).message === 'string'
+      ) {
+        errorMsg = (error as { message: string }).message;
+      }
+      result = `JavaScript Error: ${errorMsg}`;
       status = false;
     }
 
@@ -143,7 +136,8 @@ export class SandBoxNode extends Node {
 }
 
 function generateSandBoxPreview(properties: SandBoxNodeProperties): string {
-  const jsCode = properties.jsCode || 'No code';
+  const jsCode =
+    properties.jsCode !== undefined && properties.jsCode !== null ? properties.jsCode : 'No code';
 
   // Truncate code for display
   let displayCode = jsCode;

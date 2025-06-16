@@ -25,7 +25,12 @@ export class RandomNode extends Node {
     properties.max = properties.max ?? 100;
     properties.type = properties.type || 'integer';
     properties.length = properties.length ?? 10;
-    properties.language = properties.language || 'JavaScript';
+    properties.language =
+      properties.language !== undefined &&
+      properties.language !== null &&
+      properties.language !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = generateRandomNodeContent(properties);
     super(id, 'random', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -41,17 +46,29 @@ export class RandomNode extends Node {
       this.addOutput(new Port('value', 'Random Number', 'number', 'value'));
     }
   }
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = generateRandomNodeContent(this.properties);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const min = inputValues.min !== undefined ? Number(inputValues.min) : this.properties.min;
-    const max = inputValues.max !== undefined ? Number(inputValues.max) : this.properties.max;
-    const type = this.properties.type;
-    const length = this.properties.length;
-    let value: any;
+  process(inputValues: Record<string, unknown>): Record<string, unknown> {
+    const min: number =
+      typeof inputValues.min === 'number'
+        ? inputValues.min
+        : inputValues.min !== undefined
+          ? Number(inputValues.min)
+          : (this.properties.min as number);
+    const max: number =
+      typeof inputValues.max === 'number'
+        ? inputValues.max
+        : inputValues.max !== undefined
+          ? Number(inputValues.max)
+          : (this.properties.max as number);
+    // Define the type for better readability
+    type RandomType = 'integer' | 'float' | 'boolean' | 'string';
+    const type: RandomType = this.properties.type as RandomType;
+    const length: number = typeof this.properties.length === 'number' ? this.properties.length : 10;
+    let value: unknown;
     switch (type) {
       case 'integer':
         value = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -62,7 +79,7 @@ export class RandomNode extends Node {
       case 'boolean':
         value = Math.random() >= 0.5;
         break;
-      case 'string':
+      case 'string': {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
         for (let i = 0; i < length; i++) {
@@ -70,6 +87,7 @@ export class RandomNode extends Node {
         }
         value = result;
         break;
+      }
       default:
         value = Math.random() * (max - min) + min;
     }

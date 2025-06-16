@@ -25,7 +25,10 @@ export class MathNode extends Node {
       properties.expression = 'a + b';
     }
     properties.variables = properties.variables || {};
-    properties.language = properties.language || 'JavaScript';
+    properties.language =
+      typeof properties.language === 'string' && properties.language.trim() !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
     super(id, 'math', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
@@ -37,24 +40,37 @@ export class MathNode extends Node {
     this.addOutput(new Port('error', 'Error', 'string', 'expression'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = `<p class="math-expression-display">${this.properties.expression}</p>`;
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
+  process(inputValues: Record<string, unknown>): { result: number; error: string | null } {
     try {
-      const expression = inputValues['expression'] || this.properties.expression;
+      const expression: string =
+        typeof inputValues['expression'] === 'string'
+          ? inputValues['expression']
+          : typeof this.properties.expression === 'string'
+            ? this.properties.expression
+            : 'a + b';
+      const variables =
+        this.properties.variables !== undefined &&
+        this.properties.variables !== null &&
+        typeof this.properties.variables === 'object'
+          ? (this.properties.variables as Record<string, number>)
+          : {};
       const scope: Record<string, number> = {
-        ...this.properties.variables,
+        ...variables,
       };
       Object.keys(inputValues).forEach(key => {
         if (key !== 'previous' && key !== 'expression') {
-          const value = Number(inputValues[key] || 0);
+          const rawValue = inputValues[key];
+          const value = rawValue !== undefined && rawValue !== null ? Number(rawValue) : 0;
           scope[key] = isNaN(value) ? 0 : value;
         }
       });
-      const result = math.evaluate(expression, scope);
+      const evalResult: unknown = math.evaluate(expression, scope);
+      const result: number = typeof evalResult === 'number' ? evalResult : Number(evalResult);
       return {
         result: result,
         error: null,

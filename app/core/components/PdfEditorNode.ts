@@ -23,10 +23,16 @@ export class PdfEditorNode extends Node {
 
   constructor(id: string, properties: Partial<PdfEditorNodeProperties> = {}) {
     const pdfEditorProps: PdfEditorNodeProperties = {
-      pdfPath: properties.pdfPath || '',
-      newText: properties.newText || '',
-      locator: properties.locator || '',
-      language: properties.language || 'JavaScript',
+      pdfPath: properties.pdfPath ?? '',
+      newText: properties.newText ?? '',
+      locator:
+        typeof properties.locator === 'string' && properties.locator.length > 0
+          ? properties.locator
+          : '',
+      language:
+        typeof properties.language === 'string' && properties.language.trim().length > 0
+          ? properties.language
+          : 'JavaScript',
     };
 
     pdfEditorProps.nodeContent = generatePdfEditorPreview(pdfEditorProps);
@@ -45,16 +51,25 @@ export class PdfEditorNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const pdfProps = this.properties as PdfEditorNodeProperties;
     this.properties.nodeContent = generatePdfEditorPreview(pdfProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const pdfPath = inputValues['pdfPath'] || this.properties.pdfPath;
-    const newText = inputValues['newText'] || this.properties.newText;
-    const locator = inputValues['locator'] || this.properties.locator;
+  process(inputValues: Record<string, unknown>): Record<string, boolean> {
+    const pdfPath: string =
+      typeof inputValues['pdfPath'] === 'string'
+        ? inputValues['pdfPath']
+        : (this.properties.pdfPath as string);
+    const newText: string =
+      typeof inputValues['newText'] === 'string'
+        ? inputValues['newText']
+        : (this.properties.newText as string);
+    const locator: string =
+      typeof inputValues['locator'] === 'string'
+        ? inputValues['locator']
+        : (this.properties.locator as string);
 
     // Process PDF text replacement directly on the file
     let status = true;
@@ -67,7 +82,7 @@ export class PdfEditorNode extends Node {
         // This would call the actual PDF editing library to modify the file in place
         status = true;
       }
-    } catch (error) {
+    } catch {
       status = false;
     }
 
@@ -78,9 +93,18 @@ export class PdfEditorNode extends Node {
 }
 
 function generatePdfEditorPreview(properties: PdfEditorNodeProperties): string {
-  const pdfPath = properties.pdfPath || 'No file selected';
-  const newText = properties.newText || 'No text specified';
-  const locator = properties.locator || 'No locator';
+  const pdfPath =
+    typeof properties.pdfPath === 'string' && properties.pdfPath.trim().length > 0
+      ? properties.pdfPath
+      : 'No file selected';
+  const newText =
+    typeof properties.newText === 'string' && properties.newText.trim().length > 0
+      ? properties.newText
+      : 'No text specified';
+  const locator =
+    typeof properties.locator === 'string' && properties.locator.trim().length > 0
+      ? properties.locator
+      : 'No locator';
 
   // Truncate file path for display
   let displayPath = pdfPath;

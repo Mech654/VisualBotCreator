@@ -23,10 +23,19 @@ export class TerminalNode extends Node {
 
   constructor(id: string, properties: Partial<TerminalNodeProperties> = {}) {
     const terminalProps: TerminalNodeProperties = {
-      command: properties.command || '',
-      workingDirectory: properties.workingDirectory || '',
+      command:
+        typeof properties.command === 'string' && properties.command.trim() !== ''
+          ? properties.command
+          : '',
+      workingDirectory:
+        typeof properties.workingDirectory === 'string' && properties.workingDirectory.trim() !== ''
+          ? properties.workingDirectory
+          : '',
       platform: properties.platform || 'auto',
-      language: properties.language || 'JavaScript',
+      language:
+        typeof properties.language === 'string' && properties.language.trim() !== ''
+          ? properties.language
+          : 'JavaScript',
     };
 
     terminalProps.nodeContent = generateTerminalPreview(terminalProps);
@@ -47,16 +56,28 @@ export class TerminalNode extends Node {
     this.addOutput(new Port('status', 'Status', 'boolean', 'success'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     const terminalProps = this.properties as TerminalNodeProperties;
     this.properties.nodeContent = generateTerminalPreview(terminalProps);
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(inputValues: Record<string, any>): Record<string, any> {
-    const command = inputValues['command'] || this.properties.command;
-    const workingDirectory = inputValues['workingDirectory'] || this.properties.workingDirectory;
-    const platform = inputValues['platform'] || this.properties.platform;
+  process(inputValues: Record<string, unknown>): Record<string, unknown> {
+    const command: string =
+      typeof inputValues['command'] === 'string' && inputValues['command'].trim() !== ''
+        ? inputValues['command']
+        : (this.properties.command as string);
+    const workingDirectory: string =
+      typeof inputValues['workingDirectory'] === 'string' &&
+      inputValues['workingDirectory'].trim() !== ''
+        ? inputValues['workingDirectory']
+        : (this.properties.workingDirectory as string);
+    const platform: 'linux' | 'windows' | 'auto' =
+      inputValues['platform'] === 'linux' ||
+      inputValues['platform'] === 'windows' ||
+      inputValues['platform'] === 'auto'
+        ? inputValues['platform']
+        : (this.properties.platform as 'linux' | 'windows' | 'auto');
 
     // Execute terminal command
     let output = '';
@@ -86,7 +107,7 @@ export class TerminalNode extends Node {
         status = true;
       }
     } catch (error) {
-      output = `Error executing command: ${error}`;
+      output = `Error executing command: ${String(error)}`;
       exitCode = 1;
       status = false;
     }
@@ -135,8 +156,14 @@ export class TerminalNode extends Node {
 }
 
 function generateTerminalPreview(properties: TerminalNodeProperties): string {
-  const command = properties.command || 'No command';
-  const workingDirectory = properties.workingDirectory || 'Default directory';
+  const command =
+    typeof properties.command === 'string' && properties.command.trim() !== ''
+      ? properties.command
+      : 'No command';
+  const workingDirectory =
+    typeof properties.workingDirectory === 'string' && properties.workingDirectory.trim() !== ''
+      ? properties.workingDirectory
+      : 'Default directory';
   const platform = properties.platform || 'auto';
 
   // Truncate command for display

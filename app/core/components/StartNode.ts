@@ -18,19 +18,22 @@ export class StartNode extends Node {
   static override shownProperties = [];
 
   constructor(id: string, properties: StartNodeProperties = {}) {
-    properties.title = properties.title || 'Start';
+    properties.title = typeof properties.title === 'string' ? properties.title : 'Start';
     properties.nodeContent = 'Bot conversation starts here';
-    properties.language = properties.language || 'JavaScript';
+    properties.language =
+      typeof properties.language === 'string' && properties.language.trim() !== ''
+        ? properties.language
+        : 'JavaScript';
     super(id, 'start', properties);
     this.addOutput(new Port('next', 'Next', 'control', 'next'));
   }
 
-  updateNodeContent() {
+  updateNodeContent(): string {
     this.properties.nodeContent = 'Bot conversation starts here';
-    return this.properties.nodeContent;
+    return this.properties.nodeContent as string;
   }
 
-  process(): Record<string, any> {
+  process(): Record<string, string> {
     return { status: 'started' };
   }
 }

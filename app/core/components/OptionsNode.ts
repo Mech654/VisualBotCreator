@@ -25,8 +25,14 @@ export class OptionsNode extends Node {
   static override shownProperties = ['options'];
 
   constructor(id: string, properties: OptionsNodeProperties = {}) {
-    properties.title = properties.title || 'Options';
-    properties.language = properties.language || 'JavaScript';
+    properties.title =
+      typeof properties.title === 'string' && properties.title.trim() !== ''
+        ? properties.title
+        : 'Options';
+    properties.language =
+      typeof properties.language === 'string' && properties.language.trim() !== ''
+        ? properties.language
+        : 'JavaScript';
     properties.options = properties.options || [
       { text: 'Option 1', value: 'option1' },
       { text: 'Option 2', value: 'option2' },
@@ -42,21 +48,23 @@ export class OptionsNode extends Node {
     this.addOutput(new Port('selectedOption', 'Selected Option', 'string', 'options'));
   }
 
-  updateNodeContent() {
-    this.properties.nodeContent = generateOptionsPreview(this.properties.options || []);
-    return this.properties.nodeContent;
+  updateNodeContent(): string {
+    this.properties.nodeContent = generateOptionsPreview(
+      Array.isArray(this.properties.options) ? (this.properties.options as Option[]) : []
+    );
+    return this.properties.nodeContent as string;
   }
 
   process(
-    inputValues: Record<string, any>,
+    inputValues: Record<string, unknown>,
     selectedOptionIndex: number | null = null
-  ): Record<string, any> {
+  ): Record<string, unknown> {
     if (
       selectedOptionIndex !== null &&
       selectedOptionIndex >= 0 &&
-      selectedOptionIndex < this.properties.options.length
+      selectedOptionIndex < (this.properties.options as Option[]).length
     ) {
-      const selectedOption = this.properties.options[selectedOptionIndex];
+      const selectedOption = (this.properties.options as Option[])[selectedOptionIndex];
       return {
         selectedOption: selectedOption.value,
       };
@@ -70,7 +78,7 @@ export class OptionsNode extends Node {
 }
 
 function generateOptionsPreview(options: Option[]): string {
-  if (!options || options.length === 0) {
+  if (options.length === 0) {
     return '<div class="options-empty">No options defined</div>';
   }
   const displayOptions = options.slice(0, 3);
