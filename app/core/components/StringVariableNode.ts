@@ -19,7 +19,7 @@ export class StringVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: StringVariableNodeProperties = {}) {
+  constructor(id: string, properties: StringVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.title =
       properties.title !== undefined && properties.title !== null && properties.title !== ''
         ? properties.title
@@ -35,7 +35,7 @@ export class StringVariableNode extends Node {
         ? properties.language
         : 'JavaScript';
     properties.nodeContent = `<span class="variable-string">${properties.value}</span>`;
-    super(id, 'stringvariable', properties);
+    super(id, 'stringvariable', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('value', 'Value', 'string', 'value'));

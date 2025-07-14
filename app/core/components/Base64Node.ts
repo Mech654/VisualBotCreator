@@ -17,12 +17,12 @@ export class Base64Node extends Node {
 
   static override shownProperties: string[] = [];
 
-  constructor(id: string, properties: Base64NodeProperties = {}) {
+  constructor(id: string, properties: Base64NodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+    super(id, 'base64', properties, position);
     properties.title = typeof properties.title === 'string' ? properties.title : 'Base64';
     properties.language =
       typeof properties.language === 'string' ? properties.language : 'JavaScript';
     properties.nodeContent = 'Encodes input to Base64';
-    super(id, 'base64', properties);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addInput(new Port('value', 'Value', 'string', 'value'));
     this.addOutput(new Port('next', 'Next', 'control'));

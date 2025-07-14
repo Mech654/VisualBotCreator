@@ -18,7 +18,7 @@ export class ConditionNode extends Node {
 
   static override shownProperties = ['condition'];
 
-  constructor(id: string, properties: ConditionNodeProperties = {}) {
+  constructor(id: string, properties: ConditionNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.title =
       properties.title !== undefined && properties.title !== null && properties.title !== ''
         ? properties.title
@@ -36,7 +36,7 @@ export class ConditionNode extends Node {
         ? properties.language
         : 'JavaScript';
     properties.nodeContent = `<p class="condition-expression">if (${properties.condition}) { ... }</p>`;
-    super(id, 'condition', properties);
+    super(id, 'condition', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addInput(new Port('value', 'Value to Check', 'any', 'condition'));
     this.addOutput(new Port('true', 'True', 'control', 'condition'));

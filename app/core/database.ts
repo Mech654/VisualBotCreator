@@ -126,6 +126,7 @@ async function saveNode(
     await ensureBotExists(botId);
     const definition = JSON.stringify({
       type: node.type,
+      position: node.position,
       properties: node.properties,
       inputs: node.inputs.map(port => ({
         id: port.id,

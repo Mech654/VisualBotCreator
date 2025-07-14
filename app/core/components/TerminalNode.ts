@@ -21,7 +21,7 @@ export class TerminalNode extends Node {
 
   static override shownProperties = ['command', 'workingDirectory'];
 
-  constructor(id: string, properties: Partial<TerminalNodeProperties> = {}) {
+  constructor(id: string, properties: Partial<TerminalNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     const terminalProps: TerminalNodeProperties = {
       command:
         typeof properties.command === 'string' && properties.command.trim() !== ''
@@ -39,7 +39,7 @@ export class TerminalNode extends Node {
     };
 
     terminalProps.nodeContent = generateTerminalPreview(terminalProps);
-    super(id, 'terminal', terminalProps);
+    super(id, 'terminal', terminalProps, position);
 
     // Flow control ports
     this.addInput(new Port('previous', 'Previous', 'control'));

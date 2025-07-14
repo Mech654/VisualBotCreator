@@ -21,7 +21,7 @@ export class PdfEditorNode extends Node {
 
   static override shownProperties = ['pdfPath', 'newText', 'locator'];
 
-  constructor(id: string, properties: Partial<PdfEditorNodeProperties> = {}) {
+  constructor(id: string, properties: Partial<PdfEditorNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     const pdfEditorProps: PdfEditorNodeProperties = {
       pdfPath: properties.pdfPath ?? '',
       newText: properties.newText ?? '',
@@ -36,7 +36,7 @@ export class PdfEditorNode extends Node {
     };
 
     pdfEditorProps.nodeContent = generatePdfEditorPreview(pdfEditorProps);
-    super(id, 'pdfeditor', pdfEditorProps);
+    super(id, 'pdfeditor', pdfEditorProps, position);
 
     // Flow control ports
     this.addInput(new Port('previous', 'Previous', 'control'));

@@ -21,7 +21,7 @@ export class TextNode extends Node {
 
   static override shownProperties = ['text', 'fontSize', 'bold', 'color'];
 
-  constructor(id: string, properties: Partial<TextNodeProperties> = {}) {
+  constructor(id: string, properties: Partial<TextNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     const textNodeProps: TextNodeProperties = {
       text:
         typeof properties.text === 'string' && properties.text.trim() !== ''
@@ -42,7 +42,7 @@ export class TextNode extends Node {
           : 'JavaScript',
     };
     textNodeProps.nodeContent = generateTextNodePreview(textNodeProps);
-    super(id, 'text', textNodeProps);
+    super(id, 'text', textNodeProps, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addInput(new Port('textInput', 'Text Input', 'string', 'text'));

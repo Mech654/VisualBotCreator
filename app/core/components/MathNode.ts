@@ -20,7 +20,7 @@ export class MathNode extends Node {
 
   static override shownProperties = ['expression'];
 
-  constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }) {
+  constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }, position: { x: number; y: number } = { x: 0, y: 0 }) {
     if (!properties.expression) {
       properties.expression = 'a + b';
     }
@@ -30,7 +30,7 @@ export class MathNode extends Node {
         ? properties.language
         : 'JavaScript';
     properties.nodeContent = `<p class="math-expression-display">${properties.expression}</p>`;
-    super(id, 'math', properties);
+    super(id, 'math', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addInput(new Port('a', 'Variable A', 'number', 'variables'));

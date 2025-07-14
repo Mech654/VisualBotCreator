@@ -19,7 +19,7 @@ export class IntVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: IntVariableNodeProperties = {}) {
+  constructor(id: string, properties: IntVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     if (typeof properties.title !== 'string' || properties.title.trim() === '') {
       properties.title = 'Int Variable';
     }
@@ -29,7 +29,7 @@ export class IntVariableNode extends Node {
         ? properties.language
         : 'JavaScript';
     properties.nodeContent = `<span class="variable-int">${properties.value}</span>`;
-    super(id, 'intvariable', properties);
+    super(id, 'intvariable', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('value', 'Value', 'number', 'value'));

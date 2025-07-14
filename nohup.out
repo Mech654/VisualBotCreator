@@ -1,0 +1,64 @@
+
+> visualbotcreator@1.0.0 dev
+> node cross_platform/dev-runner.js
+
+⏳ Starting development environment...
+
+🧹 Cleaning output directory...
+(node:47769) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+📂 Setting up development environment...
+🚀 Starting development servers...
+
+❌ Development process exited with code null
+
+> visualbotcreator@1.0.0 dev
+> node cross_platform/dev-runner.js
+
+⏳ Starting development environment...
+
+🧹 Cleaning output directory...
+(node:48079) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+📂 Setting up development environment...
+🚀 Starting development servers...
+📄 Processing HTML...
+✅ HTML ready
+🎨 Building styles...
+⚙️ Compiling TypeScript...
+📦 Starting webpack...
+🌐 Starting dev server...
+🔌 Building preload script...
+✅ Dev server ready
+✅ TypeScript ready
+✅ Styles ready
+✅ Webpack ready
+🏍️ Running electron app
+⏳ Starting development environment...
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+    at writeGeneric (node:internal/stream_base_commons:150:3)
+    at Socket._writeGeneric (node:net:966:11)
+    at Socket._write (node:net:978:8)
+    at writeOrBuffer (node:internal/streams/writable:570:12)
+    at _write (node:internal/streams/writable:499:10)
+    at Writable.write (node:internal/streams/writable:508:10)
+    at OutputWriter.write (/home/blazing/Documents/VisualBotCreator/node_modules/concurrently/dist/src/output-writer.js:63:31)
+    at Object.next (/home/blazing/Documents/VisualBotCreator/node_modules/concurrently/dist/src/concurrently.js:76:77)
+    at ConsumerObserver.next (/home/blazing/Documents/VisualBotCreator/node_modules/rxjs/dist/cjs/internal/Subscriber.js:113:33)
+Emitted 'error' event on Socket instance at:
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -32,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+
+Node.js v24.4.0
+
+❌ Development process exited with code 130

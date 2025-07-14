@@ -19,13 +19,13 @@ export class BooleanVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: BooleanVariableNodeProperties = {}) {
+  constructor(id: string, properties: BooleanVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.title = typeof properties.title === 'string' ? properties.title : 'Boolean Variable';
     properties.value = typeof properties.value === 'boolean' ? properties.value : false;
     properties.language =
       typeof properties.language === 'string' ? properties.language : 'JavaScript';
     properties.nodeContent = `<span class="variable-boolean">${(typeof properties.value === 'boolean' ? properties.value : false) ? 'true' : 'false'}</span>`;
-    super(id, 'booleanvariable', properties);
+    super(id, 'booleanvariable', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addOutput(new Port('value', 'Value', 'boolean', 'value'));

@@ -13,7 +13,7 @@ export enum ComponentCategory {
 }
 
 export interface NodeComponent {
-  new (id: string, properties?: any): Node;
+  new (id: string, properties?: any, position?: { x: number; y: number }): Node;
   metadata?: {
     name?: string;
     category?: ComponentCategory | string;
@@ -46,7 +46,7 @@ export class NodeFactory {
           const componentName = file.replace('.js', '');
 
           // Skip if we've already registered this component
-          if (this.getTypeFromComponentName(componentName) in this.nodeTypes) {
+          if (this.renameWithoutType(componentName) in this.nodeTypes) {
             continue;
           }
 
@@ -55,7 +55,7 @@ export class NodeFactory {
           const ComponentClass = componentModule[componentName];
 
           if (ComponentClass && typeof ComponentClass === 'function') {
-            const type = this.getTypeFromComponentName(componentName);
+            const type = this.renameWithoutType(componentName);
 
             this.registerNodeType(type, ComponentClass);
           }
@@ -73,7 +73,7 @@ export class NodeFactory {
   /**
    * Extract the node type from component name
    */
-  private static getTypeFromComponentName(componentName: string): string {
+  private static renameWithoutType(componentName: string): string {
     return componentName.replace(/Node$/, '').toLowerCase();
   }
 
@@ -81,7 +81,7 @@ export class NodeFactory {
     this.nodeTypes[type] = componentClass;
   }
 
-  static createNode(type: string, id: string, properties: Record<string, any> = {}): Node {
+  static createNode(type: string, id: string, properties: Record<string, any> = {}, position: { x: number; y: number } = { x: 0, y: 0 }): Node {
     console.log(`Creating node of type: ${type}, available types:`, Object.keys(this.nodeTypes));
 
     const NodeClass = this.nodeTypes[type];
@@ -90,7 +90,7 @@ export class NodeFactory {
       throw new Error(`Unknown node type: ${type}`);
     }
 
-    return new NodeClass(id, properties);
+    return new NodeClass(id, properties, position);
   }
 
   static getRegisteredTypes(): Array<{

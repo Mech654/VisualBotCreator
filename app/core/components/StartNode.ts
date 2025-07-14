@@ -17,14 +17,14 @@ export class StartNode extends Node {
 
   static override shownProperties = [];
 
-  constructor(id: string, properties: StartNodeProperties = {}) {
+  constructor(id: string, properties: StartNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.title = typeof properties.title === 'string' ? properties.title : 'Start';
     properties.nodeContent = 'Bot conversation starts here';
     properties.language =
       typeof properties.language === 'string' && properties.language.trim() !== ''
         ? properties.language
         : 'JavaScript';
-    super(id, 'start', properties);
+    super(id, 'start', properties, position);
     this.addOutput(new Port('next', 'Next', 'control', 'next'));
   }
 

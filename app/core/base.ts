@@ -45,13 +45,15 @@ export class Node {
   properties: NodeProperties;
   inputs: Port[];
   outputs: Port[];
+  position: { x: number; y: number };
 
-  constructor(id: string, type: string, properties: NodeProperties = {}) {
+  constructor(id: string, type: string, properties: NodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     this.id = id;
     this.type = type;
     this.properties = properties;
     this.inputs = [];
     this.outputs = [];
+    this.position = position;
   }
 
   addInput(port: Port): void {

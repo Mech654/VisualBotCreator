@@ -18,7 +18,7 @@ export function setupIpcHandlers(): void {
   // Handle node creation requests
   ipcMain.handle(
     'node:create',
-    (event, { type, id, properties }: { type: string; id: string; properties: NodeProperties }) => {
+    (event, { type, id, properties, position }: { type: string; id: string; properties: NodeProperties, position: { x: number; y: number } }) => {
       try {
         // Check if we're updating an existing node
         const existingNode = nodeInstances.get(id);
@@ -32,7 +32,7 @@ export function setupIpcHandlers(): void {
           };
         }
 
-        const node = NodeFactory.createNode(type, id, properties);
+        const node = NodeFactory.createNode(type, id, properties, position);
 
         if (preservedConnections && existingNode) {
           // Restore input connections
@@ -320,7 +320,6 @@ export function setupIpcHandlers(): void {
     }
   });
   // Expose changeNameDb via IPC
-  // This is a direct database function exposure, consider using the botconfig namespaced one for business logic
   ipcMain.handle('database:changeName', async (event, oldId: string, newId: string) => {
     try {
       const result = await changeNameDb(oldId, newId);

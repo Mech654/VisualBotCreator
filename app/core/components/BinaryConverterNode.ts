@@ -20,8 +20,8 @@ export class BinaryConverterNode extends Node {
 
   static override shownProperties = ['inputValue'];
 
-  constructor(id: string, properties: BinaryConverterNodeProperties = {}) {
-    super(id, 'binaryconverter', properties);
+  constructor(id: string, properties: BinaryConverterNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+    super(id, 'binaryconverter', properties, position);
     properties.language = properties.language || 'JavaScript';
     properties.inputValue =
       properties.inputValue !== null && properties.inputValue !== undefined

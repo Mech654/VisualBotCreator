@@ -18,7 +18,7 @@ export class IncrementNode extends Node {
 
   static override shownProperties = ['incrementBy'];
 
-  constructor(id: string, properties: IncrementNodeProperties = {}) {
+  constructor(id: string, properties: IncrementNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.incrementBy =
       typeof properties.incrementBy === 'number' && !isNaN(properties.incrementBy)
         ? properties.incrementBy
@@ -29,7 +29,7 @@ export class IncrementNode extends Node {
         ? properties.language
         : 'JavaScript';
     properties.nodeContent = `<div class="increment-preview">n + <span class="increment-value">${properties.incrementBy}</span></div>`;
-    super(id, 'increment', properties);
+    super(id, 'increment', properties, position);
     this.addInput(new Port('previous', 'Previous', 'control'));
     this.addOutput(new Port('next', 'Next', 'control'));
     this.addInput(new Port('number', 'Number', 'number', 'number'));

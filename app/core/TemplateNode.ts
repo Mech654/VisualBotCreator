@@ -18,12 +18,12 @@ export class TemplateNode extends Node {
 
   static override shownProperties: string[] = [];
 
-  constructor(id: string, properties: TemplateNodeProperties = {}) {
+  constructor(id: string, properties: TemplateNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     properties.title = properties.title || 'Template Node';
     properties.language = properties.language || 'JavaScript';
     properties.nodeContent =
       properties.nodeContent || '<div class="template-node-content">Template</div>';
-    super(id, 'template', properties);
+    super(id, 'template', properties, position);
     // this.addInput(new Port('input', 'Input', 'string'));
     // this.addOutput(new Port('output', 'Output', 'string'));
   }

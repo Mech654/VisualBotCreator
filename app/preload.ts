@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 interface NodeSystemAPI {
-  createNode: (type: string, id: string, properties: Record<string, unknown>) => Promise<unknown>;
+  createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => Promise<unknown>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getNodeById: (id: string) => Promise<unknown>;
@@ -46,8 +46,8 @@ interface BotConfigAPI {
 }
 
 contextBridge.exposeInMainWorld('nodeSystem', {
-  createNode: (type: string, id: string, properties: Record<string, unknown>) => {
-    return ipcRenderer.invoke('node:create', { type, id, properties }) as Promise<unknown>;
+  createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => {
+    return ipcRenderer.invoke('node:create', { type, id, properties, position }) as Promise<unknown>;
   },
 
   getNodeTypes: () => {

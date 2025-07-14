@@ -103,15 +103,27 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
     setupPropertyEventListeners(nodeInstance, propertiesGroup, async (key, value) => {
       nodeInstance.properties[key] = value;
       try {
-        const updatedNode = await window.nodeSystem.createNode(
-          nodeInstance.type,
-          nodeInstance.id,
-          nodeInstance.properties
-        ) as NodeInstance;
-        nodeInstance.properties = updatedNode.properties;
+        // Get the node element to extract current position
         const nodeElement = document.querySelector(
           `[data-node-id="${nodeInstance.id}"]`
         ) as HTMLElement;
+        
+        let position = { x: 0, y: 0 };
+        if (nodeElement) {
+          position = {
+            x: nodeElement.offsetLeft,
+            y: nodeElement.offsetTop
+          };
+        }
+
+        const updatedNode = await (window.nodeSystem.createNode as any)(
+          nodeInstance.type,
+          nodeInstance.id,
+          nodeInstance.properties,
+          position
+        ) as NodeInstance;
+        nodeInstance.properties = updatedNode.properties;
+        
         if (nodeElement) {
           const contentEl = nodeElement.querySelector('.node-content');
           if (contentEl && updatedNode.properties.nodeContent) {
@@ -275,9 +287,9 @@ export async function createNodeInstance(
   const id = window.utils.generateNodeId();
 
   try {
-    const nodeInstance = await window.nodeSystem.createNode(type, id, {
+    const nodeInstance = await (window.nodeSystem.createNode as any)(type, id, {
       flowType,
-    }) as NodeInstance;
+    }, { x, y }) as NodeInstance;
 
     const nodeElement = document.createElement('div');
     nodeElement.className = 'node';

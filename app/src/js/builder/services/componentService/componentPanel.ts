@@ -62,10 +62,6 @@ export async function populateComponentsPanel(): Promise<void> {
     return;
   }
 
-
-
-
-
   const { categories } = await fetchAvailableComponents();
 
   for (const [categoryName, components] of Object.entries(categories)) {

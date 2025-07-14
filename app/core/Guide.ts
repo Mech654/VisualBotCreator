@@ -80,7 +80,7 @@ export class GuideNode extends Node {
    * PURPOSE: Initialize your node with default values and set its initial appearance
    * This runs when a node is first created or loaded from saved data
    */
-  constructor(id: string, properties: GuideNodeProperties = {}) {
+  constructor(id: string, properties: GuideNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
     // Set default values for properties
     properties.title = properties.title || 'Guide';
     properties.customValue = properties.customValue || 'Default value';
@@ -98,7 +98,7 @@ export class GuideNode extends Node {
         `;
 
     // Call super with the node id, type, and properties
-    super(id, 'guide', properties);
+    super(id, 'guide', properties, position);
 
     /**
      * Step 5: Add input and output ports
