@@ -1,4 +1,4 @@
-import { InteractEvent, NodeRectangle } from '../../models/types.js';
+import { InteractEvent, NodeRectangle, NodeInstance } from '../../models/types.js';
 import { showCollisionFeedback, snapToGrid } from '../../utils/grid.js';
 import { updateNodePosition, showPropertiesPanel } from '../nodeService/nodeService.js';
 import { updateConnections } from '../connectionService/connectionService.js';
@@ -26,7 +26,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
       if (nodeId) {
         try {
           // Fetch the node instance data from the backend
-          const nodeInstance = await window.nodeSystem.getNodeById(nodeId);
+          const nodeInstance = await window.nodeSystem.getNodeById(nodeId) as NodeInstance;
 
           // Show the properties panel with this node's data
           if (nodeInstance) {

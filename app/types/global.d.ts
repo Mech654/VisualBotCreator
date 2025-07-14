@@ -19,12 +19,37 @@ interface DatabaseAPI {
   setBotEnabled: (botId: string, enabled: boolean) => Promise<void>;
 }
 
+interface NodeInstanceGlobal {
+  id: string;
+  type: string;
+  properties: {
+    title?: string;
+    message?: string;
+    condition?: string;
+    operation?: string;
+    placeholder?: string;
+    options?: Array<{ text: string; value: string }>;
+    nodeContent?: string;
+    [key: string]: any;
+  };
+  inputs: Array<{
+    id: string;
+    label: string;
+    dataType: string;
+  }>;
+  outputs: Array<{
+    id: string;
+    label: string;
+    dataType: string;
+  }>;
+}
+
 // Define NodeSystemAPI interface
 interface NodeSystemAPI {
-  createNode: (type: string, id: string, properties: Record<string, unknown>) => Promise<unknown>;
+  createNode: (type: string, id: string, properties: Record<string, unknown>) => Promise<NodeInstanceGlobal>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
-  getNodeById: (id: string) => Promise<unknown>;
+  getNodeById: (id: string) => Promise<NodeInstanceGlobal>;
   processNode: (id: string, inputs: Record<string, unknown>) => Promise<unknown>;
   createConnection: (
     fromNodeId: string,

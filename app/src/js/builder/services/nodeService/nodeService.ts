@@ -107,7 +107,7 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
           nodeInstance.type,
           nodeInstance.id,
           nodeInstance.properties
-        );
+        ) as NodeInstance;
         nodeInstance.properties = updatedNode.properties;
         const nodeElement = document.querySelector(
           `[data-node-id="${nodeInstance.id}"]`
@@ -149,7 +149,7 @@ function generateDefaultPropertiesPanel(nodeInstance: NodeInstance): string {
   // Determine which properties to show
   let shownProps: string[] | null = null;
   // Try to get the class constructor from the nodeInstance
-  const nodeClass = window.nodeSystem?.getNodeClass?.(nodeInstance.type);
+  const nodeClass = window.nodeSystem?.getNodeClass?.(nodeInstance.type) as any;
   if (nodeClass && Array.isArray(nodeClass.shownProperties)) {
     shownProps = nodeClass.shownProperties;
   } else if (
@@ -277,7 +277,7 @@ export async function createNodeInstance(
   try {
     const nodeInstance = await window.nodeSystem.createNode(type, id, {
       flowType,
-    });
+    }) as NodeInstance;
 
     const nodeElement = document.createElement('div');
     nodeElement.className = 'node';

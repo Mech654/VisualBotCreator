@@ -64,7 +64,7 @@ export function generateNodeHtml(nodeInstance: NodeInstance): string {
     content = `<p>${type.charAt(0).toUpperCase() + type.slice(1)} node</p>`;
   }
 
-  const NodeClass = window.nodeSystem?.getNodeClass?.(type);
+  const NodeClass = window.nodeSystem?.getNodeClass?.(type) as any;
   let shownProperties: string[] = [];
   if (NodeClass && Array.isArray(NodeClass.shownProperties)) {
     shownProperties = NodeClass.shownProperties;
