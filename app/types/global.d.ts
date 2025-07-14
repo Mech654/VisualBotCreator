@@ -1,9 +1,6 @@
-// filepath: /home/eagle/Documents/2VSC/app/types/global.d.ts
-
-// Define Bot interface
 interface Bot {
   Id: string;
-  Name: string; // This will be the same as Id after changes
+  Name: string;
   CreatedAt: string;
   UpdatedAt: string;
   enabled: number;
@@ -12,7 +9,6 @@ interface Bot {
   run_failure_count: number;
 }
 
-// Define DatabaseAPI interface
 interface DatabaseAPI {
   getAllBots: () => Promise<Bot[]>;
   getRunConditions: (botId: string) => Promise<{ Key: string; Value: string }[]>;
@@ -44,7 +40,6 @@ interface NodeInstanceGlobal {
   }>;
 }
 
-// Define NodeSystemAPI interface
 interface NodeSystemAPI {
   createNode: (type: string, id: string, properties: Record<string, unknown>) => Promise<NodeInstanceGlobal>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
@@ -66,9 +61,6 @@ interface NodeSystemAPI {
   getNodeConnections?: (nodeId: string) => Promise<unknown[]>;
   clearAllNodes?: () => Promise<{ success: boolean; error?: string }>;
   deleteNode?: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
-  /**
-   * Returns the Node class (constructor) for a given type string, or undefined if not found.
-   */
   getNodeClass?: (type: string) => unknown;
 }
 
@@ -77,7 +69,7 @@ interface UtilsAPI {
 }
 
 interface BotConfigAPI {
-  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>; // Updated signature
+  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>;
   changeDescription: (
     botId: string,
     newDescription: string
@@ -94,10 +86,15 @@ interface BotConfigAPI {
   deleteCondition: (botId: string, key: string) => Promise<{ success: boolean; error?: string }>;
 }
 
+interface SweetAlert2 {
+  fire(options: any): Promise<any>;
+  fire(title?: string, text?: string, icon?: string): Promise<any>;
+}
+
 declare interface Window {
   nodeSystem: NodeSystemAPI;
   utils: UtilsAPI;
   botconfig: BotConfigAPI;
-  database?: DatabaseAPI; // Added DatabaseAPI
-  Swal?: unknown; // Added Swal, type set to unknown to avoid 'any'
+  database?: DatabaseAPI;
+  Swal: SweetAlert2;
 }
