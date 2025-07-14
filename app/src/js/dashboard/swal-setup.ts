@@ -80,7 +80,7 @@ export function setupSwalDashboardModalStyle() {
   font-size: 1em;
   padding: 4px 0;
   margin-left: 8px;
-  width: calc(100% - 100px); /* Adjust width as needed */
+  width: calc(100% - 80px); /* Adjust width as needed */
 }
 .swal2-dashboard-bot-modal .swal-inline-input:focus {
   outline: none;

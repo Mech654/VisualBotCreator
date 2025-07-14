@@ -172,14 +172,14 @@ export function initPanelControls(): void {
       exitTransition(componentsPanel, 'fade', 200).then(() => {
         componentsPanel.style.display = 'none';
         propertiesPanel.style.display = 'block';
-        propertiesToggle.textContent = '🧩';
+        propertiesToggle.innerHTML = '<i class="bi bi-puzzle-fill"></i>';
         enterTransition(propertiesPanel, 'fade', 200);
       });
     } else {
       exitTransition(propertiesPanel, 'fade', 200).then(() => {
         componentsPanel.style.display = 'flex';
         propertiesPanel.style.display = 'none';
-        propertiesToggle.textContent = '📝';
+        propertiesToggle.innerHTML = '<i class="bi bi-pencil-square"></i>';
         enterTransition(componentsPanel, 'fade', 200);
       });
     }

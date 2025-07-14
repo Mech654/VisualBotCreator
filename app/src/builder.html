@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws:;"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws:;"
     />
     <title>Bot Creator - Builder</title>
     <link rel="icon" type="image/png" href="assets/images/mascot.png" />
@@ -18,6 +18,7 @@
       }
     </style>
     <link rel="stylesheet" href="styles/builder.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.17/dist/interact.min.js"></script>
     <script type="module" src="js/builder.js"></script>
   </head>
@@ -32,23 +33,23 @@
       </div>
       <nav class="menu">
         <div class="menu-item" data-page="dashboard">
-          <span class="menu-icon">📊</span>
+          <span class="menu-icon"><i class="bi bi-bar-chart-fill"></i></span>
           <span class="menu-text">Dashboard</span>
         </div>
         <div class="menu-item active" data-page="builder">
-          <span class="menu-icon">🧠</span>
+          <span class="menu-icon"><i class="bi bi-diagram-3-fill"></i></span>
           <span class="menu-text">Bot Builder</span>
         </div>
         <div class="menu-item" data-page="integrations">
-          <span class="menu-icon">🔌</span>
+          <span class="menu-icon"><i class="bi bi-plug-fill"></i></span>
           <span class="menu-text">Integrations</span>
         </div>
         <div class="menu-item" data-page="analytics">
-          <span class="menu-icon">📈</span>
+          <span class="menu-icon"><i class="bi bi-graph-up"></i></span>
           <span class="menu-text">Analytics</span>
         </div>
         <div class="menu-item" data-page="settings">
-          <span class="menu-icon">⚙️</span>
+          <span class="menu-icon"><i class="bi bi-gear-fill"></i></span>
           <span class="menu-text">Settings</span>
         </div>
       </nav>
@@ -63,27 +64,27 @@
         <div class="workspace">
           <div class="toolbox">
             <div class="tool" title="Select">
-              <span class="tool-icon">👆</span>
+              <span class="tool-icon"><i class="bi bi-cursor-fill"></i></span>
               <span class="tool-tooltip">Select</span>
             </div>
             <div class="tool" title="Connect">
-              <span class="tool-icon">🔗</span>
+              <span class="tool-icon"><i class="bi bi-bezier2"></i></span>
               <span class="tool-tooltip">Connect</span>
             </div>
             <div class="tool" title="Delete">
-              <span class="tool-icon">🗑️</span>
+              <span class="tool-icon"><i class="bi bi-trash-fill"></i></span>
               <span class="tool-tooltip">Delete</span>
             </div>
             <div class="tool" title="Zoom In">
-              <span class="tool-icon">🔍+</span>
+              <span class="tool-icon"><i class="bi bi-zoom-in"></i></span>
               <span class="tool-tooltip">Zoom In</span>
             </div>
             <div class="tool" title="Zoom Out">
-              <span class="tool-icon">🔍-</span>
+              <span class="tool-icon"><i class="bi bi-zoom-out"></i></span>
               <span class="tool-tooltip">Zoom Out</span>
             </div>
             <div class="tool" id="save-button" title="Save Project">
-              <span class="tool-icon">💾</span>
+              <span class="tool-icon"><i class="bi bi-floppy-fill"></i></span>
               <span class="tool-tooltip">Save</span>
             </div>
           </div>
@@ -98,7 +99,7 @@
           </div>
           <div class="panel-header">
             <span class="panel-title text-primary">Components</span>
-            <span id="properties-toggle" class="panel-toggle cursor-pointer">📝</span>
+            <span id="properties-toggle" class="panel-toggle cursor-pointer"><i class="bi bi-pencil-square"></i></span>
           </div>
           <div class="panel-content components-container">
             <div class="component-search">
@@ -109,19 +110,7 @@
                 aria-label="Search components"
               />
             </div>
-            <div class="component-filters">
-              <div class="filter-pill active">All</div>
-              <div class="filter-pill">Flow</div>
-              <div class="filter-pill">Data</div>
-            </div>
             <div id="component-categories" class="component-categories-container">
-              <div class="component-category">
-                <div class="category-header">
-                  <div class="category-icon">💬</div>
-                  <div class="category-title">Messages</div>
-                  <div class="category-toggle"></div>
-                </div>
-              </div>
             </div>
           </div>
           <div
@@ -199,7 +188,7 @@ Hello! How can I help you today?</textarea
                 data-tooltip="Preview this node in the chatbot conversation"
               >
                 <button class="btn btn-outline btn-sm">
-                  <span class="btn-icon">👁️</span>
+                  <span class="btn-icon"><i class="bi bi-eye-fill"></i></span>
                   Preview Node
                 </button>
               </div>
@@ -212,7 +201,6 @@ Hello! How can I help you today?</textarea
       </div>
     </div>
 
-    <!-- Project Namedddd Modal -->
     <div id="project-name-modal" class="modal" style="display: none">
       <div class="modal-content">
         <span class="modal-title">Save Project</span>

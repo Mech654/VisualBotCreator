@@ -93,22 +93,20 @@ export async function loadComponentIcons(componentTypes: string[]): Promise<void
 }
 
 export function initializeDefaultIcons(): void {
-  const createEmojiSvg = (emoji: string) => {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-      <text x="12" y="14" font-size="14" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
-    </svg>`;
+  const createBootstrapIconSvg = (iconClass: string) => {
+    return `<i class="bi ${iconClass}"></i>`;
   };
 
-  // Register default icons for common components
-  registerIcon('start', createEmojiSvg('🚀'));
-  registerIcon('message', createEmojiSvg('💬'));
-  registerIcon('options', createEmojiSvg('📋'));
-  registerIcon('condition', createEmojiSvg('❓'));
-  registerIcon('input', createEmojiSvg('📝'));
-  registerIcon('math', createEmojiSvg('🔢'));
-  registerIcon('text', createEmojiSvg('📄'));
-  registerIcon('increment', createEmojiSvg('➕'));
-  registerIcon('random', createEmojiSvg('🎲'));
+  // Register default Bootstrap icons for common components
+  registerIcon('start', createBootstrapIconSvg('bi-play-circle-fill'));
+  registerIcon('message', createBootstrapIconSvg('bi-chat-left-text-fill'));
+  registerIcon('options', createBootstrapIconSvg('bi-list-check'));
+  registerIcon('condition', createBootstrapIconSvg('bi-question-circle-fill'));
+  registerIcon('input', createBootstrapIconSvg('bi-input-cursor-text'));
+  registerIcon('math', createBootstrapIconSvg('bi-calculator-fill'));
+  registerIcon('text', createBootstrapIconSvg('bi-file-text-fill'));
+  registerIcon('increment', createBootstrapIconSvg('bi-plus-square-fill'));
+  registerIcon('random', createBootstrapIconSvg('bi-dice-6-fill'));
 }
 
 initializeDefaultIcons();

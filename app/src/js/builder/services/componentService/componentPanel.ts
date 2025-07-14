@@ -35,7 +35,7 @@ async function fetchAvailableComponents() {
         else category = 'Flow';
       }
 
-      const iconSvg = getIcon(type.toLowerCase()) || '🧩';
+      const iconSvg = getIcon(type.toLowerCase()) || '<i class="bi bi-puzzle-fill"></i>';
 
       categories[category].push({
         type: String(type),
@@ -62,30 +62,9 @@ export async function populateComponentsPanel(): Promise<void> {
     return;
   }
 
-  const searchHTML = `<div class="component-search">
-    <input type="text" placeholder="Search components..." class="component-search-input">
-  </div>`;
 
-  componentCategoriesContainer.innerHTML = searchHTML;
 
-  const favoritesHTML = `
-  <div class="favorites-section">
-    <div class="favorites-header">⭐ Quick Access</div>
-    <div class="favorites-list">
-      <div class="component-item favorite-item" draggable="true" data-type="message" data-flow-type="flow">
-        <div class="flow-type-indicator flow-type"></div>
-        <div class="component-icon">💬</div>
-        <div class="component-name">Message</div>
-      </div>
-      <div class="component-item favorite-item" draggable="true" data-type="condition" data-flow-type="flow">
-        <div class="flow-type-indicator flow-type"></div>
-        <div class="component-icon">❓</div>
-        <div class="component-name">Condition</div>
-      </div>
-    </div>
-  </div>`;
 
-  componentCategoriesContainer.innerHTML += favoritesHTML;
 
   const { categories } = await fetchAvailableComponents();
 
@@ -155,13 +134,13 @@ export async function populateComponentsPanel(): Promise<void> {
 
 function getCategoryIcon(category: string): string {
   if (category === 'Data') {
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>';
+    return '<i class="bi bi-database-fill"></i>';
   }
   if (category === 'Variable') {
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><text x="12" y="16" text-anchor="middle" font-size="10" fill="currentColor">V</text></svg>';
+    return '<i class="bi bi-box-fill"></i>';
   }
   // Default to Flow icon
-  return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1-2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+  return '<i class="bi bi-diagram-2-fill"></i>';
 }
 
 function getFlowType(category: string): string {

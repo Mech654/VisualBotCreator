@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dropdown = document.createElement('div');
       dropdown.className = 'action-dropdown';
       const actions: ActionItem[] = [
-        { icon: '✏️', text: 'Edit', action: 'edit' },
-        { icon: '🔄', text: 'Duplicate', action: 'duplicate' },
-        { icon: '⚙️', text: 'Settings', action: 'settings' },
-        { icon: '🗑️', text: 'Delete', action: 'delete', danger: true },
+        { icon: '<i class="bi bi-pencil-fill"></i>', text: 'Edit', action: 'edit' },
+        { icon: '<i class="bi bi-files"></i>', text: 'Duplicate', action: 'duplicate' },
+        { icon: '<i class="bi bi-gear-fill"></i>', text: 'Settings', action: 'settings' },
+        { icon: '<i class="bi bi-trash-fill"></i>', text: 'Delete', action: 'delete', danger: true },
       ];
       actions.forEach(item => {
         const actionItem = document.createElement('div');
