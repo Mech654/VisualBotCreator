@@ -4,6 +4,7 @@ import { NodeFactory } from './core/nodeSystem.js';
 import {
   saveAllNodes,
   getAllBots,
+  getBotNodes,
   getRunConditions,
   setBotEnabled,
   changeNameDb,
@@ -300,6 +301,18 @@ export function setupIpcHandlers(): void {
       return [];
     }
   });
+
+  // Expose getBotNodes via IPC
+  ipcMain.handle('database:getBotNodes', async (event, botId: string): Promise<unknown[]> => {
+    try {
+      const nodes: unknown[] = await getBotNodes(botId);
+      return nodes;
+    } catch (error) {
+      console.error('Error in getBotNodes IPC handler:', error);
+      return [];
+    }
+  });
+
   // Expose getRunConditions via IPC
   ipcMain.handle('database:getRunConditions', async (event, botId: string) => {
     try {

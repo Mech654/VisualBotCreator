@@ -11,6 +11,7 @@ interface Bot {
 
 interface DatabaseAPI {
   getAllBots: () => Promise<Bot[]>;
+  getBotNodes: (botId: string) => Promise<any[]>;
   getRunConditions: (botId: string) => Promise<{ Key: string; Value: string }[]>;
   setBotEnabled: (botId: string, enabled: boolean) => Promise<void>;
 }

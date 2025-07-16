@@ -45,6 +45,13 @@ export function initCanvasInteractions(): void {
       console.log('Using direct type:', nodeType);
     }
 
+    // Validate nodeType is clean and not HTML content
+    if (!nodeType || nodeType.includes('<') || nodeType.includes('>') || nodeType.length > 50) {
+      console.error('Invalid node type detected:', nodeType);
+      showNotification('Invalid component type. Please try dragging again.', 'error');
+      return;
+    }
+
     const canvasRect = canvas.getBoundingClientRect();
     const currentZoom = parseFloat(canvas.dataset.zoomLevel || '1');
     const x = (e.clientX - canvasRect.left + canvas.scrollLeft) / currentZoom;
@@ -53,6 +60,7 @@ export function initCanvasInteractions(): void {
     const snappedY = snapToGrid(y - 50);
 
     console.log(`Drop position: x=${x}, y=${y}, snapped: x=${snappedX}, y=${snappedY}`);
+    console.log(`Creating node of type: "${nodeType}" with flowType: "${flowType}"`);
 
     if (!checkPositionValidity(snappedX, snappedY, 220, 150, getNodes())) {
       showNotification('Cannot place node here: overlapping with existing node', 'error');

@@ -213,6 +213,38 @@ function getAllBots(): Promise<any[]> {
   });
 }
 
+// Get all nodes for a specific bot
+function getBotNodes(botId: string): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    db.all(
+      'SELECT NodeId, Definition FROM Nodes WHERE BotId = ?',
+      [botId],
+      (err: Error | null, rows: any[]) => {
+        if (err) {
+          console.error('Error fetching bot nodes:', err);
+          return reject(err);
+        }
+        
+        // Parse the Definition JSON for each node
+        const parsedNodes = rows.map(row => {
+          try {
+            const definition = JSON.parse(row.Definition);
+            return {
+              nodeId: row.NodeId,
+              ...definition
+            };
+          } catch (parseErr) {
+            console.error('Error parsing node definition:', parseErr);
+            return null;
+          }
+        }).filter(node => node !== null);
+        
+        resolve(parsedNodes);
+      }
+    );
+  });
+}
+
 // Get run conditions for a bot
 function getRunConditions(botId: string): Promise<{ Key: string; Value: string }[]> {
   return new Promise((resolve, reject) => {
@@ -382,6 +414,7 @@ export {
   closeDB as close,
   initDatabase,
   getAllBots,
+  getBotNodes,
   getRunConditions,
   setBotEnabled,
   changeNameDb,

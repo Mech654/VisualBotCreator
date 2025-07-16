@@ -277,19 +277,22 @@ function formatPropertyName(key: string): string {
  * @param x X position of the node
  * @param y Y position of the node
  * @param flowType The flow type ('flow' or 'data')
+ * @param nodeId Optional existing node ID (for loading projects)
+ * @param properties Optional existing properties (for loading projects)
  */
 export async function createNodeInstance(
   type: string,
   x: number,
   y: number,
-  flowType: string = 'flow'
+  flowType: string = 'flow',
+  nodeId?: string,
+  properties?: Record<string, any>
 ): Promise<{ nodeElement: HTMLElement; nodeInstance: NodeInstance } | null> {
-  const id = window.utils.generateNodeId();
+  const id = nodeId || window.utils.generateNodeId();
 
   try {
-    const nodeInstance = await (window.nodeSystem.createNode as any)(type, id, {
-      flowType,
-    }, { x, y }) as NodeInstance;
+    const nodeProperties = properties ? { ...properties, flowType } : { flowType };
+    const nodeInstance = await (window.nodeSystem.createNode as any)(type, id, nodeProperties, { x, y }) as NodeInstance;
 
     const nodeElement = document.createElement('div');
     nodeElement.className = 'node';

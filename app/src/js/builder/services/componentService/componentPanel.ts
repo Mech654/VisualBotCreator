@@ -149,9 +149,12 @@ function initDraggableComponents(): void {
   document.querySelectorAll('.component-item').forEach(item => {
     item.addEventListener('dragstart', (e: Event) => {
       const dragEvent = e as DragEvent;
-      const target = e.target as HTMLElement;
-      const type = target.dataset.type;
-      const flowType = target.dataset.flowType || 'flow';
+      // Use currentTarget instead of target to get the component-item itself
+      const componentItem = e.currentTarget as HTMLElement;
+      const type = componentItem.dataset.type;
+      const flowType = componentItem.dataset.flowType || 'flow';
+
+      console.log('[DragStart] Component type:', type, 'flowType:', flowType);
 
       if (dragEvent.dataTransfer) {
         dragEvent.dataTransfer.setData('text/plain', type || '');

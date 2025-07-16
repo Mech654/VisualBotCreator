@@ -124,9 +124,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   function handleBotAction(action: string, botCard: HTMLElement): void {
     const botNameElement = botCard.querySelector('.bot-name');
     const botName = botNameElement ? botNameElement.textContent || 'Bot' : 'Bot';
+    const botId = botCard.dataset.botId;
 
     switch (action) {
       case 'edit':
+        // Save the bot ID to localStorage for auto-loading in the builder
+        if (botId) {
+          localStorage.setItem('editBotId', botId);
+          console.log('[Dashboard] Saved bot ID for editing:', botId);
+        }
         showPageTransition('builder.html');
         break;
 

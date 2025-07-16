@@ -138,6 +138,7 @@ contextBridge.exposeInMainWorld('database', {
   saveAllNodes: (botId: string, nodes: Record<string, unknown>[]) =>
     ipcRenderer.invoke('database:saveAllNodes', botId, nodes),
   getAllBots: () => ipcRenderer.invoke('database:getAllBots'),
+  getBotNodes: (botId: string) => ipcRenderer.invoke('database:getBotNodes', botId),
   getRunConditions: (botId: string) => ipcRenderer.invoke('database:getRunConditions', botId),
   setBotEnabled: (botId: string, enabled: boolean) =>
     ipcRenderer.invoke('database:setBotEnabled', botId, enabled),

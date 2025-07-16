@@ -24,6 +24,25 @@
 @use 'components/properties';
 @use 'components/forms';
 @use 'components/component-panel';
+@use 'components/modals';
+
+// Bot Name Display
+.current-bot-name {
+  background-color: $surface;
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-sm $spacing-md;
+  text-align: center;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin: 0;
+  
+  &:empty {
+    display: none; // Hide completely when empty
+    padding: 0;
+    border: none;
+  }
+}
 
 // Notification styles
 .notification {

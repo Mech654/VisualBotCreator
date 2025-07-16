@@ -63,6 +63,7 @@ release/
 VisualBotCreator.db
 VisualBotCreator.db-wal
 VisualBotCreator.db-shm
+VisualBotCreator.sln
 
 # .NET/C# build artifacts and auto-generated files
 *.sln
@@ -86,3 +87,6 @@ obj/
 *.nuget.g.targets
 project.assets.json
 project.nuget.cache
+
+# Miscellaneous
+nohup.out
