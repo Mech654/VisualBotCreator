@@ -662,4 +662,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   setupSwalDashboardModalStyle();
+
+  // Debug: Press 'n' to check nodeInstances count from dashboard
+  document.addEventListener('keydown', async (e) => {
+    if (e.key === 'n' || e.key === 'N') {
+      try {
+        const existingNodes = await window.nodeSystem?.getAllNodes?.();
+        console.log('[DEBUG-DASHBOARD] NodeInstances count:', existingNodes?.length || 0);
+        console.log('[DEBUG-DASHBOARD] NodeInstances data:', existingNodes);
+      } catch (error) {
+        console.error('[DEBUG-DASHBOARD] Error getting nodeInstances:', error);
+      }
+    }
+  });
 });

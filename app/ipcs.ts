@@ -291,6 +291,17 @@ export function setupIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle('node:getAllNodes', async (event) => {
+    const allNodes = Array.from(nodeInstances.values()).map(node => ({
+      nodeId: node.id,
+      type: node.type,
+      properties: node.properties,
+      position: { x: 100, y: 100 },
+      outputs: node.outputs
+    }));
+    return allNodes;
+  });
+
   // Expose getAllBots via IPC
   ipcMain.handle('database:getAllBots', async (): Promise<unknown[]> => {
     try {
@@ -463,6 +474,10 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle('node:clearAll', () => {
     try {
+      console.log('[DEBUG-BACKEND] clearAllNodes called! Stack trace:');
+      console.trace();
+      console.log('[DEBUG-BACKEND] Clearing', nodeInstances.size, 'nodes and', connections.length, 'connections');
+      
       nodeInstances.clear();
       connections.length = 0;
 

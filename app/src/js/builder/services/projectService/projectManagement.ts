@@ -38,19 +38,6 @@ function getCurrentBotName(): string | null {
   return currentBotName;
 }
 
-function startNewProject(): void {
-  clearBotName();
-  clearConnections();
-  setNodes([]);
-  
-  const canvas = document.querySelector('.canvas') as HTMLElement;
-  if (canvas) {
-    const nodeElements = canvas.querySelectorAll('.node');
-    nodeElements.forEach(node => node.remove());
-  }
-  
-  console.log('[ProjectManagement] Started new project');
-}
 declare global {
   interface Window {
     electron?: {
@@ -319,6 +306,9 @@ async function loadProjectFromDatabase(botId: string): Promise<void> {
     setNodes([]);
     clearBotName();
     
+    // Clear backend nodes before loading new project
+    await window.nodeSystem?.clearAllNodes?.();
+    
     const canvas = document.querySelector('.canvas') as HTMLElement;
     if (canvas) {
       const nodeElements = canvas.querySelectorAll('.node');
@@ -493,108 +483,37 @@ async function restoreConnection(
 async function checkForAutoLoad(): Promise<void> {
   try {
     const editBotId = localStorage.getItem('editBotId');
-    const preserveState = localStorage.getItem('preserveNodesOnTransition');
     
     if (editBotId) {
-      console.log('[ProjectManagement] Auto-loading bot from dashboard:', editBotId);
-      
       localStorage.removeItem('editBotId');
-      localStorage.removeItem('preserveNodesOnTransition');
-
       await loadProjectFromDatabase(editBotId);
       setBotName(editBotId);
       showNotification(`Project "${editBotId}" loaded successfully!`, 'success');
-
-    } else if (preserveState) {
-      console.log('[ProjectManagement] Checking for workspace state to restore...');
+    } else {
       await restoreWorkspaceState();
     }
   } catch (error) {
     console.error('Error in auto-load:', error);
     showNotification('Failed to load project from dashboard', 'error');
-    
     localStorage.removeItem('editBotId');
-    localStorage.removeItem('preserveNodesOnTransition');
   }
 }
 
-// Save current workspace state before navigation
-export async function saveWorkspaceState(): Promise<void> {
-  try {
-    const nodes = getNodes();
-    console.log('[ProjectManagement] Saving workspace state, nodes found:', nodes.length);
-    
-    if (nodes.length === 0) {
-      console.log('[ProjectManagement] No nodes to save');
-      return;
-    }
 
-    const workspaceData = [];
-    for (const nodeElement of nodes) {
-      const nodeId = nodeElement.dataset.nodeId;
-      const nodeType = nodeElement.dataset.nodeType;
-      
-      if (!nodeId || !nodeType) continue;
-
-      try {
-        const nodeInstance = await window.nodeSystem.getNodeById(nodeId);
-        const position = {
-          x: nodeElement.offsetLeft,
-          y: nodeElement.offsetTop
-        };
-
-        workspaceData.push({
-          nodeId,
-          type: nodeType,
-          properties: (nodeInstance as any)?.properties || {},
-          position,
-          outputs: (nodeInstance as any)?.outputs || []
-        });
-      } catch (error) {
-        console.error(`Error saving node ${nodeId}:`, error);
-      }
-    }
-
-    localStorage.setItem('workspaceState', JSON.stringify(workspaceData));
-    console.log('[ProjectManagement] Workspace state saved, data:', workspaceData.length, 'nodes');
-  } catch (error) {
-    console.error('Error saving workspace state:', error);
-  }
-}
 
 // Restore workspace state after navigation
 async function restoreWorkspaceState(): Promise<void> {
   try {
-    const savedState = localStorage.getItem('workspaceState');
-    console.log('[ProjectManagement] Saved state found:', !!savedState);
+    const existingNodes = await window.nodeSystem?.getAllNodes?.();
     
-    if (!savedState) {
-      console.log('[ProjectManagement] No saved state found, cleaning up...');
-      localStorage.removeItem('preserveNodesOnTransition');
-      return;
+    console.log('[ProjectManagement] Found', existingNodes?.length || 0, 'existing nodes to restore');
+    
+    if (existingNodes && existingNodes.length > 0) {
+      await restoreNodesAndConnections(existingNodes);
+      showNotification('Workspace restored!', 'success');
     }
-
-    const workspaceData = JSON.parse(savedState);
-    console.log('[ProjectManagement] Parsed workspace data:', workspaceData.length, 'nodes');
-    
-    if (workspaceData.length === 0) {
-      console.log('[ProjectManagement] Empty workspace data, cleaning up...');
-      localStorage.removeItem('preserveNodesOnTransition');
-      localStorage.removeItem('workspaceState');
-      return;
-    }
-
-    console.log('[ProjectManagement] Restoring workspace state...');
-    await restoreNodesAndConnections(workspaceData);
-    
-    localStorage.removeItem('preserveNodesOnTransition');
-    localStorage.removeItem('workspaceState');
-    
-    showNotification('Workspace restored!', 'success');
   } catch (error) {
     console.error('Error restoring workspace state:', error);
-    localStorage.removeItem('preserveNodesOnTransition');
-    localStorage.removeItem('workspaceState');
   }
 }
 
@@ -628,4 +547,17 @@ export function initProjectManagement(): void {
   setTimeout(() => {
     checkForAutoLoad();
   }, 500);
+
+  // Debug: Press 'n' to check nodeInstances count
+  document.addEventListener('keydown', async (e) => {
+    if (e.key === 'n' || e.key === 'N') {
+      try {
+        const existingNodes = await window.nodeSystem?.getAllNodes?.();
+        console.log('[DEBUG] NodeInstances count:', existingNodes?.length || 0);
+        console.log('[DEBUG] NodeInstances data:', existingNodes);
+      } catch (error) {
+        console.error('[DEBUG] Error getting nodeInstances:', error);
+      }
+    }
+  });
 }

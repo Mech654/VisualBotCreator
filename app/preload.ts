@@ -5,6 +5,7 @@ interface NodeSystemAPI {
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getNodeById: (id: string) => Promise<unknown>;
+  getAllNodes: () => Promise<any[]>;
   processNode: (id: string, inputs: Record<string, unknown>) => Promise<unknown>;
   createConnection: (
     fromNodeId: string,
@@ -60,6 +61,10 @@ contextBridge.exposeInMainWorld('nodeSystem', {
 
   getNodeById: (id: string) => {
     return ipcRenderer.invoke('node:getById', id);
+  },
+
+  getAllNodes: () => {
+    return ipcRenderer.invoke('node:getAllNodes');
   },
 
   processNode: (id: string, inputs: Record<string, unknown>) => {

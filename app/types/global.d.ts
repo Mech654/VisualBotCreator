@@ -46,6 +46,7 @@ interface NodeSystemAPI {
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getNodeById: (id: string) => Promise<NodeInstanceGlobal>;
+  getAllNodes: () => Promise<any[]>;
   processNode: (id: string, inputs: Record<string, unknown>) => Promise<unknown>;
   createConnection: (
     fromNodeId: string,
