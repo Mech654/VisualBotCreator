@@ -4,6 +4,7 @@ import { initDraggableNodes } from '../dragDropService/dragDropService.js';
 import { showNotification } from '../../utils/notifications.js';
 import {
   enterTransition,
+  highlightElement,
   staggerAnimation,
   createRippleEffect,
   addAttentionAnimation,
@@ -13,7 +14,6 @@ import { getNodes, addNode, setNodes } from '../nodeService/nodeState.js';
 // Global variable to track current bot name
 let currentBotName: string | null = null;
 
-// Utility functions for bot name display
 function setBotName(botName: string): void {
   currentBotName = botName;
   const botNameElement = document.getElementById('current-bot-name') as HTMLElement;
@@ -38,7 +38,6 @@ function getCurrentBotName(): string | null {
   return currentBotName;
 }
 
-// Function to start a new project (clears everything)
 function startNewProject(): void {
   clearBotName();
   clearConnections();
@@ -147,7 +146,6 @@ function showSaveConfirmationModal(botName: string): Promise<'overwrite' | 'canc
       resolve('cancel');
     }
 
-    // Event listeners
     const overwriteBtn = modal.querySelector('.modal-overwrite-btn');
     const cancelBtn = modal.querySelector('.modal-cancel-btn');
     const closeBtn = modal.querySelector('.modal-close-btn');
@@ -158,7 +156,6 @@ function showSaveConfirmationModal(botName: string): Promise<'overwrite' | 'canc
     closeBtn?.addEventListener('click', onCancel);
     overlay?.addEventListener('click', onCancel);
 
-    // Keyboard event
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onCancel();
@@ -176,18 +173,15 @@ async function saveProject(): Promise<void> {
   try {
     let projectName: string | null = null;
     
-    // Check if we're editing an existing bot
     const currentBot = getCurrentBotName();
     if (currentBot) {
-      // Show overwrite confirmation for existing bot
       const action = await showSaveConfirmationModal(currentBot);
       if (action === 'cancel') {
         showNotification('Save cancelled.', 'info');
         return;
       }
-      projectName = currentBot; // Use existing bot name for overwrite
+      projectName = currentBot;
     } else {
-      // Show name input modal for new bot
       projectName = await showProjectNameModal();
       if (!projectName) {
         showNotification('Project name is required to save.', 'info');
@@ -197,18 +191,14 @@ async function saveProject(): Promise<void> {
     
     console.log('[SaveProject] Using project name:', projectName);
 
-    // Check for ipcRenderer existence (bypass TS error)
     const electron = (window as any).electron;
     if (!electron || !electron.ipcRenderer) {
-      console.error('[SaveProject] window.electron or ipcRenderer is undefined!');
       showNotification('IPC is not available. Project cannot be saved.', 'error');
       return;
     }
 
-    const result = await electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
-    console.log('[SaveProject] IPC result:', result);
+    await electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
 
-    // Update the displayed bot name after successful save
     setBotName(projectName);
 
     showNotification('Project saved successfully!', 'success');
@@ -227,7 +217,7 @@ async function loadProject(): Promise<void> {
     }
 
     await loadProjectFromDatabase(botId);
-    setBotName(botId); // Set the bot name after loading
+    setBotName(botId); 
     showNotification('Project loaded successfully!', 'success');
   } catch (error) {
     console.error('Failed to load project:', error);
@@ -325,10 +315,9 @@ function showProjectSelectionModal(): Promise<string | null> {
 
 async function loadProjectFromDatabase(botId: string): Promise<void> {
   try {
-    // Clear current state
     clearConnections();
     setNodes([]);
-    clearBotName(); // Clear any previous bot name
+    clearBotName();
     
     const canvas = document.querySelector('.canvas') as HTMLElement;
     if (canvas) {
@@ -354,42 +343,19 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
   try {
     const connectionPromises: Promise<void>[] = [];
 
-    // Create all nodes first
-    for (const node of nodeData) {
+    for (let i = 0; i < nodeData.length; i++) {
+      const node = nodeData[i];
       try {
         const { nodeId, type, properties, position } = node;
-        
-        // Create node instance in the backend with existing ID
         await window.nodeSystem.createNode(type, nodeId, properties);
-        
-        // Create visual node in the frontend with existing ID and position
-        const result = await createNodeInstance(
-          type, 
-          position?.x || 100, 
-          position?.y || 100, 
-          properties?.flowType || 'flow',
-          nodeId,
-          properties
-        );
-        
-        if (result) {
-          const canvas = document.querySelector('.canvas-content') as HTMLElement;
-          if (canvas) {
-            canvas.appendChild(result.nodeElement);
-            addNode(result.nodeElement);
-          }
-        }
-        
-        console.log(`[LoadProject] Restored node: ${nodeId} (${type}) at ${position?.x}, ${position?.y}`);
+        await simulateDropPlacement(type, position?.x || 100, position?.y || 100, properties?.flowType || 'flow', nodeId, properties, i * 100);
       } catch (error) {
         console.error(`Error restoring node ${node.nodeId}:`, error);
       }
     }
 
-    // Wait for nodes to be fully rendered before creating connections
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Restore connections
+    await new Promise(resolve => setTimeout(resolve, Math.max(500, nodeData.length * 100 + 200)));
+    
     for (const node of nodeData) {
       if (node.outputs) {
         for (const output of node.outputs) {
@@ -408,14 +374,100 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
         }
       }
     }
-
+    
     await Promise.all(connectionPromises);
-    initDraggableNodes(getNodes(), getNodes());
-
+    
     console.log(`[LoadProject] Successfully restored ${nodeData.length} nodes`);
   } catch (error) {
     console.error('Error restoring nodes and connections:', error);
     throw error;
+  }
+}
+
+/**
+ * Simulate the drop placement logic for project loading
+ * This gives loaded nodes the same visual treatment as user-dropped nodes and also the temp fix for first interaction issue
+ */
+async function simulateDropPlacement(
+  nodeType: string,
+  x: number,
+  y: number,
+  flowType: string,
+  existingNodeId: string,
+  existingProperties: any,
+  delay: number = 0
+): Promise<void> {
+  if (delay > 0) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  const result = await createNodeInstance(
+    nodeType,
+    x,
+    y,
+    flowType,
+    existingNodeId,
+    existingProperties
+  );
+
+  if (result) {
+    const { nodeElement } = result;
+    const canvas = document.querySelector('.canvas-content') as HTMLElement;
+    
+    if (canvas) {
+      canvas.appendChild(nodeElement);
+      addNode(nodeElement);
+      
+
+      nodeElement.style.display = 'block';
+      nodeElement.style.visibility = 'visible';
+      nodeElement.style.opacity = '1';
+      nodeElement.style.position = 'absolute';
+      nodeElement.style.transform = 'none';
+      nodeElement.style.left = `${x}px`;
+      nodeElement.style.top = `${y}px`;
+      nodeElement.offsetHeight;
+      
+      initDraggableNodes([nodeElement], getNodes());
+      enterTransition(nodeElement, 'scale', 300); 
+      setTimeout(() => {
+        highlightElement(nodeElement, 'var(--primary)', 800);
+      }, 300);
+
+      setTimeout(() => {
+        const rect = nodeElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const moveDelta = -30;
+        const pointerDown = new PointerEvent('pointerdown', {
+          bubbles: true,
+          clientX: centerX,
+          clientY: centerY,
+          pointerId: 1,
+          pointerType: 'mouse',
+          isPrimary: true,
+        });
+        nodeElement.dispatchEvent(pointerDown);
+        const pointerMove = new PointerEvent('pointermove', {
+          bubbles: true,
+          clientX: centerX + moveDelta,
+          clientY: centerY,
+          pointerId: 1,
+          pointerType: 'mouse',
+          isPrimary: true,
+        });
+        document.dispatchEvent(pointerMove);
+        const pointerUp = new PointerEvent('pointerup', {
+          bubbles: true,
+          clientX: centerX + moveDelta,
+          clientY: centerY,
+          pointerId: 1,
+          pointerType: 'mouse',
+          isPrimary: true,
+        });
+        document.dispatchEvent(pointerUp);
+      }, 400);
+    }
   }
 }
 
@@ -426,7 +478,6 @@ async function restoreConnection(
   toPortId: string
 ): Promise<void> {
   try {
-    // Use the frontend createConnection which handles both backend and visual connections
     const connection = await createConnection(fromNodeId, fromPortId, toNodeId, toPortId);
     if (connection) {
       console.log(`[LoadProject] Restored connection: ${fromNodeId}.${fromPortId} -> ${toNodeId}.${toPortId}`);
@@ -449,12 +500,12 @@ async function checkForAutoLoad(): Promise<void> {
       
       localStorage.removeItem('editBotId');
       localStorage.removeItem('preserveNodesOnTransition');
-      
+
       await loadProjectFromDatabase(editBotId);
-      setBotName(editBotId); // Set the bot name after auto-loading
+      setBotName(editBotId);
       showNotification(`Project "${editBotId}" loaded successfully!`, 'success');
+
     } else if (preserveState) {
-      // Try to restore the last workspace state
       console.log('[ProjectManagement] Checking for workspace state to restore...');
       await restoreWorkspaceState();
     }
@@ -536,7 +587,6 @@ async function restoreWorkspaceState(): Promise<void> {
     console.log('[ProjectManagement] Restoring workspace state...');
     await restoreNodesAndConnections(workspaceData);
     
-    // Clean up
     localStorage.removeItem('preserveNodesOnTransition');
     localStorage.removeItem('workspaceState');
     
@@ -549,7 +599,6 @@ async function restoreWorkspaceState(): Promise<void> {
 }
 
 export function initProjectManagement(): void {
-  // Initialize bot name as empty
   clearBotName();
   
   const saveBtn = document.getElementById('save-button');
