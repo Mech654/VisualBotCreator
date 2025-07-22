@@ -203,8 +203,10 @@ async function loadProject(): Promise<void> {
       return;
     }
 
+    setBotName(botId);
+    localStorage.setItem('editBotId', botId);
+    
     await loadProjectFromDatabase(botId);
-    setBotName(botId); 
     showNotification('Project loaded successfully!', 'success');
   } catch (error) {
     console.error('Failed to load project:', error);
@@ -304,12 +306,10 @@ async function loadProjectFromDatabase(botId: string): Promise<void> {
   try {
     clearConnections();
     setNodes([]);
-    clearBotName();
     
-    // Clear backend nodes before loading new project
     await window.nodeSystem?.clearAllNodes?.();
     
-    const canvas = document.querySelector('.canvas') as HTMLElement;
+    const canvas = document.querySelector('.canvas-content') as HTMLElement;
     if (canvas) {
       const nodeElements = canvas.querySelectorAll('.node');
       nodeElements.forEach(node => node.remove());
@@ -479,15 +479,13 @@ async function restoreConnection(
   }
 }
 
-// Auto-loads bot when coming from dashboard edit button
 async function checkForAutoLoad(): Promise<void> {
   try {
     const editBotId = localStorage.getItem('editBotId');
     
     if (editBotId) {
-      localStorage.removeItem('editBotId');
-      await loadProjectFromDatabase(editBotId);
       setBotName(editBotId);
+      await loadProjectFromDatabase(editBotId);
       showNotification(`Project "${editBotId}" loaded successfully!`, 'success');
     } else {
       await restoreWorkspaceState();
@@ -495,7 +493,6 @@ async function checkForAutoLoad(): Promise<void> {
   } catch (error) {
     console.error('Error in auto-load:', error);
     showNotification('Failed to load project from dashboard', 'error');
-    localStorage.removeItem('editBotId');
   }
 }
 
@@ -514,6 +511,28 @@ async function restoreWorkspaceState(): Promise<void> {
     }
   } catch (error) {
     console.error('Error restoring workspace state:', error);
+  }
+}
+
+export async function clearAllAndExitEditMode(): Promise<void> {
+  try {
+    clearConnections();
+    setNodes([]);
+    clearBotName();
+    await window.nodeSystem?.clearAllNodes?.();
+    
+    const canvas = document.querySelector('.canvas-content') as HTMLElement;
+    if (canvas) {
+      const nodeElements = canvas.querySelectorAll('.node');
+      nodeElements.forEach(node => node.remove());
+    }
+    
+    localStorage.removeItem('editBotId');
+    showNotification('Workspace cleared and exited edit mode', 'success');
+    
+  } catch (error) {
+    console.error('Error clearing workspace:', error);
+    showNotification('Error clearing workspace', 'error');
   }
 }
 
@@ -542,6 +561,16 @@ export function initProjectManagement(): void {
     });
   } else {
     console.warn('Load button not found in DOM');
+  }
+
+  // Hook up delete button to clear workspace and exit edit mode
+  const deleteBtn = document.querySelector('.tool[title="Delete"]') as HTMLElement;
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', e => {
+      createRippleEffect(deleteBtn, e);
+      addAttentionAnimation(deleteBtn, 'bounce', 500);
+      clearAllAndExitEditMode();
+    });
   }
 
   setTimeout(() => {
