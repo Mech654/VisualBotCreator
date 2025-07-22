@@ -93,36 +93,56 @@
   top: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.4);
+  background: rgba($background, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 #project-name-modal .modal-content {
-  background: #fff;
-  border-radius: 8px;
-  padding: 2rem 2.5rem;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  background: $surface;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+  box-shadow: $shadow-xl;
   min-width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: $spacing-md;
 }
 #project-name-modal .modal-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-sm;
+  color: $text-primary;
+}
+#project-name-modal label {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
 }
 #project-name-modal .modal-input {
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  padding: $spacing-sm;
+  font-size: $font-size-base;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  margin-bottom: $spacing-md;
+  background: $background;
+  color: $text-primary;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+  
+  &::placeholder {
+    color: $text-secondary;
+  }
 }
 #project-name-modal .modal-actions {
   display: flex;
-  gap: 1rem;
+  gap: $spacing-sm;
   justify-content: flex-end;
 }
 #project-name-modal .btn {
