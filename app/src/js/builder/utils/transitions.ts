@@ -1,7 +1,7 @@
 // Transitions and animations system for VisualBotCreator
 // Provides a set of reusable transitions for creating smooth user experiences
-import { clearConnections } from '../services/connectionService/connectionService.js';
-import { initializeNodes } from '../services/nodeService/nodeState.js';
+
+
 
 /**
  * Shows a full-page transition when navigating between pages
@@ -62,13 +62,6 @@ export function showPageTransition(
     window.location.href = destination;
   }, delay);
 
-  if (window && (window as any).nodeSystem?.clearAllNodes) {
-    (window as any).nodeSystem.clearAllNodes();
-
-    // Also clear frontend connections and node tracking
-    clearConnections();
-    initializeNodes();
-  }
 }
 
 /**
