@@ -1,5 +1,6 @@
 import { showPageTransition } from './builder/utils/transitions.js';
 import { setupSwalDashboardModalStyle } from './dashboard/swal-setup.js';
+import { showBotDuplicatedNotification, showBotStatusChangedNotification, showErrorNotification, notifications } from './dashboard/notifications.js';
 declare const module: any;
 
 interface ActionItem {
@@ -88,9 +89,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.bot-action').forEach(action => {
     action.addEventListener('click', e => {
       e.stopPropagation();
+      
+      // Remove all existing dropdowns and dropdown-active classes
       document.querySelectorAll('.action-dropdown').forEach(dropdown => dropdown.remove());
+      document.querySelectorAll('.bot-card.dropdown-active').forEach(card => card.classList.remove('dropdown-active'));
+      
       const dropdown = document.createElement('div');
       dropdown.className = 'action-dropdown';
+      
+      // Add dropdown-active class to the current bot card
+      const currentBotCard = (action as HTMLElement).closest('.bot-card');
+      if (currentBotCard) {
+        currentBotCard.classList.add('dropdown-active');
+      }
+      
       const actions: ActionItem[] = [
         { icon: '<i class="bi bi-pencil-fill"></i>', text: 'Edit', action: 'edit' },
         { icon: '<i class="bi bi-files"></i>', text: 'Duplicate', action: 'duplicate' },
@@ -106,6 +118,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           const botCard = target.closest('.bot-card') as HTMLElement;
           handleBotAction(item.action, botCard);
           dropdown.remove();
+          if (currentBotCard) {
+            currentBotCard.classList.remove('dropdown-active');
+          }
         });
         dropdown.appendChild(actionItem);
       });
@@ -114,6 +129,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const target = evt.target as HTMLElement;
         if (!target.closest('.bot-action')) {
           dropdown.remove();
+          if (currentBotCard) {
+            currentBotCard.classList.remove('dropdown-active');
+          }
           document.removeEventListener('click', closeDropdown);
         }
       });
@@ -136,15 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
 
       case 'duplicate':
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `<span>✅</span> Bot "${botName}" duplicated successfully!`;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-          notification.classList.add('fade-out');
-          setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        showBotDuplicatedNotification(botName);
         break;
 
       case 'settings':
@@ -156,10 +166,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusDot.classList.remove('status-active');
             statusDot.classList.add('status-offline');
             statusText.innerHTML = '<div class="status-dot status-offline"></div>Offline';
+            showBotStatusChangedNotification(botName, false);
           } else {
             statusDot.classList.remove('status-offline');
             statusDot.classList.add('status-active');
             statusText.innerHTML = '<div class="status-dot status-active"></div>Active';
+            showBotStatusChangedNotification(botName, true);
           }
         }
         break;

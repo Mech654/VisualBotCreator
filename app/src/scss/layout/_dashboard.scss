@@ -1,6 +1,7 @@
 // Dashboard layout styles
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use '../shared/notifications' as *;
 @use 'sass:color';
 
 // Main Content
@@ -223,13 +224,21 @@
   box-shadow: $shadow;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
   transition: all $transition-time $transition-function;
-  overflow: visible; // Changed from hidden to visible to prevent clipping of dropdown
+  overflow: visible;
 
   &:hover {
     border-color: $primary;
     box-shadow: $shadow-lg;
     transform: translateY(-3px);
+    z-index: $z-index-dropdown + 1; // Ensure hovered card is above others
+  }
+
+  // When dropdown is active, ensure this card is above others
+  &.dropdown-active {
+    z-index: $z-index-dropdown + 1;
   }
 
   &.fade-out {
@@ -458,13 +467,13 @@
   background: $surface;
   border-radius: $border-radius;
   box-shadow: $shadow-lg;
-  z-index: $z-index-dropdown;
-  min-width: 153px; // Reduced from 180px (15% smaller)
+  z-index: $z-index-popover; // Higher z-index to ensure it's always on top
+  min-width: 153px;
   overflow: hidden;
   border: 1px solid $border-color;
   transform-origin: top right;
   animation: scaleIn 0.15s $transition-function;
-  font-size: 0.85em; // Added to make text 15% smaller
+  font-size: 0.85em;
 }
 
 @keyframes scaleIn {
@@ -507,38 +516,59 @@
   font-size: $font-size-lg;
 }
 
-// Notification
-.notification {
-  position: fixed;
-  bottom: $spacing-xl;
-  right: $spacing-xl;
-  background: $surface;
-  border-left: 3px solid $success;
-  border-radius: $border-radius;
-  padding: $spacing-sm $spacing-md;
-  box-shadow: $shadow-lg;
-  display: flex;
-  align-items: center;
-  font-size: $font-size-sm;
-  z-index: $z-index-tooltip;
-  animation: slideIn 0.3s $transition-function;
+// Apply dashboard-specific notification theme
+body {
+  @include notification-dashboard-theme;
+}
 
-  &.error {
-    border-left-color: $danger;
+// Dashboard notification customizations
+.notification-container {
+  @include notification-container-base;
+  @include notification-position-top-right;
+  
+  top: $spacing-lg;
+  right: $spacing-lg;
+}
 
-    .notification-icon {
-      color: $danger;
+.vbc-notification {
+  // Dashboard-specific styling adjustments
+  border-left: 3px solid var(--notification-border-color);
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  
+  @include notification-base;
+  @include notification-accessibility;
+  
+  .vbc-notification-icon {
+    @include notification-icon;
+    margin-right: $spacing-sm;
+    font-size: $font-size-lg;
+  }
+
+  .vbc-notification-content {
+    @include notification-content;
+  }
+
+  .vbc-notification-dismiss {
+    @include notification-dismiss;
+    margin-left: $spacing-md;
+    color: $text-secondary;
+
+    &:hover {
+      color: $text-primary;
     }
   }
 
-  &.warning {
-    border-left-color: $warning;
-
-    .notification-icon {
-      color: $warning;
-    }
+  .vbc-notification-progress {
+    @include notification-progress;
   }
 
+  &:hover .vbc-notification-progress {
+    animation-play-state: paused;
+  }
+  
+  // Dashboard fade-out animation for backward compatibility
   &.fade-out {
     opacity: 0;
     transform: translateY(10px);
@@ -546,6 +576,7 @@
   }
 }
 
+// Dashboard slideIn animation
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -554,26 +585,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-.notification-icon {
-  margin-right: $spacing-sm;
-  font-size: $font-size-lg;
-  color: $success;
-}
-
-.notification-message {
-  flex-grow: 1;
-}
-
-.notification-close {
-  margin-left: $spacing-md;
-  color: $text-secondary;
-  cursor: pointer;
-
-  &:hover {
-    color: $text-primary;
   }
 }
 

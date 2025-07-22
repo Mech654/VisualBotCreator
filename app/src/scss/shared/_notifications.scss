@@ -1,0 +1,346 @@
+// Global Notification System Styles
+// Provides base notification styles with customizable theming per page
+
+@use '../abstracts/variables' as *;
+
+// CSS Custom Properties for theming
+:root {
+  --notification-border-color: #{$primary};
+  --notification-text-color: #{$text-primary};
+  --notification-success-color: #{$success};
+  --notification-error-color: #{$danger};
+  --notification-warning-color: #{$warning};
+  --notification-info-color: #{$info};
+  --notification-animation-duration: 300ms;
+  --notification-backdrop-blur: 10px;
+  --notification-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --notification-border-width: 2px;
+  --notification-border-radius: #{$border-radius};
+  --notification-padding: #{$spacing-sm} #{$spacing-md};
+  --notification-font-size: #{$font-size-sm};
+  --notification-max-width: 400px;
+  --notification-min-width: 250px;
+  --notification-gap: #{$spacing-xs};
+}
+
+// Container positioning mixins
+@mixin notification-container-base {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--notification-gap);
+  max-width: var(--notification-max-width);
+  width: auto;
+}
+
+@mixin notification-position-top-right {
+  top: $spacing-md;
+  right: $spacing-md;
+}
+
+@mixin notification-position-top-left {
+  top: $spacing-md;
+  left: $spacing-md;
+  right: auto;
+}
+
+@mixin notification-position-bottom-right {
+  top: auto;
+  bottom: $spacing-md;
+  right: $spacing-md;
+}
+
+@mixin notification-position-bottom-left {
+  top: auto;
+  bottom: $spacing-md;
+  left: $spacing-md;
+  right: auto;
+}
+
+@mixin notification-position-top-center {
+  top: $spacing-md;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+@mixin notification-position-bottom-center {
+  top: auto;
+  bottom: $spacing-md;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+// Base notification styles
+@mixin notification-base {
+  background: transparent;
+  border: var(--notification-border-width) solid var(--notification-border-color);
+  border-radius: var(--notification-border-radius);
+  padding: var(--notification-padding);
+  color: var(--notification-text-color);
+  font-size: var(--notification-font-size);
+  font-family: $font-family;
+  box-shadow: var(--notification-shadow);
+  backdrop-filter: blur(var(--notification-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--notification-backdrop-blur));
+  pointer-events: auto;
+  cursor: default;
+  position: relative;
+  opacity: 0;
+  transform: translateX(100%) scale(0.9);
+  transition: all var(--notification-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: var(--notification-min-width);
+  max-width: var(--notification-max-width);
+  word-wrap: break-word;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-xs;
+
+  &.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  &.hiding {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
+  }
+
+  // Type variations
+  &.type-success {
+    border-color: var(--notification-success-color);
+  }
+
+  &.type-error {
+    border-color: var(--notification-error-color);
+  }
+
+  &.type-warning {
+    border-color: var(--notification-warning-color);
+  }
+
+  &.type-info {
+    border-color: var(--notification-info-color);
+  }
+
+  // Left-side positioning animations
+  &.position-left {
+    transform: translateX(-100%) scale(0.9);
+
+    &.hiding {
+      transform: translateX(-100%) scale(0.9);
+    }
+  }
+}
+
+@mixin notification-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+@mixin notification-content {
+  flex: 1;
+  line-height: 1.4;
+}
+
+@mixin notification-dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  margin-left: $spacing-xs;
+  opacity: 0.7;
+  transition: opacity 150ms;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@mixin notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+  transform-origin: left;
+  animation: notification-progress var(--progress-duration, 4000ms) linear;
+}
+
+// Keyframes
+@keyframes notification-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+// Accessibility and user preferences
+@mixin notification-accessibility {
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity var(--notification-animation-duration);
+    transform: none !important;
+
+    &.show {
+      transform: none !important;
+    }
+    
+    &.hiding {
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    border-width: 3px;
+    background: rgba(0, 0, 0, 0.9);
+  }
+}
+
+// Page-specific customization mixins
+@mixin notification-dashboard-theme {
+  --notification-border-color: #{$surface-alt};
+  --notification-text-color: #{$text-primary};
+  --notification-backdrop-blur: 8px;
+  --notification-shadow: #{$shadow-lg};
+}
+
+@mixin notification-builder-theme {
+  --notification-border-color: #{$primary};
+  --notification-text-color: #{$on-surface};
+  --notification-backdrop-blur: 12px;
+  --notification-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+// Complete notification component class
+.vbc-notification-system {
+  .notification-container {
+    @include notification-container-base;
+    @include notification-position-top-right;
+
+    &.position-top-left {
+      @include notification-position-top-left;
+    }
+
+    &.position-bottom-right {
+      @include notification-position-bottom-right;
+    }
+
+    &.position-bottom-left {
+      @include notification-position-bottom-left;
+    }
+
+    &.position-top-center {
+      @include notification-position-top-center;
+    }
+
+    &.position-bottom-center {
+      @include notification-position-bottom-center;
+    }
+  }
+
+  .vbc-notification {
+    @include notification-base;
+    @include notification-accessibility;
+
+    .vbc-notification-icon {
+      @include notification-icon;
+    }
+
+    .vbc-notification-content {
+      @include notification-content;
+    }
+
+    .vbc-notification-dismiss {
+      @include notification-dismiss;
+    }
+
+    .vbc-notification-progress {
+      @include notification-progress;
+    }
+
+    &:hover .vbc-notification-progress {
+      animation-play-state: paused;
+    }
+  }
+}
+
+// Legacy support for backward compatibility
+.notification-legacy {
+  // Base styles and declarations
+  background: transparent;
+  border: var(--notification-border-width) solid var(--notification-border-color);
+  border-radius: var(--notification-border-radius);
+  padding: var(--notification-padding);
+  color: var(--notification-text-color);
+  font-size: var(--notification-font-size);
+  font-family: $font-family;
+  box-shadow: var(--notification-shadow);
+  backdrop-filter: blur(var(--notification-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--notification-backdrop-blur));
+  pointer-events: auto;
+  cursor: default;
+  opacity: 0;
+  z-index: 10000;
+  word-wrap: break-word;
+  
+  // Legacy positioning
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(40px);
+  min-width: 220px;
+  max-width: 90vw;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all var(--notification-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  &.hiding {
+    opacity: 0;
+    transform: translateX(-50%) translateY(40px);
+  }
+  
+  &.notification-success {
+    border-color: var(--notification-success-color);
+  }
+  
+  &.notification-error {
+    border-color: var(--notification-error-color);
+  }
+  
+  &.notification-info {
+    border-color: var(--notification-info-color);
+  }
+
+  // Accessibility media queries
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity var(--notification-animation-duration);
+    transform: none !important;
+
+    &.show {
+      transform: none !important;
+    }
+    
+    &.hiding {
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    border-width: 3px;
+    background: rgba(0, 0, 0, 0.9);
+  }
+}

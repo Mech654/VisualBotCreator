@@ -11,6 +11,9 @@
 @use 'base/typography';
 @use 'base/utilities';
 
+// Shared
+@use 'shared/notifications' as *;
+
 // Layout
 @use 'layout/header';
 @use 'layout/sidebar';

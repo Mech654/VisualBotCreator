@@ -1,20 +1,21 @@
-import { enterTransition, exitTransition } from './transitions.js';
+// Updated notification utilities using the shared notification system
+import { notifications } from '../../shared/notifications.js';
 
+// Backward compatible function with original signature
 export function showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.textContent = message;
-  document.body.appendChild(notification);
-
-  enterTransition(notification, 'slide-up', 300);
-
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-
-  setTimeout(() => {
-    exitTransition(notification, 'slide-up', 300).then(() => {
-      notification.remove();
-    });
-  }, 3000);
+  notifications.show(message, { type });
 }
+
+// Modern notification functions
+export const showSuccess = notifications.success.bind(notifications);
+export const showError = notifications.error.bind(notifications);
+export const showWarning = notifications.warning.bind(notifications);
+export const showInfo = notifications.info.bind(notifications);
+
+// Legacy function for backward compatibility
+export function showNotificationLegacy(message: string, type: 'success' | 'error' | 'info'): void {
+  notifications.show(message, { type });
+}
+
+export { notifications };
+export default notifications;

@@ -6,6 +6,9 @@
 @use 'abstracts/mixins' as *;
 @use 'abstracts/functions' as *;
 
+// Shared
+@use 'shared/notifications' as *;
+
 // Base
 @use 'base/reset';
 @use 'base/typography';
@@ -52,37 +55,62 @@
   }
 }
 
-// Notification styles
-.notification {
-  position: fixed;
-  left: 50%;
-  bottom: 32px;
-  transform: translateX(-50%) translateY(40px);
-  min-width: 220px;
-  max-width: 90vw;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #fff;
-  background: #222;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-  opacity: 0;
-  z-index: 9999;
-  pointer-events: none;
-  transition: opacity 0.25s, transform 0.3s;
-}
-.notification-success { background: #2ecc40; }
-.notification-error { background: #e74c3c; }
-.notification-info { background: #3498db; }
-.notification.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+// Apply builder-specific notification theme
+body {
+  @include notification-builder-theme;
 }
 
-// Slide-up animation (for enter/exitTransition)
-@keyframes slide-up {
-  from { transform: translateX(-50%) translateY(40px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0); opacity: 1; }
+// Include the notification system styles
+.vbc-notification-system {
+  .notification-container {
+    @include notification-container-base;
+    @include notification-position-top-right;
+
+    &.position-top-left {
+      @include notification-position-top-left;
+    }
+
+    &.position-bottom-right {
+      @include notification-position-bottom-right;
+    }
+
+    &.position-bottom-left {
+      @include notification-position-bottom-left;
+    }
+
+    &.position-top-center {
+      @include notification-position-top-center;
+    }
+
+    &.position-bottom-center {
+      @include notification-position-bottom-center;
+    }
+  }
+
+  .vbc-notification {
+    @include notification-base;
+    @include notification-accessibility;
+
+    .vbc-notification-icon {
+      @include notification-icon;
+    }
+
+    .vbc-notification-content {
+      @include notification-content;
+    }
+
+    .vbc-notification-dismiss {
+      @include notification-dismiss;
+    }
+
+    .vbc-notification-progress {
+      @include notification-progress;
+    }
+
+    &:hover .vbc-notification-progress {
+      animation-play-state: paused;
+    }
+  }
 }
 
 /* Project Name Modal Styles */
