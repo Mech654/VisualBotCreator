@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const actions: ActionItem[] = [
         { icon: '<i class="bi bi-pencil-fill"></i>', text: 'Edit', action: 'edit' },
         { icon: '<i class="bi bi-files"></i>', text: 'Duplicate', action: 'duplicate' },
-        { icon: '<i class="bi bi-gear-fill"></i>', text: 'Settings', action: 'settings' },
         { icon: '<i class="bi bi-trash-fill"></i>', text: 'Delete', action: 'delete', danger: true },
       ];
       actions.forEach(item => {

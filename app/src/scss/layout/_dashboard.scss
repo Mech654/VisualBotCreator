@@ -224,7 +224,7 @@
   display: flex;
   flex-direction: column;
   transition: all $transition-time $transition-function;
-  overflow: hidden;
+  overflow: visible; // Changed from hidden to visible to prevent clipping of dropdown
 
   &:hover {
     border-color: $primary;
@@ -459,11 +459,12 @@
   border-radius: $border-radius;
   box-shadow: $shadow-lg;
   z-index: $z-index-dropdown;
-  min-width: 180px;
+  min-width: 153px; // Reduced from 180px (15% smaller)
   overflow: hidden;
   border: 1px solid $border-color;
   transform-origin: top right;
   animation: scaleIn 0.15s $transition-function;
+  font-size: 0.85em; // Added to make text 15% smaller
 }
 
 @keyframes scaleIn {
@@ -478,7 +479,7 @@
 }
 
 .dropdown-item {
-  padding: $spacing-sm $spacing-md;
+  padding: calc(#{$spacing-sm} * 0.85) calc(#{$spacing-md} * 0.85); // Reduced padding by 15%
   cursor: pointer;
   display: flex;
   align-items: center;
