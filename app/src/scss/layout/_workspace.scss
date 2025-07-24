@@ -83,8 +83,7 @@
 
   // Flow connection mode visual indicator
   &.flow-connecting-mode {
-    background-image: radial-gradient(circle, rgba($flow-color, 0.7) 1.5px, transparent 1.5px);
-    
+    background-image: radial-gradient(circle, rgba($flow-color, 0.7) 1px, transparent 1px);
     &::after {
       content: 'Flow Connection Mode';
       position: absolute;
@@ -105,8 +104,8 @@
 
   // Data connection mode visual indicator
   &.data-connecting-mode {
-    background-image: radial-gradient(circle, rgba($data-color, 0.7) 1.5px, transparent 1.5px);
-    
+    background-image: radial-gradient(circle, rgba($data-color, 0.7) 1px, transparent 1px);
+
     &::after {
       content: 'Data Connection Mode';
       position: absolute;
