@@ -1,51 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-interface NodeSystemAPI {
-  createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => Promise<unknown>;
-  getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
-  getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
-  getNodeById: (id: string) => Promise<unknown>;
-  getAllNodes: () => Promise<any[]>;
-  processNode: (id: string, inputs: Record<string, unknown>) => Promise<unknown>;
-  createConnection: (
-    fromNodeId: string,
-    fromPortId: string,
-    toNodeId: string,
-    toPortId: string
-  ) => Promise<unknown>;
-  deleteConnection: (
-    fromNodeId: string,
-    fromPortId: string,
-    toNodeId: string,
-    toPortId: string
-  ) => Promise<unknown>;
-  getNodeConnections: (nodeId: string) => Promise<unknown[]>;
-  clearAllNodes: () => Promise<{ success: boolean; error?: string }>;
-  deleteNode: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
-}
-
-interface UtilsAPI {
-  generateNodeId: () => string;
-}
-
-interface BotConfigAPI {
-  changeName: (oldId: string, newId: string) => Promise<{ success: boolean; error?: string }>;
-  changeDescription: (
-    botId: string,
-    newDescription: string
-  ) => Promise<{ success: boolean; error?: string }>;
-  changeStatus: (
-    botId: string,
-    newStatus: boolean
-  ) => Promise<{ success: boolean; error?: string }>;
-  addOrUpdateCondition: (
-    botId: string,
-    key: string,
-    value: string
-  ) => Promise<{ success: boolean; error?: string }>;
-  deleteCondition: (botId: string, key: string) => Promise<{ success: boolean; error?: string }>;
-}
-
 contextBridge.exposeInMainWorld('nodeSystem', {
   createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => {
     return ipcRenderer.invoke('node:create', { type, id, properties, position }) as Promise<unknown>;
@@ -110,13 +64,13 @@ contextBridge.exposeInMainWorld('nodeSystem', {
   deleteNode: (nodeId: string) => {
     return ipcRenderer.invoke('node:delete', nodeId);
   },
-} as NodeSystemAPI);
+});
 
 contextBridge.exposeInMainWorld('utils', {
   generateNodeId: () => {
     return `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   },
-} as UtilsAPI);
+});
 
 // Expose database functions for bot configurations
 contextBridge.exposeInMainWorld('botconfig', {
@@ -137,7 +91,7 @@ contextBridge.exposeInMainWorld('botconfig', {
   deleteCondition: (botId: string, key: string) => {
     return ipcRenderer.invoke('botconfig:deleteCondition', botId, key);
   },
-} as BotConfigAPI);
+});
 
 contextBridge.exposeInMainWorld('database', {
   saveAllNodes: (botId: string, nodes: Record<string, unknown>[]) =>

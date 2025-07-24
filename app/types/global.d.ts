@@ -55,15 +55,15 @@ interface NodeSystemAPI {
     toNodeId: string,
     toPortId: string
   ) => Promise<unknown>;
-  deleteConnection?: (
+  deleteConnection: (
     fromNodeId: string,
     fromPortId: string,
     toNodeId: string,
     toPortId: string
   ) => Promise<unknown>;
-  getNodeConnections?: (nodeId: string) => Promise<unknown[]>;
-  clearAllNodes?: () => Promise<{ success: boolean; error?: string }>;
-  deleteNode?: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
+  getNodeConnections: (nodeId: string) => Promise<unknown[]>;
+  clearAllNodes: () => Promise<{ success: boolean; error?: string }>;
+  deleteNode: (nodeId: string) => Promise<{ success: boolean; error?: string }>;
   getNodeClass?: (type: string) => unknown;
 }
 

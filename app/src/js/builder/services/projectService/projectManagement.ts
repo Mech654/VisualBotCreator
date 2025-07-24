@@ -337,7 +337,7 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
       const node = nodeData[i];
       try {
         const { nodeId, type, properties, position } = node;
-        await window.nodeSystem.createNode(type, nodeId, properties);
+        await window.nodeSystem.createNode(type, nodeId, properties, position || { x: 100, y: 100 });
         await simulateDropPlacement(type, position?.x || 100, position?.y || 100, properties?.flowType || 'flow', nodeId, properties, i * 100);
       } catch (error) {
         console.error(`Error restoring node ${node.nodeId}:`, error);
