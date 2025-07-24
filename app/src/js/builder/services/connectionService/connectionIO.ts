@@ -23,6 +23,13 @@ export function clearConnections(): void {
     if (connection.lineInstance) {
       connection.lineInstance.remove();
     }
+    // Clean up center points
+    if (connection.fromCenterPoint && connection.fromCenterPoint.parentNode) {
+      connection.fromCenterPoint.parentNode.removeChild(connection.fromCenterPoint);
+    }
+    if (connection.toCenterPoint && connection.toCenterPoint.parentNode) {
+      connection.toCenterPoint.parentNode.removeChild(connection.toCenterPoint);
+    }
   });
   connections.length = 0;
 }

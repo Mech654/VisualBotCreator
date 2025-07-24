@@ -154,8 +154,8 @@ function setupOutputPort(
         endPlug: 'arrow3',
         color: connectionColor,
         size: portCategory === PortCategory.FLOW ? 3 : 2,
-        startSocketGravity: 20,
-        endSocketGravity: 20,
+        startSocketGravity: 0,
+        endSocketGravity: 0,
         dash: portCategory === PortCategory.DATA ? { animation: true } : false,
       });
 

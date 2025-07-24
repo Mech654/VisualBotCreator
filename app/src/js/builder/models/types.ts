@@ -59,6 +59,8 @@ export interface ConnectionInstance {
   toPortId: string;
   flowType?: string; // 'flow' or 'data'
   lineInstance?: any; // Will hold the LeaderLine instance
+  fromCenterPoint?: HTMLElement; // Center point element for from port
+  toCenterPoint?: HTMLElement; // Center point element for to port
 }
 
 export enum ConnectionMode {

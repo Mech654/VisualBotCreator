@@ -34,14 +34,36 @@ export async function createConnection(
         : PortCategory.DATA);
     const connectionColor = CONNECTION_COLORS[portCategory as keyof typeof CONNECTION_COLORS];
 
-    const line = new LeaderLine(fromPortElement, toPortElement, {
+    // Create invisible center points for more precise connections
+    const fromRect = fromPortElement.getBoundingClientRect();
+    const toRect = toPortElement.getBoundingClientRect();
+    
+    const fromCenterPoint = document.createElement('div');
+    fromCenterPoint.style.position = 'absolute';
+    fromCenterPoint.style.left = `${fromRect.left + fromRect.width / 2}px`;
+    fromCenterPoint.style.top = `${fromRect.top + fromRect.height / 2}px`;
+    fromCenterPoint.style.width = '1px';
+    fromCenterPoint.style.height = '1px';
+    fromCenterPoint.style.pointerEvents = 'none';
+    fromCenterPoint.style.zIndex = '-1';
+    document.body.appendChild(fromCenterPoint);
+    
+    const toCenterPoint = document.createElement('div');
+    toCenterPoint.style.position = 'absolute';
+    toCenterPoint.style.left = `${toRect.left + toRect.width / 2}px`;
+    toCenterPoint.style.top = `${toRect.top + toRect.height / 2}px`;
+    toCenterPoint.style.width = '1px';
+    toCenterPoint.style.height = '1px';
+    toCenterPoint.style.pointerEvents = 'none';
+    toCenterPoint.style.zIndex = '-1';
+    document.body.appendChild(toCenterPoint);
+
+    const line = new LeaderLine(fromCenterPoint, toCenterPoint, {
       path: 'fluid',
       startPlug: 'disc',
       endPlug: 'arrow3',
       color: connectionColor,
       size: portCategory === PortCategory.FLOW ? 3 : 2,
-      startSocketGravity: 20,
-      endSocketGravity: 20,
       dash: portCategory === PortCategory.DATA ? { animation: true } : false,
     });
 
@@ -57,6 +79,8 @@ export async function createConnection(
       toPortId,
       flowType: portCategory,
       lineInstance: line,
+      fromCenterPoint,
+      toCenterPoint,
     };
     connections.push(connection);
 
@@ -107,7 +131,26 @@ if (typeof window !== 'undefined') {
 
 export function updateConnections(): void {
   connections.forEach(connection => {
-    if (connection.lineInstance) {
+    if (connection.lineInstance && connection.fromCenterPoint && connection.toCenterPoint) {
+      // Update center point positions
+      const fromPortElement = document.querySelector(
+        `.node[data-node-id="${connection.fromNodeId}"] .output-port[data-port-id="${connection.fromPortId}"]`
+      ) as HTMLElement;
+      const toPortElement = document.querySelector(
+        `.node[data-node-id="${connection.toNodeId}"] .input-port[data-port-id="${connection.toPortId}"]`
+      ) as HTMLElement;
+      
+      if (fromPortElement && toPortElement) {
+        const fromRect = fromPortElement.getBoundingClientRect();
+        const toRect = toPortElement.getBoundingClientRect();
+        
+        connection.fromCenterPoint.style.left = `${fromRect.left + fromRect.width / 2}px`;
+        connection.fromCenterPoint.style.top = `${fromRect.top + fromRect.height / 2}px`;
+        
+        connection.toCenterPoint.style.left = `${toRect.left + toRect.width / 2}px`;
+        connection.toCenterPoint.style.top = `${toRect.top + toRect.height / 2}px`;
+      }
+      
       connection.lineInstance.position();
     }
   });
@@ -122,6 +165,13 @@ export function removeNodeConnections(nodeId: string): void {
   nodeConnections.forEach(connection => {
     if (connection.lineInstance) {
       connection.lineInstance.remove();
+    }
+    // Clean up center points
+    if (connection.fromCenterPoint && connection.fromCenterPoint.parentNode) {
+      connection.fromCenterPoint.parentNode.removeChild(connection.fromCenterPoint);
+    }
+    if (connection.toCenterPoint && connection.toCenterPoint.parentNode) {
+      connection.toCenterPoint.parentNode.removeChild(connection.toCenterPoint);
     }
     const index = connections.findIndex(conn => conn.id === connection.id);
     if (index !== -1) {
