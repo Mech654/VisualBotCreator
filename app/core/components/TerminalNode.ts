@@ -21,7 +21,11 @@ export class TerminalNode extends Node {
 
   static override shownProperties = ['command', 'workingDirectory'];
 
-  constructor(id: string, properties: Partial<TerminalNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: Partial<TerminalNodeProperties> = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     const terminalProps: TerminalNodeProperties = {
       command:
         typeof properties.command === 'string' && properties.command.trim() !== ''

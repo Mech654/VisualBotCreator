@@ -20,7 +20,11 @@ export class SandBoxNode extends Node {
 
   static override shownProperties = ['jsCode'];
 
-  constructor(id: string, properties: Partial<SandBoxNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: Partial<SandBoxNodeProperties> = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     const sandBoxProps: SandBoxNodeProperties = {
       jsCode:
         properties.jsCode !== undefined && properties.jsCode !== null

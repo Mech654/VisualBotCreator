@@ -1,8 +1,18 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('nodeSystem', {
-  createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => {
-    return ipcRenderer.invoke('node:create', { type, id, properties, position }) as Promise<unknown>;
+  createNode: (
+    type: string,
+    id: string,
+    properties: Record<string, unknown>,
+    position: { x: number; y: number }
+  ) => {
+    return ipcRenderer.invoke('node:create', {
+      type,
+      id,
+      properties,
+      position,
+    }) as Promise<unknown>;
   },
 
   getNodeTypes: () => {
@@ -111,8 +121,7 @@ contextBridge.exposeInMainWorld('database', {
     ipcRenderer.invoke('database:addOrUpdateBotCondition', botId, key, value),
   deleteBotConditionDb: (botId: string, conditionId: string) =>
     ipcRenderer.invoke('database:deleteBotCondition', botId, conditionId),
-  removeBot: (botId: string) =>
-    ipcRenderer.invoke('database:removeBot', botId),
+  removeBot: (botId: string) => ipcRenderer.invoke('database:removeBot', botId),
 });
 
 contextBridge.exposeInMainWorld('electron', {

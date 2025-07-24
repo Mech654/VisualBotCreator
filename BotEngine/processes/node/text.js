@@ -6,7 +6,7 @@ class TextProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get text properties, checking runtimeInputs first, then properties
       const text = runtimeInputs.textInput || this.getProperty(properties, 'text', 'Sample text');
       const fontSize = this.getProperty(properties, 'fontSize', 16);
@@ -14,7 +14,7 @@ class TextProcessor extends BaseProcessor {
       const color = this.getProperty(properties, 'color', '#000000');
 
       let processedText = text;
-      
+
       // Apply formatting if needed
       if (bold) {
         processedText = `<strong>${processedText}</strong>`;
@@ -34,9 +34,9 @@ class TextProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
       };
-      
+
       console.error('[TextProcessor] Returning result:', JSON.stringify(responseData));
-      
+
       return responseData;
     } catch (error) {
       console.error('[TextProcessor] Error during processing:', error.message);

@@ -18,7 +18,11 @@ export class IncrementNode extends Node {
 
   static override shownProperties = ['incrementBy'];
 
-  constructor(id: string, properties: IncrementNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: IncrementNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     properties.incrementBy =
       typeof properties.incrementBy === 'number' && !isNaN(properties.incrementBy)
         ? properties.incrementBy

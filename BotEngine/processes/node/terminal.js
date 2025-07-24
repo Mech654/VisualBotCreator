@@ -6,10 +6,11 @@ class TerminalProcessor extends BaseProcessor {
     // Extract properties and runtimeInputs from the execution data
     const properties = executionData.properties || {};
     const runtimeInputs = executionData.runtimeInputs || {};
-    
+
     // Check runtimeInputs first (from connected nodes), then fall back to properties
     let command = runtimeInputs.command || this.getProperty(properties, 'command');
-    const workingDirectory = runtimeInputs.workingDirectory || this.getProperty(properties, 'workingDirectory');
+    const workingDirectory =
+      runtimeInputs.workingDirectory || this.getProperty(properties, 'workingDirectory');
 
     if (!command) {
       return {

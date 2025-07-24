@@ -11,7 +11,12 @@ import { getNodes } from './builder/services/nodeService/nodeState.js';
 
 interface Window {
   nodeSystem: {
-    createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => Promise<unknown>;
+    createNode: (
+      type: string,
+      id: string,
+      properties: Record<string, unknown>,
+      position: { x: number; y: number }
+    ) => Promise<unknown>;
     createConnection: (
       fromNodeId: string,
       fromPortId: string,

@@ -20,7 +20,11 @@ export class MathNode extends Node {
 
   static override shownProperties = ['expression'];
 
-  constructor(id: string, properties: MathNodeProperties = { expression: 'a + b' }, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: MathNodeProperties = { expression: 'a + b' },
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     if (!properties.expression) {
       properties.expression = 'a + b';
     }

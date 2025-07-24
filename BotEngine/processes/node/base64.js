@@ -6,7 +6,7 @@ class Base64Processor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Check runtimeInputs first (from connected nodes), then fall back to properties
       const value = runtimeInputs.value || this.getProperty(properties, 'value', '');
 
@@ -29,9 +29,9 @@ class Base64Processor extends BaseProcessor {
         exitCode: 0,
         status: true,
       };
-      
+
       console.error('[Base64Processor] Returning result:', JSON.stringify(result));
-      
+
       return result;
     } catch (error) {
       console.error('[Base64Processor] Error during processing:', error.message);

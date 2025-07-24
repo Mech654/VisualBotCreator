@@ -1,8 +1,6 @@
 // Transitions and animations system for VisualBotCreator
 // Provides a set of reusable transitions for creating smooth user experiences
 
-
-
 /**
  * Shows a full-page transition when navigating between pages
  * @param destination The URL to navigate to after the transition
@@ -61,7 +59,6 @@ export function showPageTransition(
   setTimeout(() => {
     window.location.href = destination;
   }, delay);
-
 }
 
 /**

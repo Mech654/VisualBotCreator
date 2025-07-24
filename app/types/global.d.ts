@@ -43,7 +43,12 @@ interface NodeInstanceGlobal {
 }
 
 interface NodeSystemAPI {
-  createNode: (type: string, id: string, properties: Record<string, unknown>, position: { x: number; y: number }) => Promise<NodeInstanceGlobal>;
+  createNode: (
+    type: string,
+    id: string,
+    properties: Record<string, unknown>,
+    position: { x: number; y: number }
+  ) => Promise<NodeInstanceGlobal>;
   getNodeTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getRegisteredTypes: () => Promise<Array<{ type: string; name: string; category: string }>>;
   getNodeById: (id: string) => Promise<NodeInstanceGlobal>;

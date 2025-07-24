@@ -5,21 +5,21 @@ class BinaryConverterProcessor extends BaseProcessor {
     try {
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       const inputValue = runtimeInputs.input || this.getProperty(properties, 'input', '');
-      
+
       // Validate input
       if (inputValue === '') {
         return {
           output: '',
           exitCode: 0,
-          status: true
+          status: true,
         };
       }
-      
+
       let outputValue = '';
       let detectedType = '';
-      
+
       // Always auto-detect the input type
       // If input looks like binary (only 0s, 1s, and spaces)
       if (/^[01\s]+$/.test(inputValue)) {
@@ -27,7 +27,7 @@ class BinaryConverterProcessor extends BaseProcessor {
       } else {
         detectedType = 'toBinary';
       }
-      
+
       // Perform conversion based on detected type
       if (detectedType === 'toBinary') {
         outputValue = this.textToBinary(inputValue);
@@ -37,46 +37,45 @@ class BinaryConverterProcessor extends BaseProcessor {
         return {
           output: `Error: Could not determine conversion type`,
           exitCode: 1,
-          status: false
+          status: false,
         };
       }
-      
+
       // Return the result
       return {
         output: outputValue,
         exitCode: 0,
-        status: true
+        status: true,
       };
     } catch (error) {
       return {
         output: `Error during binary conversion: ${error.message}`,
         exitCode: 1,
-        status: false
+        status: false,
       };
     }
   }
-  
+
   textToBinary(text) {
     if (!text || typeof text !== 'string') {
       throw new Error('Input must be a non-empty string');
     }
-    
-    return text.split('').map(char => 
-      char.charCodeAt(0).toString(2).padStart(8, '0')
-    ).join(' ');
+
+    return text
+      .split('')
+      .map(char => char.charCodeAt(0).toString(2).padStart(8, '0'))
+      .join(' ');
   }
-  
+
   binaryToText(binary) {
     if (!binary || typeof binary !== 'string') {
       throw new Error('Input must be a non-empty string');
     }
-    
+
     try {
       // Handle input with or without spaces
-      const binaryGroups = binary.includes(' ') 
-        ? binary.split(' ')
-        : binary.match(/.{1,8}/g) || [];
-      
+      const binaryGroups = binary.includes(' ') ? binary.split(' ') : binary.match(/.{1,8}/g) || [];
+
       return binaryGroups
         .filter(bin => bin.trim() !== '') // Filter out empty strings
         .map(bin => {

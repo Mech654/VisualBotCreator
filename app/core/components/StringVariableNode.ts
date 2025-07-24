@@ -19,7 +19,11 @@ export class StringVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: StringVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: StringVariableNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     properties.title =
       properties.title !== undefined && properties.title !== null && properties.title !== ''
         ? properties.title

@@ -6,13 +6,14 @@ class MathProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get the expression, checking runtimeInputs first, then properties
-      const expression = runtimeInputs.expression || this.getProperty(properties, 'expression', 'a + b');
-      
+      const expression =
+        runtimeInputs.expression || this.getProperty(properties, 'expression', 'a + b');
+
       // Build scope with variables from properties and runtimeInputs
       const scope = { ...properties };
-      
+
       // Add runtime inputs as variables (these take precedence)
       Object.keys(runtimeInputs).forEach(key => {
         if (key !== 'expression') {
@@ -39,9 +40,9 @@ class MathProcessor extends BaseProcessor {
         exitCode: error ? 1 : 0,
         status: !error,
       };
-      
+
       console.error('[MathProcessor] Returning result:', JSON.stringify(responseData));
-      
+
       return responseData;
     } catch (error) {
       console.error('[MathProcessor] Error during processing:', error.message);
@@ -60,7 +61,7 @@ class MathProcessor extends BaseProcessor {
     // Simple expression evaluator for basic math operations
     // Replace variables in the expression with their values
     let processedExpression = expression;
-    
+
     // Replace variables with their values
     Object.keys(scope).forEach(variable => {
       const regex = new RegExp(`\\b${variable}\\b`, 'g');

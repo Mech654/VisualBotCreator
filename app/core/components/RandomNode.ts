@@ -20,7 +20,11 @@ export class RandomNode extends Node {
 
   static override shownProperties = ['min', 'max', 'type', 'length'];
 
-  constructor(id: string, properties: RandomNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: RandomNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     properties.min = properties.min ?? 1;
     properties.max = properties.max ?? 100;
     properties.type = properties.type || 'integer';

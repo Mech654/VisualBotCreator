@@ -19,7 +19,11 @@ export class IntVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: IntVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: IntVariableNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     if (typeof properties.title !== 'string' || properties.title.trim() === '') {
       properties.title = 'Int Variable';
     }

@@ -6,7 +6,7 @@ class ConditionProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get the condition and value to check
       const conditionString = this.getProperty(properties, 'condition', 'value == true');
       const valueToCheck = runtimeInputs.value;
@@ -91,7 +91,7 @@ class ConditionProcessor extends BaseProcessor {
       if (nextNodeId) {
         responseData.NextNodeId = nextNodeId;
       }
-      
+
       console.error('[ConditionProcessor] Returning result:', JSON.stringify(responseData));
 
       return responseData;

@@ -224,21 +224,23 @@ function getBotNodes(botId: string): Promise<any[]> {
           console.error('Error fetching bot nodes:', err);
           return reject(err);
         }
-        
+
         // Parse the Definition JSON for each node
-        const parsedNodes = rows.map(row => {
-          try {
-            const definition = JSON.parse(row.Definition);
-            return {
-              nodeId: row.NodeId,
-              ...definition
-            };
-          } catch (parseErr) {
-            console.error('Error parsing node definition:', parseErr);
-            return null;
-          }
-        }).filter(node => node !== null);
-        
+        const parsedNodes = rows
+          .map(row => {
+            try {
+              const definition = JSON.parse(row.Definition);
+              return {
+                nodeId: row.NodeId,
+                ...definition,
+              };
+            } catch (parseErr) {
+              console.error('Error parsing node definition:', parseErr);
+              return null;
+            }
+          })
+          .filter(node => node !== null);
+
         resolve(parsedNodes);
       }
     );
@@ -388,18 +390,22 @@ function deleteBotConditionDb(botId: string, key: string): Promise<void> {
 
 function removeBotFromDatabase(botId: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    db.run('DELETE FROM Bots WHERE Id = ?', [botId], function (this: sqlite3.RunResult, err: Error | null) {
-      if (err) {
-        console.error('Error removing bot from database:', err);
-        return reject(err);
+    db.run(
+      'DELETE FROM Bots WHERE Id = ?',
+      [botId],
+      function (this: sqlite3.RunResult, err: Error | null) {
+        if (err) {
+          console.error('Error removing bot from database:', err);
+          return reject(err);
+        }
+        if (this.changes === 0) {
+          console.warn('No bot found with Id to remove:', botId);
+          return resolve();
+        }
+        console.log('Bot removed successfully:', botId);
+        resolve();
       }
-      if (this.changes === 0) {
-        console.warn('No bot found with Id to remove:', botId);
-        return resolve();
-      }
-      console.log('Bot removed successfully:', botId);
-      resolve();
-    });
+    );
   });
 }
 
@@ -441,5 +447,5 @@ export {
   changeStatusDb,
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
-  removeBotFromDatabase
+  removeBotFromDatabase,
 };

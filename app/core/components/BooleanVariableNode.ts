@@ -19,7 +19,11 @@ export class BooleanVariableNode extends Node {
 
   static override shownProperties = ['value'];
 
-  constructor(id: string, properties: BooleanVariableNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: BooleanVariableNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     properties.title = typeof properties.title === 'string' ? properties.title : 'Boolean Variable';
     properties.value = typeof properties.value === 'boolean' ? properties.value : false;
     properties.language =

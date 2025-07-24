@@ -21,7 +21,11 @@ export class PdfEditorNode extends Node {
 
   static override shownProperties = ['pdfPath', 'newText', 'locator'];
 
-  constructor(id: string, properties: Partial<PdfEditorNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: Partial<PdfEditorNodeProperties> = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     const pdfEditorProps: PdfEditorNodeProperties = {
       pdfPath: properties.pdfPath ?? '',
       newText: properties.newText ?? '',

@@ -1,4 +1,9 @@
-import { exportConnections, clearConnections, createConnection, connections } from '../connectionService/connectionService.js';
+import {
+  exportConnections,
+  clearConnections,
+  createConnection,
+  connections,
+} from '../connectionService/connectionService.js';
 import { createNodeInstance } from '../nodeService/nodeService.js';
 import { initDraggableNodes } from '../dragDropService/dragDropService.js';
 import { showNotification } from '../../utils/notifications.js';
@@ -17,7 +22,7 @@ let currentBotName: string | null = null;
 function setBotName(botName: string): void {
   currentBotName = botName;
   const botNameElement = document.getElementById('current-bot-name') as HTMLElement;
-  
+
   if (botNameElement) {
     botNameElement.textContent = botName;
     console.log('[ProjectManagement] Set bot name:', botName);
@@ -27,7 +32,7 @@ function setBotName(botName: string): void {
 function clearBotName(): void {
   currentBotName = null;
   const botNameElement = document.getElementById('current-bot-name') as HTMLElement;
-  
+
   if (botNameElement) {
     botNameElement.textContent = '';
     console.log('[ProjectManagement] Cleared bot name');
@@ -127,7 +132,7 @@ function showSaveConfirmationModal(botName: string): Promise<'overwrite' | 'canc
       cleanup();
       resolve('overwrite');
     }
-    
+
     function onCancel() {
       cleanup();
       resolve('cancel');
@@ -159,7 +164,7 @@ function showSaveConfirmationModal(botName: string): Promise<'overwrite' | 'canc
 async function saveProject(): Promise<void> {
   try {
     let projectName: string | null = null;
-    
+
     const currentBot = getCurrentBotName();
     if (currentBot) {
       const action = await showSaveConfirmationModal(currentBot);
@@ -175,7 +180,7 @@ async function saveProject(): Promise<void> {
         return;
       }
     }
-    
+
     console.log('[SaveProject] Using project name:', projectName);
 
     const electron = (window as any).electron;
@@ -205,7 +210,7 @@ async function loadProject(): Promise<void> {
 
     setBotName(botId);
     localStorage.setItem('editBotId', botId);
-    
+
     await loadProjectFromDatabase(botId);
     showNotification('Project loaded successfully!', 'success');
   } catch (error) {
@@ -215,7 +220,7 @@ async function loadProject(): Promise<void> {
 }
 
 function showProjectSelectionModal(): Promise<string | null> {
-  return new Promise(async (resolve) => {
+  return new Promise(async resolve => {
     try {
       const bots = await window.database?.getAllBots();
       if (!bots || bots.length === 0) {
@@ -235,7 +240,9 @@ function showProjectSelectionModal(): Promise<string | null> {
           </div>
           <div class="modal-body">
             <div class="project-list">
-              ${bots.map(bot => `
+              ${bots
+                .map(
+                  bot => `
                 <div class="project-item" data-bot-id="${bot.Id}">
                   <div class="project-icon">${bot.Id.substring(0, 2).toUpperCase()}</div>
                   <div class="project-info">
@@ -249,7 +256,9 @@ function showProjectSelectionModal(): Promise<string | null> {
                     </div>
                   </div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
           </div>
           <div class="modal-footer">
@@ -266,12 +275,14 @@ function showProjectSelectionModal(): Promise<string | null> {
         setTimeout(() => modal.remove(), 300);
       }
 
-      modal.addEventListener('click', (e) => {
+      modal.addEventListener('click', e => {
         const target = e.target as HTMLElement;
-        
-        if (target.classList.contains('modal-overlay') || 
-            target.classList.contains('modal-close-btn') || 
-            target.classList.contains('modal-cancel-btn')) {
+
+        if (
+          target.classList.contains('modal-overlay') ||
+          target.classList.contains('modal-close-btn') ||
+          target.classList.contains('modal-cancel-btn')
+        ) {
           cleanup();
           resolve(null);
           return;
@@ -293,7 +304,6 @@ function showProjectSelectionModal(): Promise<string | null> {
         }
       };
       document.addEventListener('keydown', handleEscape);
-
     } catch (error) {
       console.error('Error fetching projects:', error);
       showNotification('Failed to fetch projects', 'error');
@@ -306,9 +316,9 @@ async function loadProjectFromDatabase(botId: string): Promise<void> {
   try {
     clearConnections();
     setNodes([]);
-    
+
     await window.nodeSystem?.clearAllNodes?.();
-    
+
     const canvas = document.querySelector('.canvas-content') as HTMLElement;
     if (canvas) {
       const nodeElements = canvas.querySelectorAll('.node');
@@ -322,7 +332,6 @@ async function loadProjectFromDatabase(botId: string): Promise<void> {
     }
 
     await restoreNodesAndConnections(nodeData);
-
   } catch (error) {
     console.error('Error loading project from database:', error);
     throw error;
@@ -337,15 +346,28 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
       const node = nodeData[i];
       try {
         const { nodeId, type, properties, position } = node;
-        await window.nodeSystem.createNode(type, nodeId, properties, position || { x: 100, y: 100 });
-        await simulateDropPlacement(type, position?.x || 100, position?.y || 100, properties?.flowType || 'flow', nodeId, properties, i * 100);
+        await window.nodeSystem.createNode(
+          type,
+          nodeId,
+          properties,
+          position || { x: 100, y: 100 }
+        );
+        await simulateDropPlacement(
+          type,
+          position?.x || 100,
+          position?.y || 100,
+          properties?.flowType || 'flow',
+          nodeId,
+          properties,
+          i * 100
+        );
       } catch (error) {
         console.error(`Error restoring node ${node.nodeId}:`, error);
       }
     }
 
     await new Promise(resolve => setTimeout(resolve, Math.max(500, nodeData.length * 100 + 200)));
-    
+
     for (const node of nodeData) {
       if (node.outputs) {
         for (const output of node.outputs) {
@@ -364,9 +386,9 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
         }
       }
     }
-    
+
     await Promise.all(connectionPromises);
-    
+
     console.log(`[LoadProject] Successfully restored ${nodeData.length} nodes`);
   } catch (error) {
     console.error('Error restoring nodes and connections:', error);
@@ -403,11 +425,10 @@ async function simulateDropPlacement(
   if (result) {
     const { nodeElement } = result;
     const canvas = document.querySelector('.canvas-content') as HTMLElement;
-    
+
     if (canvas) {
       canvas.appendChild(nodeElement);
       addNode(nodeElement);
-      
 
       nodeElement.style.display = 'block';
       nodeElement.style.visibility = 'visible';
@@ -417,9 +438,9 @@ async function simulateDropPlacement(
       nodeElement.style.left = `${x}px`;
       nodeElement.style.top = `${y}px`;
       nodeElement.offsetHeight;
-      
+
       initDraggableNodes([nodeElement], getNodes());
-      enterTransition(nodeElement, 'scale', 300); 
+      enterTransition(nodeElement, 'scale', 300);
       setTimeout(() => {
         highlightElement(nodeElement, 'var(--primary)', 800);
       }, 300);
@@ -470,9 +491,13 @@ async function restoreConnection(
   try {
     const connection = await createConnection(fromNodeId, fromPortId, toNodeId, toPortId);
     if (connection) {
-      console.log(`[LoadProject] Restored connection: ${fromNodeId}.${fromPortId} -> ${toNodeId}.${toPortId}`);
+      console.log(
+        `[LoadProject] Restored connection: ${fromNodeId}.${fromPortId} -> ${toNodeId}.${toPortId}`
+      );
     } else {
-      console.error(`Failed to restore connection: ${fromNodeId}.${fromPortId} -> ${toNodeId}.${toPortId}`);
+      console.error(
+        `Failed to restore connection: ${fromNodeId}.${fromPortId} -> ${toNodeId}.${toPortId}`
+      );
     }
   } catch (error) {
     console.error(`Error restoring connection ${fromNodeId} -> ${toNodeId}:`, error);
@@ -482,7 +507,7 @@ async function restoreConnection(
 async function checkForAutoLoad(): Promise<void> {
   try {
     const editBotId = localStorage.getItem('editBotId');
-    
+
     if (editBotId) {
       setBotName(editBotId);
       await loadProjectFromDatabase(editBotId);
@@ -496,15 +521,17 @@ async function checkForAutoLoad(): Promise<void> {
   }
 }
 
-
-
 // Restore workspace state after navigation
 async function restoreWorkspaceState(): Promise<void> {
   try {
     const existingNodes = await window.nodeSystem?.getAllNodes?.();
-    
-    console.log('[ProjectManagement] Found', existingNodes?.length || 0, 'existing nodes to restore');
-    
+
+    console.log(
+      '[ProjectManagement] Found',
+      existingNodes?.length || 0,
+      'existing nodes to restore'
+    );
+
     if (existingNodes && existingNodes.length > 0) {
       await restoreNodesAndConnections(existingNodes);
       showNotification('Workspace restored!', 'success');
@@ -520,16 +547,15 @@ export async function clearAllAndExitEditMode(): Promise<void> {
     setNodes([]);
     clearBotName();
     await window.nodeSystem?.clearAllNodes?.();
-    
+
     const canvas = document.querySelector('.canvas-content') as HTMLElement;
     if (canvas) {
       const nodeElements = canvas.querySelectorAll('.node');
       nodeElements.forEach(node => node.remove());
     }
-    
+
     localStorage.removeItem('editBotId');
     showNotification('Workspace cleared and exited edit mode', 'success');
-    
   } catch (error) {
     console.error('Error clearing workspace:', error);
     showNotification('Error clearing workspace', 'error');
@@ -538,7 +564,7 @@ export async function clearAllAndExitEditMode(): Promise<void> {
 
 export function initProjectManagement(): void {
   clearBotName();
-  
+
   const saveBtn = document.getElementById('save-button');
   if (saveBtn) {
     saveBtn.addEventListener('click', e => {
@@ -578,7 +604,7 @@ export function initProjectManagement(): void {
   }, 500);
 
   // Debug: Press 'n' to check nodeInstances count
-  document.addEventListener('keydown', async (e) => {
+  document.addEventListener('keydown', async e => {
     if (e.key === 'n' || e.key === 'N') {
       try {
         const existingNodes = await window.nodeSystem?.getAllNodes?.();

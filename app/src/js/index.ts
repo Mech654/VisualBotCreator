@@ -1,6 +1,12 @@
 import { showPageTransition } from './builder/utils/transitions.js';
 import { setupSwalDashboardModalStyle } from './dashboard/swal-setup.js';
-import { showBotDuplicatedNotification, showBotStatusChangedNotification, showErrorNotification, showBotDeletedNotification, notifications } from './dashboard/notifications.js';
+import {
+  showBotDuplicatedNotification,
+  showBotStatusChangedNotification,
+  showErrorNotification,
+  showBotDeletedNotification,
+  notifications,
+} from './dashboard/notifications.js';
 declare const module: any;
 
 interface ActionItem {
@@ -89,24 +95,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.bot-action').forEach(action => {
     action.addEventListener('click', e => {
       e.stopPropagation();
-      
+
       // Remove all existing dropdowns and dropdown-active classes
       document.querySelectorAll('.action-dropdown').forEach(dropdown => dropdown.remove());
-      document.querySelectorAll('.bot-card.dropdown-active').forEach(card => card.classList.remove('dropdown-active'));
-      
+      document
+        .querySelectorAll('.bot-card.dropdown-active')
+        .forEach(card => card.classList.remove('dropdown-active'));
+
       const dropdown = document.createElement('div');
       dropdown.className = 'action-dropdown';
-      
+
       // Add dropdown-active class to the current bot card
       const currentBotCard = (action as HTMLElement).closest('.bot-card');
       if (currentBotCard) {
         currentBotCard.classList.add('dropdown-active');
       }
-      
+
       const actions: ActionItem[] = [
         { icon: '<i class="bi bi-pencil-fill"></i>', text: 'Edit', action: 'edit' },
         { icon: '<i class="bi bi-files"></i>', text: 'Duplicate', action: 'duplicate' },
-        { icon: '<i class="bi bi-trash-fill"></i>', text: 'Delete', action: 'delete', danger: true },
+        {
+          icon: '<i class="bi bi-trash-fill"></i>',
+          text: 'Delete',
+          action: 'delete',
+          danger: true,
+        },
       ];
       actions.forEach(item => {
         const actionItem = document.createElement('div');
@@ -208,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (botId && window.database?.removeBot) {
               try {
                 await window.database.removeBot(botId);
-                
+
                 botCard.style.height = `${botCard.offsetHeight}px`;
                 botCard.classList.add('fade-out');
 
@@ -238,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                       }
                     }
-                    
+
                     showBotDeletedNotification(botName);
                   }, 300);
                 }, 10);
@@ -690,7 +703,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupSwalDashboardModalStyle();
 
   // Debug: Press 'n' to check nodeInstances count from dashboard
-  document.addEventListener('keydown', async (e) => {
+  document.addEventListener('keydown', async e => {
     if (e.key === 'n' || e.key === 'N') {
       try {
         const existingNodes = await window.nodeSystem?.getAllNodes?.();

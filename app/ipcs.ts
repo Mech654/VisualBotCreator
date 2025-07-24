@@ -12,14 +12,27 @@ import {
   changeStatusDb,
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
-  removeBotFromDatabase
+  removeBotFromDatabase,
 } from './core/database.js';
 import { nodeInstances, connections, arePortTypesCompatible } from './main.js';
 
 export function setupIpcHandlers(): void {
   ipcMain.handle(
     'node:create',
-    (event, { type, id, properties, position }: { type: string; id: string; properties: NodeProperties, position: { x: number; y: number } }) => {
+    (
+      event,
+      {
+        type,
+        id,
+        properties,
+        position,
+      }: {
+        type: string;
+        id: string;
+        properties: NodeProperties;
+        position: { x: number; y: number };
+      }
+    ) => {
       try {
         const existingNode = nodeInstances.get(id);
         let preservedConnections: { inputs: Connection[]; outputs: Connection[] } | null = null;
@@ -273,13 +286,13 @@ export function setupIpcHandlers(): void {
     }
   });
 
-  ipcMain.handle('node:getAllNodes', async (event) => {
+  ipcMain.handle('node:getAllNodes', async event => {
     const allNodes = Array.from(nodeInstances.values()).map(node => ({
       nodeId: node.id,
       type: node.type,
       properties: node.properties,
       position: node.position,
-      outputs: node.outputs
+      outputs: node.outputs,
     }));
     return allNodes;
   });
@@ -446,8 +459,14 @@ export function setupIpcHandlers(): void {
     try {
       console.log('[DEBUG-BACKEND] clearAllNodes called! Stack trace:');
       console.trace();
-      console.log('[DEBUG-BACKEND] Clearing', nodeInstances.size, 'nodes and', connections.length, 'connections');
-      
+      console.log(
+        '[DEBUG-BACKEND] Clearing',
+        nodeInstances.size,
+        'nodes and',
+        connections.length,
+        'connections'
+      );
+
       nodeInstances.clear();
       connections.length = 0;
 

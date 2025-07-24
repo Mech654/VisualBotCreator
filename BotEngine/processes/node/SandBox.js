@@ -7,9 +7,10 @@ class SandBoxProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Check runtimeInputs first (from connected nodes), then fall back to properties
-      const jsCode = runtimeInputs.jsCode || this.getProperty(properties, 'jsCode', 'return input1 + input2;');
+      const jsCode =
+        runtimeInputs.jsCode || this.getProperty(properties, 'jsCode', 'return input1 + input2;');
       const input1 = runtimeInputs.input1;
       const input2 = runtimeInputs.input2;
       const input3 = runtimeInputs.input3;
@@ -67,16 +68,15 @@ class SandBoxProcessor extends BaseProcessor {
 
         // Create VM context
         const context = vm.createContext(sandbox);
-        
+
         // Execute the code with timeout
         result = vm.runInContext(wrappedCode, context, {
           timeout: 5000, // 5 second timeout
-          displayErrors: true
+          displayErrors: true,
         });
 
         status = true;
         output = `JavaScript executed successfully. Result: ${JSON.stringify(result)}`;
-
       } catch (error) {
         result = null;
         status = false;
@@ -90,9 +90,9 @@ class SandBoxProcessor extends BaseProcessor {
         status: status,
         exitCode: status ? 0 : 1,
       };
-      
+
       console.error('[SandBoxProcessor] Returning result:', JSON.stringify(responseData));
-      
+
       return responseData;
     } catch (error) {
       console.error('[SandBoxProcessor] Error during processing:', error.message);

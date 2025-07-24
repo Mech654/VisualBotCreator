@@ -9,7 +9,13 @@ export interface NotificationOptions {
   /** Duration in milliseconds (0 for persistent) */
   duration?: number;
   /** Position on screen */
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
+  position?:
+    | 'top-right'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-left'
+    | 'top-center'
+    | 'bottom-center';
   /** Whether notification can be manually dismissed */
   dismissible?: boolean;
   /** Custom icon (emoji or HTML) */
@@ -44,7 +50,7 @@ class NotificationSystem {
       maxNotifications: config.maxNotifications ?? 5,
       defaultDuration: config.defaultDuration ?? 4000,
       defaultPosition: config.defaultPosition ?? 'top-right',
-      animationDuration: config.animationDuration ?? 300
+      animationDuration: config.animationDuration ?? 300,
     };
 
     this.initializeContainer();
@@ -247,7 +253,7 @@ class NotificationSystem {
         }
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -256,7 +262,7 @@ class NotificationSystem {
       success: '✅',
       error: '❌',
       warning: '⚠️',
-      info: 'ℹ️'
+      info: 'ℹ️',
     };
     return icons[type] || '';
   }
@@ -266,7 +272,7 @@ class NotificationSystem {
 
     // Remove all position classes
     this.container.className = 'notification-container';
-    
+
     // Add new position class
     if (position !== 'top-right') {
       this.container.classList.add(`position-${position}`);
@@ -284,7 +290,7 @@ class NotificationSystem {
     if (!this.notifications.has(notification)) return;
 
     notification.classList.add('hiding');
-    
+
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
@@ -311,7 +317,7 @@ class NotificationSystem {
       icon,
       customClasses = [],
       onDismiss,
-      onClick
+      onClick,
     } = options;
 
     this.enforceMaxNotifications();
@@ -319,13 +325,9 @@ class NotificationSystem {
 
     const notification = document.createElement('div');
     const notificationId = `notification-${++this.notificationCounter}`;
-    
+
     notification.id = notificationId;
-    notification.className = [
-      'vbc-notification',
-      `type-${type}`,
-      ...customClasses
-    ].join(' ');
+    notification.className = ['vbc-notification', `type-${type}`, ...customClasses].join(' ');
 
     notification.setAttribute('role', 'alert');
     notification.setAttribute('aria-live', 'assertive');
@@ -338,9 +340,10 @@ class NotificationSystem {
     // Create notification content
     const iconElement = icon !== undefined ? icon : this.getDefaultIcon(type);
     const iconHtml = iconElement ? `<div class="vbc-notification-icon">${iconElement}</div>` : '';
-    
-    const dismissButton = dismissible ? 
-      '<button class="vbc-notification-dismiss" aria-label="Dismiss notification" title="Dismiss">×</button>' : '';
+
+    const dismissButton = dismissible
+      ? '<button class="vbc-notification-dismiss" aria-label="Dismiss notification" title="Dismiss">×</button>'
+      : '';
 
     notification.innerHTML = `
       ${iconHtml}
@@ -359,7 +362,7 @@ class NotificationSystem {
     // Add event listeners
     if (dismissible) {
       const dismissBtn = notification.querySelector('.vbc-notification-dismiss');
-      dismissBtn?.addEventListener('click', (e) => {
+      dismissBtn?.addEventListener('click', e => {
         e.stopPropagation();
         this.dismissNotification(notification);
       });

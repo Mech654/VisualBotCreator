@@ -15,7 +15,7 @@ import { ComponentCategory } from './nodeSystem.js';
  * 8. Event Listeners - Connect UI controls to update node properties
  * 9. Process Method - Implement the node's behavior/functionality
  * 10. Register Node - Add your node to the system (in nodeSystem.ts)
- * 
+ *
  * IMPORTANT: Nodes include a 'language' property that determines which runtime
  * processor handles execution (JavaScript, Python, or C#).
  */
@@ -80,7 +80,11 @@ export class GuideNode extends Node {
    * PURPOSE: Initialize your node with default values and set its initial appearance
    * This runs when a node is first created or loaded from saved data
    */
-  constructor(id: string, properties: GuideNodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: GuideNodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     // Set default values for properties
     properties.title = properties.title || 'Guide';
     properties.customValue = properties.customValue || 'Default value';

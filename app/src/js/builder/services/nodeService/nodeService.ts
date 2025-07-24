@@ -107,23 +107,23 @@ export function updatePropertiesPanel(nodeInstance: NodeInstance): void {
         const nodeElement = document.querySelector(
           `[data-node-id="${nodeInstance.id}"]`
         ) as HTMLElement;
-        
+
         let position = { x: 0, y: 0 };
         if (nodeElement) {
           position = {
             x: nodeElement.offsetLeft,
-            y: nodeElement.offsetTop
+            y: nodeElement.offsetTop,
           };
         }
 
-        const updatedNode = await (window.nodeSystem.createNode as any)(
+        const updatedNode = (await (window.nodeSystem.createNode as any)(
           nodeInstance.type,
           nodeInstance.id,
           nodeInstance.properties,
           position
-        ) as NodeInstance;
+        )) as NodeInstance;
         nodeInstance.properties = updatedNode.properties;
-        
+
         if (nodeElement) {
           const contentEl = nodeElement.querySelector('.node-content');
           if (contentEl && updatedNode.properties.nodeContent) {
@@ -292,7 +292,10 @@ export async function createNodeInstance(
 
   try {
     const nodeProperties = properties ? { ...properties, flowType } : { flowType };
-    const nodeInstance = await (window.nodeSystem.createNode as any)(type, id, nodeProperties, { x, y }) as NodeInstance;
+    const nodeInstance = (await (window.nodeSystem.createNode as any)(type, id, nodeProperties, {
+      x,
+      y,
+    })) as NodeInstance;
 
     const nodeElement = document.createElement('div');
     nodeElement.className = 'node';

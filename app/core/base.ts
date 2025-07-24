@@ -47,7 +47,12 @@ export class Node {
   outputs: Port[];
   position: { x: number; y: number };
 
-  constructor(id: string, type: string, properties: NodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    type: string,
+    properties: NodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     this.id = id;
     this.type = type;
     this.properties = properties;

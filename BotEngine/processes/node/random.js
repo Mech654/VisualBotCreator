@@ -6,10 +6,16 @@ class RandomProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get the random generation parameters, checking runtimeInputs first, then properties
-      const min = runtimeInputs.min !== undefined ? Number(runtimeInputs.min) : Number(this.getProperty(properties, 'min', 1));
-      const max = runtimeInputs.max !== undefined ? Number(runtimeInputs.max) : Number(this.getProperty(properties, 'max', 100));
+      const min =
+        runtimeInputs.min !== undefined
+          ? Number(runtimeInputs.min)
+          : Number(this.getProperty(properties, 'min', 1));
+      const max =
+        runtimeInputs.max !== undefined
+          ? Number(runtimeInputs.max)
+          : Number(this.getProperty(properties, 'max', 100));
       const type = this.getProperty(properties, 'type', 'integer');
       const length = Number(this.getProperty(properties, 'length', 10));
       const seed = runtimeInputs.seed;
@@ -66,9 +72,9 @@ class RandomProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
       };
-      
+
       console.error('[RandomProcessor] Returning result:', JSON.stringify(responseData));
-      
+
       return responseData;
     } catch (error) {
       console.error('[RandomProcessor] Error during processing:', error.message);

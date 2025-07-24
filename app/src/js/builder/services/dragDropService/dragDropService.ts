@@ -26,7 +26,7 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
       if (nodeId) {
         try {
           // Fetch the node instance data from the backend
-          const nodeInstance = await window.nodeSystem.getNodeById(nodeId) as NodeInstance;
+          const nodeInstance = (await window.nodeSystem.getNodeById(nodeId)) as NodeInstance;
 
           // Show the properties panel with this node's data
           if (nodeInstance) {

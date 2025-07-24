@@ -8,7 +8,7 @@ class PdfEditorProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Check runtimeInputs first (from connected nodes), then fall back to properties
       const pdfPath = runtimeInputs.pdfPath || this.getProperty(properties, 'pdfPath');
       const newText = runtimeInputs.newText || this.getProperty(properties, 'newText');
@@ -47,7 +47,7 @@ class PdfEditorProcessor extends BaseProcessor {
       try {
         // In a real implementation, this would use a PDF library like pdf-lib, PDFtk, or similar
         // For now, we'll simulate the PDF editing process
-        
+
         // Simulate PDF editing
         output = `PDF editing simulated:\n- File: ${pdfPath}\n- Locator: ${locator}\n- New Text: ${newText}\n\nNote: Actual PDF editing requires PDF manipulation libraries`;
         status = true;
@@ -57,9 +57,8 @@ class PdfEditorProcessor extends BaseProcessor {
         // 2. Find text using the locator (could be coordinates, text pattern, etc.)
         // 3. Replace or modify the text
         // 4. Save the modified PDF back to the file
-        
+
         console.log(`[PdfEditorProcessor] Simulated PDF editing: ${pdfPath}`);
-        
       } catch (error) {
         output = `Error editing PDF: ${error.message}`;
         status = false;
@@ -70,9 +69,9 @@ class PdfEditorProcessor extends BaseProcessor {
         status: status,
         exitCode: status ? 0 : 1,
       };
-      
+
       console.error('[PdfEditorProcessor] Returning result:', JSON.stringify(responseData));
-      
+
       return responseData;
     } catch (error) {
       console.error('[PdfEditorProcessor] Error during processing:', error.message);

@@ -6,9 +6,12 @@ class BooleanVariableProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get the value, checking runtimeInputs first, then properties
-      const value = runtimeInputs.value !== undefined ? runtimeInputs.value : this.getProperty(properties, 'value', false);
+      const value =
+        runtimeInputs.value !== undefined
+          ? runtimeInputs.value
+          : this.getProperty(properties, 'value', false);
       const boolValue = typeof value === 'boolean' ? value : Boolean(value);
 
       return {
@@ -17,7 +20,7 @@ class BooleanVariableProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
         // Include all properties so they can be accessed by propertyKey
-        ...properties
+        ...properties,
       };
     } catch (error) {
       console.error('[BooleanVariableProcessor] Error during processing:', error.message);

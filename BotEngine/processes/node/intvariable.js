@@ -6,9 +6,12 @@ class IntVariableProcessor extends BaseProcessor {
       // Extract properties and runtimeInputs from the execution data
       const properties = executionData.properties || {};
       const runtimeInputs = executionData.runtimeInputs || {};
-      
+
       // Get the value, checking runtimeInputs first, then properties
-      const value = runtimeInputs.value !== undefined ? runtimeInputs.value : this.getProperty(properties, 'value', 0);
+      const value =
+        runtimeInputs.value !== undefined
+          ? runtimeInputs.value
+          : this.getProperty(properties, 'value', 0);
       const intValue = typeof value === 'number' ? value : parseInt(String(value)) || 0;
 
       return {
@@ -17,7 +20,7 @@ class IntVariableProcessor extends BaseProcessor {
         exitCode: 0,
         status: true,
         // Include all properties so they can be accessed by propertyKey
-        ...properties
+        ...properties,
       };
     } catch (error) {
       console.error('[IntVariableProcessor] Error during processing:', error.message);

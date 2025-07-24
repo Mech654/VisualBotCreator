@@ -17,7 +17,11 @@ export class Base64Node extends Node {
 
   static override shownProperties: string[] = [];
 
-  constructor(id: string, properties: Base64NodeProperties = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: Base64NodeProperties = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     super(id, 'base64', properties, position);
     properties.title = typeof properties.title === 'string' ? properties.title : 'Base64';
     properties.language =

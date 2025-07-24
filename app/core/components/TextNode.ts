@@ -21,7 +21,11 @@ export class TextNode extends Node {
 
   static override shownProperties = ['text', 'fontSize', 'bold', 'color'];
 
-  constructor(id: string, properties: Partial<TextNodeProperties> = {}, position: { x: number; y: number } = { x: 0, y: 0 }) {
+  constructor(
+    id: string,
+    properties: Partial<TextNodeProperties> = {},
+    position: { x: number; y: number } = { x: 0, y: 0 }
+  ) {
     const textNodeProps: TextNodeProperties = {
       text:
         typeof properties.text === 'string' && properties.text.trim() !== ''
