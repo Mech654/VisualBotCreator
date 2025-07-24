@@ -157,6 +157,8 @@ contextBridge.exposeInMainWorld('database', {
     ipcRenderer.invoke('database:addOrUpdateBotCondition', botId, key, value),
   deleteBotConditionDb: (botId: string, conditionId: string) =>
     ipcRenderer.invoke('database:deleteBotCondition', botId, conditionId),
+  removeBot: (botId: string) =>
+    ipcRenderer.invoke('database:removeBot', botId),
 });
 
 contextBridge.exposeInMainWorld('electron', {

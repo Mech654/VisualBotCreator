@@ -12,6 +12,7 @@ import {
   changeStatusDb,
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
+  removeBotFromDatabase
 } from './core/database.js';
 import { nodeInstances, connections, arePortTypesCompatible } from './main.js';
 
@@ -517,6 +518,15 @@ export function setupIpcHandlers(): void {
     } catch (error) {
       console.error('Error deleting node:', error);
       return { success: false, error: (error as Error).message || 'Unknown error' };
+    }
+  });
+
+  ipcMain.handle('database:removeBot', async (event, botId: string) => {
+    try {
+      await removeBotFromDatabase(botId);
+    } catch (error) {
+      console.error('Error removing bot from database:', error);
+      throw error;
     }
   });
 }

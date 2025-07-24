@@ -1,6 +1,6 @@
 import { showPageTransition } from './builder/utils/transitions.js';
 import { setupSwalDashboardModalStyle } from './dashboard/swal-setup.js';
-import { showBotDuplicatedNotification, showBotStatusChangedNotification, showErrorNotification, notifications } from './dashboard/notifications.js';
+import { showBotDuplicatedNotification, showBotStatusChangedNotification, showErrorNotification, showBotDeletedNotification, notifications } from './dashboard/notifications.js';
 declare const module: any;
 
 interface ActionItem {
@@ -204,34 +204,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const confirmButton = dialogElement.querySelector('.dialog-confirm');
         if (confirmButton) {
-          confirmButton.addEventListener('click', () => {
-            botCard.style.height = `${botCard.offsetHeight}px`;
-            botCard.classList.add('fade-out');
+          confirmButton.addEventListener('click', async () => {
+            if (botId && window.database?.removeBot) {
+              try {
+                await window.database.removeBot(botId);
+                
+                botCard.style.height = `${botCard.offsetHeight}px`;
+                botCard.classList.add('fade-out');
 
-            setTimeout(() => {
-              botCard.style.height = '0px';
-              botCard.style.margin = '0px';
-              botCard.style.padding = '0px';
-              botCard.style.overflow = 'hidden';
+                setTimeout(() => {
+                  botCard.style.height = '0px';
+                  botCard.style.margin = '0px';
+                  botCard.style.padding = '0px';
+                  botCard.style.overflow = 'hidden';
 
-              setTimeout(() => {
-                botCard.remove();
+                  setTimeout(() => {
+                    botCard.remove();
 
-                const countElement = document.querySelector('.section-title > span');
-                if (countElement && countElement.textContent) {
-                  const currentCount = parseInt(countElement.textContent);
-                  countElement.textContent = `${currentCount - 1} bots`;
+                    const countElement = document.querySelector('.section-subtitle');
+                    if (countElement && countElement.textContent) {
+                      const match = countElement.textContent.match(/(\d+)/);
+                      if (match) {
+                        const currentCount = parseInt(match[1]);
+                        const newCount = currentCount - 1;
+                        countElement.textContent = `${newCount} bot${newCount === 1 ? '' : 's'}`;
 
-                  if (currentCount - 1 === 0) {
-                    const botList = document.querySelector('.bot-list') as HTMLElement;
-                    const emptyState = document.querySelector('.empty-state') as HTMLElement;
+                        if (newCount === 0) {
+                          const botList = document.querySelector('.bot-list') as HTMLElement;
+                          const emptyState = document.querySelector('.empty-state') as HTMLElement;
 
-                    if (botList) botList.style.display = 'none';
-                    if (emptyState) emptyState.style.display = 'flex';
-                  }
-                }
-              }, 300);
-            }, 10);
+                          if (botList) botList.style.display = 'none';
+                          if (emptyState) emptyState.style.display = 'flex';
+                        }
+                      }
+                    }
+                    
+                    showBotDeletedNotification(botName);
+                  }, 300);
+                }, 10);
+              } catch (error) {
+                console.error('Failed to delete bot:', error);
+                showErrorNotification(`Failed to delete bot "${botName}". Please try again.`);
+              }
+            }
 
             dialogElement.classList.remove('active');
             setTimeout(() => dialogElement.remove(), 300);

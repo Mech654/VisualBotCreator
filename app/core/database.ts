@@ -386,6 +386,23 @@ function deleteBotConditionDb(botId: string, key: string): Promise<void> {
   });
 }
 
+function removeBotFromDatabase(botId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    db.run('DELETE FROM Bots WHERE Id = ?', [botId], function (this: sqlite3.RunResult, err: Error | null) {
+      if (err) {
+        console.error('Error removing bot from database:', err);
+        return reject(err);
+      }
+      if (this.changes === 0) {
+        console.warn('No bot found with Id to remove:', botId);
+        return resolve();
+      }
+      console.log('Bot removed successfully:', botId);
+      resolve();
+    });
+  });
+}
+
 app
   .whenReady()
   .then(async () => {
@@ -408,6 +425,8 @@ app.on('before-quit', async event => {
   }
 });
 
+// PS : I Dont like this(those with app) code gonna remove it later
+
 export {
   saveNode,
   saveAllNodes,
@@ -422,4 +441,5 @@ export {
   changeStatusDb,
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
+  removeBotFromDatabase
 };
