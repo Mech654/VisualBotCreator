@@ -42,10 +42,8 @@
   height: 100%;
   position: relative;
   overflow: auto;
-  background-color: $surface;
-  background-image:
-    linear-gradient(to right, rgba($border-color, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba($border-color, 0.1) 1px, transparent 1px);
+  background-color: #1a1b1b;
+  background-image: radial-gradient(circle, #555555 1px, transparent 1px);
   background-size: 20px 20px;
   scroll-behavior: smooth;
   cursor: grab;
@@ -67,7 +65,7 @@
   &::-webkit-scrollbar-thumb {
     background-color: rgba($text-secondary, 0.2);
     border-radius: $border-radius;
-    border: 3px solid $surface;
+    border: 3px solid #1a1b1b;
     
     &:hover {
       background-color: rgba($text-secondary, 0.3);
@@ -85,9 +83,7 @@
 
   // Flow connection mode visual indicator
   &.flow-connecting-mode {
-    background-image:
-      linear-gradient(to right, rgba($flow-color, 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba($flow-color, 0.07) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba($flow-color, 0.7) 1.5px, transparent 1.5px);
     
     &::after {
       content: 'Flow Connection Mode';
@@ -109,9 +105,7 @@
 
   // Data connection mode visual indicator
   &.data-connecting-mode {
-    background-image:
-      linear-gradient(to right, rgba($data-color, 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba($data-color, 0.07) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba($data-color, 0.7) 1.5px, transparent 1.5px);
     
     &::after {
       content: 'Data Connection Mode';
