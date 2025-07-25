@@ -28,9 +28,6 @@ export class NodeFactory {
   private static componentsDir = path.join(__dirname, 'components');
   private static isInitialized = false;
 
-  /**
-   * Dynamically discover and load all components from the components directory
-   */
   static async discoverComponents(): Promise<void> {
     if (this.isInitialized) return;
 
@@ -71,7 +68,7 @@ export class NodeFactory {
   }
 
   /**
-   * Extract the node type from component name
+   * CalculaterNode --> calculater
    */
   private static renameWithoutType(componentName: string): string {
     return componentName.replace(/Node$/, '').toLowerCase();
@@ -104,28 +101,17 @@ export class NodeFactory {
     category: string;
     flowType?: string;
   }> {
-    // Dynamically generate the list based on registered components
     const registeredComponents = Object.entries(this.nodeTypes).map(([type, Component]) => {
-      // Try to get metadata from component if it has static metadata
       const metadata = Component.metadata || {};
 
-      // Default values for component metadata
       const name = metadata.name || type.charAt(0).toUpperCase() + type.slice(1);
-      // Allow 'Flow', 'Data', or 'Variable' as category
       let category = metadata.category;
-      if (
-        category !== ComponentCategory.FLOW &&
-        category !== ComponentCategory.DATA &&
-        category !== ComponentCategory.VARIABLE
-      ) {
-        // fallback to default
-        category = ComponentCategory.FLOW;
-      }
+      
       const flowType = metadata.flowType || 'flow';
 
       return { type, name, category: String(category), flowType };
     });
-    console.log(`Backend side sending ${registeredComponents.length} components`);
+    console.log(`Backend side sending ${registeredComponents.length} components`); // useful for when you just added a new component
     return registeredComponents;
   }
 
