@@ -11,14 +11,40 @@ let dbPath: string;
 function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      // Use app.getAppPath() to get the application directory, then go to project root
-      const appPath = app.getAppPath();
-      const baseDir = path.resolve(appPath);
+      // Use userData directory for writable storage, fallback to app path for development
+      let baseDir: string;
+      if (app.isPackaged) {
+        // In packaged app (AppImage, exe, etc.), use userData directory
+        baseDir = app.getPath('userData');
+      } else {
+        // In development, use project root
+        const appPath = app.getAppPath();
+        baseDir = path.resolve(appPath);
+      }
+      
+      // Additional fallback for AppImage if userData fails
+      if (app.isPackaged && !fs.existsSync(path.dirname(baseDir))) {
+        console.log('[DB] userData directory parent does not exist, trying temp directory');
+        baseDir = path.join(require('os').tmpdir(), 'VisualBotCreator');
+      }
+      
       if (!fs.existsSync(baseDir)) {
+        console.log(`[DB] Creating directory: ${baseDir}`);
         fs.mkdirSync(baseDir, { recursive: true });
       }
       dbPath = path.join(baseDir, 'VisualBotCreator.db');
+      console.log('[DB] App packaged:', app.isPackaged);
       console.log('[DB] Initializing at', dbPath);
+      console.log('[DB] Directory exists:', fs.existsSync(baseDir));
+      
+      // Test write permissions
+      try {
+        fs.accessSync(baseDir, fs.constants.W_OK);
+        console.log('[DB] Directory is writable');
+      } catch (accessErr) {
+        console.error('[DB] Directory is not writable:', accessErr);
+        throw new Error(`Database directory is not writable: ${baseDir}`);
+      }
 
       db = new sqlite3.Database(dbPath, (err: Error | null) => {
         if (err) {

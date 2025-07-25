@@ -91,6 +91,9 @@
   "build": {
     "appId": "com.visualbotcreator.app",
     "productName": "Visual Bot Creator",
+    "electronVersion": "35.1.5",
+    "nodeGypRebuild": false,
+    "npmRebuild": true,
     "mac": {
       "target": "dmg",
       "category": "public.app-category.utilities",
@@ -110,6 +113,9 @@
     "files": [
       "dist/**/*",
       "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/sqlite3/**/*"
     ],
     "publish": null
   }

@@ -25,7 +25,10 @@ jobs:
         run: npm install
 
       - name: Rebuild native modules for Electron
-        run: npx electron-rebuild
+        run: npx electron-rebuild --force
+
+      - name: Verify sqlite3 module
+        run: ls -la node_modules/sqlite3/lib/binding/
 
       - name: Build Electron app for Linux
         run: npm run build && npm run dist
@@ -53,7 +56,7 @@ jobs:
         run: npm install
 
       - name: Rebuild native modules for Electron
-        run: npx electron-rebuild
+        run: npx electron-rebuild --force
 
       - name: Build Electron app for Windows
         run: npm run build && npm run dist
@@ -90,11 +93,15 @@ jobs:
           find release-files -ls
           echo "--- End of listing ---"
 
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: Release ${{ env.RELEASE_TAG }}
+          name: VBC - ${{ steps.date.outputs.date }}
           files: |
             release-files/linux/*.AppImage
             release-files/windows/*.exe
