@@ -13,6 +13,10 @@ namespace BotEngine
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Starting socket server for user debugging mode");
+            Task.Run(() => new Debugger().StartSocketServer());
+
+            
             Console.WriteLine("BotEngine started. Press Ctrl+C to stop.");
             
             while (true)
@@ -22,10 +26,11 @@ namespace BotEngine
                     var list = CheckRunCondition();
                     foreach (var startNodeId in list)
                     {
-                        System.Threading.Tasks.Task.Run(() =>
+                        System.Threading.Tasks.Task.Run(async () =>
                         {
                             Console.WriteLine($"Bot started with StartNodeId: {startNodeId}");
                             var bot = new Bot(startNodeId);
+                            await bot.Run(bot.StartId);
                         });
                     }
                     

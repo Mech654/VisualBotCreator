@@ -457,16 +457,6 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle('node:clearAll', () => {
     try {
-      console.log('[DEBUG-BACKEND] clearAllNodes called! Stack trace:');
-      console.trace();
-      console.log(
-        '[DEBUG-BACKEND] Clearing',
-        nodeInstances.size,
-        'nodes and',
-        connections.length,
-        'connections'
-      );
-
       nodeInstances.clear();
       connections.length = 0;
 

@@ -17,17 +17,24 @@ namespace BotEngine
     {
         public Dictionary<string, Dictionary<string, string>> RAM { get; private set; }
         public string StartId { get; private set; }
+        private Debugger? Debugger { get; set; }
 
-        public Bot(string startId)
+        public Bot(string startId, Debugger? debuggerInstance = null)
         {
             RAM = new Dictionary<string, Dictionary<string, string>>();
             StartId = startId;
-            Run(startId);
+            Debugger = debuggerInstance;
         }
 
-        private void Run(string startId)
+        public async Task<string> Run(string startId)
         {
-            Console.WriteLine($"[Run] Running Node: {startId}");
+            // Notify debugger that node execution is starting
+            if (Debugger != null)
+            {
+                await Debugger.SendNodeStart(startId);
+                System.Threading.Thread.Sleep(1000); // this is so user can see the workflow go.
+            }
+
             dynamic? nodeObj = null;
             try
             {
@@ -35,71 +42,82 @@ namespace BotEngine
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Run] Error loading node: {ex.Message}");
-                if (ex.InnerException != null)
-                    Console.WriteLine($"[Run] Inner exception: {ex.InnerException.Message}");
-                Console.WriteLine($"[Run] StackTrace: {ex.StackTrace}");
-                throw;
+                // Notify debugger of error
+                if (Debugger != null)
+                {
+                    await Debugger.SendNodeError(startId, ex.Message);
+                }
+                return $"Node load error: {ex.Message}";
             }
 
             var language = (string?)nodeObj.properties?.language ?? "";
-            switch (language)
+            string execResult = "Success";
+            
+            try
             {
-                case "C#":
-                    ExecuteCSharpNode(nodeObj);
-                    break;
-                case "Python":
-                    ExecutePythonNode(nodeObj);
-                    break;
-                case "JavaScript":
-                    ExecuteJavaScriptNode(nodeObj);
-                    break;
-                default:
-                    Console.WriteLine($"[Run] Unsupported language: {nodeObj.language}");
-                    throw new NotSupportedException($"Language {nodeObj.language} is not supported.");
+                switch (language)
+                {
+                    case "C#":
+                        execResult = ExecuteCSharpNode(nodeObj);
+                        break;
+                    case "Python":
+                        execResult = ExecutePythonNode(nodeObj);
+                        break;
+                    case "JavaScript":
+                        execResult = ExecuteJavaScriptNode(nodeObj);
+                        break;
+                    default:
+                        execResult = $"Unsupported language: {language}";
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                execResult = $"Execution error: {ex.Message}";
+            }
+            
+            // Notify debugger of execution result
+            if (Debugger != null)
+            {
+                if (execResult == "Success")
+                {
+                    await Debugger.SendNodeComplete(startId, execResult);
+                }
+                else
+                {
+                    await Debugger.SendNodeError(startId, execResult);
+                }
+            }
+
+            Console.WriteLine($"[Debug] Node {startId} executed with result: {execResult}");
+
+            if (execResult != "Success")
+            {
+                return execResult;
             }
 
             if (RAM.Count > 0)
             {
                 var lastNode = RAM.Last();
-                Console.WriteLine($"[Run] {lastNode.Key} executed successfully");
-
-                // Check if the response has a NextNodeId
                 if (lastNode.Value.TryGetValue("NextNodeId", out var nextNodeId) && !string.IsNullOrEmpty(nextNodeId))
                 {
-                    Console.WriteLine($"[Run] Found NextNodeId in response: {nextNodeId}");
-                    Run(nextNodeId);
+                    return await Run(nextNodeId);
                 }
                 else
                 {
-                    Console.WriteLine("[Run] No NextNodeId in response, checking node outputs...");
-                    // Check the node definition for connected outputs
                     var nextNode = GetNextNodeFromOutputs(nodeObj);
                     if (!string.IsNullOrEmpty(nextNode))
                     {
-                        Run(nextNode);
+                        return await Run(nextNode);
                     }
                     else
                     {
-                        Console.WriteLine("[Run] No connected nodes found. Execution finished.");
+                        return "Success";
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("[Run] No output stored in RAM, checking node outputs...");
-                // Check the node definition for connected outputs
-                var nextNode = GetNextNodeFromOutputs(nodeObj);
-                if (!string.IsNullOrEmpty(nextNode))
-                {
-                    Console.WriteLine($"[Run] Found connected next node: {nextNode}");
-                    Run(nextNode);
-                }
-                else
-                {
-                    Console.WriteLine("[Run] No connected nodes found. Execution finished.");
-                }
-            }
+            
+            return "No next node found";
         }
 
         private void TestDatabaseConnection(string fullDbPath)
@@ -202,72 +220,94 @@ namespace BotEngine
             }
         }
 
-        private void ExecuteCSharpNode(dynamic nodeObj)
+        private string ExecuteCSharpNode(dynamic nodeObj)
         {
-            var startInfo = new ProcessStartInfo()
+            try
             {
-                FileName = "dotnet",
-                Arguments = $"run --project {nodeObj.type}.csproj",
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            var process = new Process() { StartInfo = startInfo };
-            process.Start();
-
-            var dataToSend = PrepareNodeExecutionData(nodeObj);
-            process.StandardInput.WriteLine(dataToSend);
-            process.StandardInput.Flush();
-
-            string? responseJson = process.StandardOutput.ReadLine();
-            if (!string.IsNullOrEmpty(responseJson))
-            {
-                var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
-                if (responseDict != null)
+                var startInfo = new ProcessStartInfo()
                 {
-                    RAM[nodeObj.type.ToString()] = responseDict;
+                    FileName = "dotnet",
+                    Arguments = $"run --project {nodeObj.type}.csproj",
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                var process = new Process() { StartInfo = startInfo };
+                process.Start();
+                var dataToSend = PrepareNodeExecutionData(nodeObj);
+                process.StandardInput.WriteLine(dataToSend);
+                process.StandardInput.Flush();
+                string? responseJson = process.StandardOutput.ReadLine();
+                string? errorOutput = process.StandardError.ReadToEnd();
+                process.StandardInput.Close();
+                process.WaitForExit();
+                if (!string.IsNullOrEmpty(errorOutput))
+                    return $"Node error: {errorOutput.Trim()}";
+                if (!string.IsNullOrEmpty(responseJson))
+                {
+                    var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
+                    if (responseDict != null)
+                    {
+                        RAM[nodeObj.type.ToString()] = responseDict;
+                        return "Success";
+                    }
+                    else
+                        return "Node error: Invalid response format.";
                 }
+                else
+                    return "Node error: No response.";
             }
-
-            process.StandardInput.Close();
-            process.WaitForExit();
+            catch (Exception ex)
+            {
+                return $"Node error: {ex.Message}";
+            }
         }
 
-        private void ExecutePythonNode(dynamic nodeObj)
+        private string ExecutePythonNode(dynamic nodeObj)
         {
-            var startInfo = new ProcessStartInfo()
+            try
             {
-                FileName = "python",
-                Arguments = $"{nodeObj.type}.py",
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            var process = new Process() { StartInfo = startInfo };
-            process.Start();
-
-            var dataToSend = PrepareNodeExecutionData(nodeObj);
-            process.StandardInput.WriteLine(dataToSend);
-            process.StandardInput.Flush();
-
-            string? responseJson = process.StandardOutput.ReadLine();
-            if (!string.IsNullOrEmpty(responseJson))
-            {
-                var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
-                if (responseDict != null)
+                var startInfo = new ProcessStartInfo()
                 {
-                    RAM[nodeObj.type.ToString()] = responseDict;
+                    FileName = "python",
+                    Arguments = $"{nodeObj.type}.py",
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                var process = new Process() { StartInfo = startInfo };
+                process.Start();
+                var dataToSend = PrepareNodeExecutionData(nodeObj);
+                process.StandardInput.WriteLine(dataToSend);
+                process.StandardInput.Flush();
+                string? responseJson = process.StandardOutput.ReadLine();
+                string? errorOutput = process.StandardError.ReadToEnd();
+                process.StandardInput.Close();
+                process.WaitForExit();
+                if (!string.IsNullOrEmpty(errorOutput))
+                    return $"Node error: {errorOutput.Trim()}";
+                if (!string.IsNullOrEmpty(responseJson))
+                {
+                    var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
+                    if (responseDict != null)
+                    {
+                        RAM[nodeObj.type.ToString()] = responseDict;
+                        return "Success";
+                    }
+                    else
+                        return "Node error: Invalid response format.";
                 }
+                else
+                    return "Node error: No response.";
             }
-
-            process.StandardInput.Close();
-            process.WaitForExit();
+            catch (Exception ex)
+            {
+                return $"Node error: {ex.Message}";
+            }
         }
 
         private string PrepareNodeExecutionData(dynamic nodeObj)
@@ -310,84 +350,65 @@ namespace BotEngine
             return JsonConvert.SerializeObject(executionData);
         }
 
-        private void ExecuteJavaScriptNode(dynamic nodeObj)
+        private string ExecuteJavaScriptNode(dynamic nodeObj)
         {
-            var jsFilePath = Path.Combine("processes", "node", $"{nodeObj.type}.js");
-
-            if (!File.Exists(jsFilePath))
+            try
             {
-                Console.WriteLine($"[ExecuteJavaScriptNode] ERROR: File not found: {jsFilePath}");
-                return;
-            }
-
-            var startInfo = new ProcessStartInfo()
-            {
-                FileName = "node",
-                Arguments = jsFilePath,
-                WorkingDirectory = Directory.GetCurrentDirectory(),
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            var process = new Process() { StartInfo = startInfo };
-            process.Start();
-
-            var dataToSend = PrepareNodeExecutionData(nodeObj);
-            Console.WriteLine("Sending data: " + dataToSend);
-
-            process.StandardInput.WriteLine(dataToSend);
-            process.StandardInput.Flush();
-            process.StandardInput.Close(); // Close stdin to trigger the 'end' event in Node.js
-
-            string? responseJson = process.StandardOutput.ReadLine();
-            string? errorOutput = process.StandardError.ReadToEnd();
-
-            Console.WriteLine($"Response JSON: {responseJson}");
-
-            if (!string.IsNullOrEmpty(errorOutput))
-            {
-                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Error: {errorOutput}");
-            }
-
-            if (!string.IsNullOrEmpty(responseJson))
-            {
-                try
+                var jsFilePath = Path.Combine("processes", "node", $"{nodeObj.type}.js");
+                if (!File.Exists(jsFilePath))
+                    return $"Node error: JS file not found.";
+                var startInfo = new ProcessStartInfo()
                 {
-                    // First try to deserialize as dynamic to handle mixed types
-                    var responseDynamic = JsonConvert.DeserializeObject(responseJson);
-                    var responseDict = new Dictionary<string, string>();
-
-                    if (responseDynamic is Newtonsoft.Json.Linq.JObject jObj)
+                    FileName = "node",
+                    Arguments = jsFilePath,
+                    WorkingDirectory = Directory.GetCurrentDirectory(),
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                var process = new Process() { StartInfo = startInfo };
+                process.Start();
+                var dataToSend = PrepareNodeExecutionData(nodeObj);
+                process.StandardInput.WriteLine(dataToSend);
+                process.StandardInput.Flush();
+                process.StandardInput.Close();
+                string? responseJson = process.StandardOutput.ReadLine();
+                string? errorOutput = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                if (!string.IsNullOrEmpty(errorOutput))
+                    return $"Node error: {errorOutput.Trim()}";
+                if (!string.IsNullOrEmpty(responseJson))
+                {
+                    try
                     {
-                        foreach (var prop in jObj.Properties())
+                        var responseDynamic = JsonConvert.DeserializeObject(responseJson);
+                        var responseDict = new Dictionary<string, string>();
+                        if (responseDynamic is Newtonsoft.Json.Linq.JObject jObj)
                         {
-                            responseDict[prop.Name] = prop.Value?.ToString() ?? "";
+                            foreach (var prop in jObj.Properties())
+                                responseDict[prop.Name] = prop.Value?.ToString() ?? "";
                         }
+                        if (responseDict.Count > 0)
+                        {
+                            RAM[nodeObj.type.ToString()] = responseDict;
+                            return "Success";
+                        }
+                        else
+                            return "Node error: Empty response.";
                     }
-
-                    if (responseDict.Count > 0)
+                    catch (Exception ex)
                     {
-                        RAM[nodeObj.type.ToString()] = responseDict;
+                        return $"Node error: {ex.Message}";
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Failed to parse response: {ex.Message}");
-                }
+                else
+                    return "Node error: No response.";
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | No response received");
-            }
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine($"[ExecuteJavaScriptNode] Node: {nodeObj.type} | Process exited with code: {process.ExitCode}");
+                return $"Node error: {ex.Message}";
             }
         }
 

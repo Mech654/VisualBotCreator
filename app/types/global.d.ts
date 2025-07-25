@@ -15,6 +15,7 @@ interface DatabaseAPI {
   getRunConditions: (botId: string) => Promise<{ Key: string; Value: string }[]>;
   setBotEnabled: (botId: string, enabled: boolean) => Promise<void>;
   removeBot: (botId: string) => Promise<void>;
+  saveAllNodes: (botId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 interface NodeInstanceGlobal {

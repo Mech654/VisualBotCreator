@@ -1,0 +1,459 @@
+// Debug service styles for Visual Bot Creator
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use 'sass:color';
+
+// Debug button styling
+.tool#debug-button {
+  &.debug-active {
+    background-color: $warning !important;
+    color: white !important;
+    animation: pulse-debug 1.5s infinite;
+    
+    .tool-icon {
+      animation: spin 2s linear infinite;
+    }
+  }
+  
+  &.debug-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  &:hover:not(.debug-disabled) {
+    background-color: rgba($primary, 0.1);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes pulse-debug {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Node execution states
+.node {
+  &.node-executing {
+    border-color: $warning !important;
+    box-shadow: 0 0 0 3px rgba($warning, 0.3), $shadow-xl !important;
+    animation: pulse-executing 1s infinite;
+    z-index: $z-index-node-selected + 1;
+    
+    .node-header {
+      background-color: $warning !important;
+      color: white !important;
+    }
+  }
+  
+  &.node-completed {
+    border-color: $success !important;
+    box-shadow: 0 0 0 2px rgba($success, 0.5) !important;
+    animation: flash-success 0.5s;
+    
+    .node-header {
+      background-color: $success !important;
+      color: white !important;
+    }
+  }
+  
+  &.node-error {
+    border-color: $danger !important;
+    box-shadow: 0 0 0 3px rgba($danger, 0.5), $shadow-xl !important;
+    animation: shake-error 0.5s;
+    
+    .node-header {
+      background-color: $danger !important;
+      color: white !important;
+    }
+  }
+}
+
+@keyframes pulse-executing {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes flash-success {
+  0% {
+    background-color: rgba($success, 0.2);
+  }
+  50% {
+    background-color: rgba($success, 0.4);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes shake-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+// Node execution state indicators (already defined in nodes.scss but enhanced here)
+.node-execution-state {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 6px;
+  border-radius: 3px;
+  width: 70%;
+  z-index: $z-index-node + 5;
+  box-shadow: $shadow-sm;
+
+  &.state-waiting {
+    background-color: $text-hint;
+    animation: pulse-waiting 2s infinite;
+  }
+
+  &.state-executing {
+    background-color: $warning;
+    animation: progress-bar 2s infinite;
+    position: relative;
+    overflow: hidden;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(white, 0.8), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+  }
+
+  &.state-completed {
+    background-color: $success;
+    animation: expand-complete 0.3s ease-out;
+  }
+
+  &.state-error {
+    background-color: $danger;
+    animation: pulse-error 0.5s infinite;
+  }
+}
+
+@keyframes pulse-waiting {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes progress-bar {
+  0% {
+    background-color: $warning;
+  }
+  50% {
+    background-color: color.adjust($warning, $lightness: 10%);
+  }
+  100% {
+    background-color: $warning;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes expand-complete {
+  0% {
+    transform: translateX(-50%) scaleX(0.8);
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.1);
+  }
+  100% {
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+@keyframes pulse-error {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Debug notifications
+.debug-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: $surface;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-xl;
+  z-index: $z-index-modal + 10;
+  transform: translateX(100%);
+  transition: transform 0.3s $transition-function;
+  max-width: 400px;
+  
+  &.show {
+    transform: translateX(0);
+  }
+  
+  &.debug-error {
+    border-left: 4px solid $danger;
+    
+    .debug-notification-content i {
+      color: $danger;
+    }
+  }
+  
+  &.debug-success {
+    border-left: 4px solid $success;
+    
+    .debug-notification-content i {
+      color: $success;
+    }
+  }
+}
+
+.debug-notification-content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  
+  i {
+    font-size: $font-size-lg;
+    flex-shrink: 0;
+  }
+  
+  span {
+    color: $text-primary;
+    font-size: $font-size-sm;
+    line-height: $line-height-base;
+  }
+}
+
+// Debug panel (for future use)
+.debug-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: $surface;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-xl;
+  z-index: $z-index-modal;
+  max-width: 300px;
+  min-width: 250px;
+  transform: translateY(100%);
+  transition: transform 0.3s $transition-function;
+  
+  &.show {
+    transform: translateY(0);
+  }
+}
+
+.debug-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+  padding-bottom: $spacing-xs;
+  border-bottom: 1px solid $border-color;
+  
+  h4 {
+    margin: 0;
+    color: $text-primary;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+  }
+  
+  button {
+    background: none;
+    border: none;
+    color: $text-secondary;
+    cursor: pointer;
+    padding: $spacing-xs;
+    border-radius: $border-radius-sm;
+    
+    &:hover {
+      background-color: $surface-variant;
+      color: $text-primary;
+    }
+  }
+}
+
+.debug-execution-history {
+  max-height: 200px;
+  overflow-y: auto;
+  
+  @include custom-scrollbar;
+}
+
+.debug-execution-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-xs;
+  border-radius: $border-radius-sm;
+  background-color: $surface-variant;
+  font-size: $font-size-sm;
+  
+  &.status-executing {
+    background-color: rgba($warning, 0.1);
+    border-left: 3px solid $warning;
+  }
+  
+  &.status-completed {
+    background-color: rgba($success, 0.1);
+    border-left: 3px solid $success;
+  }
+  
+  &.status-error {
+    background-color: rgba($danger, 0.1);
+    border-left: 3px solid $danger;
+  }
+  
+  .status-icon {
+    flex-shrink: 0;
+    
+    &.executing {
+      color: $warning;
+      animation: spin 1s linear infinite;
+    }
+    
+    &.completed {
+      color: $success;
+    }
+    
+    &.error {
+      color: $danger;
+    }
+  }
+  
+  .execution-details {
+    flex: 1;
+    
+    .node-name {
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+    }
+    
+    .execution-time {
+      color: $text-secondary;
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+// Debug mode overlay
+.debug-mode-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($background, 0.1);
+  backdrop-filter: blur(1px);
+  z-index: $z-index-overlay;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s $transition-function;
+  
+  &.active {
+    opacity: 1;
+  }
+  
+  // Debug mode indicator
+  &::after {
+    content: 'RUNNING BOT';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba($warning, 0.9);
+    color: white;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-lg;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: $shadow-xl;
+    animation: fade-in-out 3s ease-in-out;
+  }
+}
+
+@keyframes fade-in-out {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  20%, 80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: $tablet) {
+  .debug-notification {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+  
+  .debug-panel {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    min-width: auto;
+  }
+}
+
+@media (max-width: $mobile) {
+  .debug-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+  
+  .debug-panel {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+}

@@ -8,6 +8,7 @@ import { initProjectManagement } from './builder/services/projectService/project
 import { initializeNodes } from './builder/services/nodeService/nodeState.js';
 import { initDraggableNodes } from './builder/services/dragDropService/dragDropService.js';
 import { getNodes } from './builder/services/nodeService/nodeState.js';
+import { initDebugControls } from './builder/services/debugService/debugControls.js';
 
 interface Window {
   nodeSystem: {
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNodeManagement();
   initProjectManagement();
   initDraggableNodes(getNodes(), getNodes());
+  initDebugControls();
 });
 
 if (typeof module !== 'undefined' && module.hot) {
