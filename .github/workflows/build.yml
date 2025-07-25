@@ -25,10 +25,7 @@ jobs:
         run: npm install
 
       - name: Rebuild native modules for Electron
-        run: npx electron-rebuild --force
-
-      - name: Verify sqlite3 module
-        run: ls -la node_modules/sqlite3/lib/binding/
+        run: npx electron-rebuild
 
       - name: Build Electron app for Linux
         run: npm run build && npm run dist
