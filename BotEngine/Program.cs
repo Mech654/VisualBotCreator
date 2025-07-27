@@ -14,7 +14,8 @@ namespace BotEngine
         static void Main(string[] args)
         {
             Console.WriteLine("Starting socket server for user debugging mode");
-            Task.Run(() => new Debugger().StartSocketServer());
+            var debugger = new Debugger();
+            Task.Run(() => debugger.StartSocketServer());
 
             
             Console.WriteLine("BotEngine started. Press Ctrl+C to stop.");

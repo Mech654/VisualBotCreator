@@ -84,7 +84,6 @@ export class NodeFactory {
     properties: Record<string, any> = {},
     position: { x: number; y: number } = { x: 0, y: 0 }
   ): Node {
-    console.log(`Creating node of type: ${type}, available types:`, Object.keys(this.nodeTypes));
 
     const NodeClass = this.nodeTypes[type];
 

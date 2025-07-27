@@ -43,15 +43,7 @@ function getCurrentBotName(): string | null {
   return currentBotName;
 }
 
-declare global {
-  interface Window {
-    electron?: {
-      ipcRenderer?: {
-        invoke: (channel: string, ...args: any[]) => Promise<any>;
-      };
-    };
-  }
-}
+// Use the global Window type from global.d.ts
 function showProjectNameModal(): Promise<string | null> {
   return new Promise(resolve => {
     const modal = document.getElementById('project-name-modal') as HTMLElement;
@@ -183,13 +175,12 @@ async function saveProject(): Promise<void> {
 
     console.log('[SaveProject] Using project name:', projectName);
 
-    const electron = (window as any).electron;
-    if (!electron || !electron.ipcRenderer) {
+    if (!window.electron || !window.electron.ipcRenderer) {
       showNotification('IPC is not available. Project cannot be saved.', 'error');
       return;
     }
 
-    await electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
+    await window.electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
 
     setBotName(projectName);
 

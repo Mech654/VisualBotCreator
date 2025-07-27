@@ -14,7 +14,7 @@ namespace BotEngine
 {
     public class Debugger
     {
-        public TcpListener listener = new TcpListener(IPAddress.Any, 5000);
+        public TcpListener listener = new TcpListener(IPAddress.Any, 5001);
         public TcpClient? client { get; set; }
         public StreamReader? reader { get; set; }
         public StreamWriter? writer { get; set; }
@@ -27,6 +27,7 @@ namespace BotEngine
 
         public async Task StartSocketServer()
         {
+            Console.WriteLine("Debugger socket server started, waiting for frontend client...");
             while (true)
             {
                 client = await listener.AcceptTcpClientAsync();
@@ -41,6 +42,7 @@ namespace BotEngine
                     // Handle incoming messages from the frontend
                     while (client.Connected)
                     {
+                        Console.WriteLine("Waiting for messages from frontend...");
                         var line = await reader.ReadLineAsync();
                         if (line == null) break;
 
@@ -64,6 +66,7 @@ namespace BotEngine
         {
             try
             {
+                Console.WriteLine($"Handling frontend message: {message}");
                 var debugCommand = JsonConvert.DeserializeObject<DebugCommand>(message);
                 if (debugCommand == null) return;
 

@@ -100,10 +100,19 @@ interface SweetAlert2 {
   fire(title?: string, text?: string, icon?: string): Promise<any>;
 }
 
+interface ElectronIpcRenderer {
+  invoke: (channel: string, ...args: unknown[]) => Promise<any>;
+  on: (channel: string, listener: (...args: unknown[]) => void) => void;
+  removeListener: (channel: string, listener: (...args: unknown[]) => void) => void;
+}
+
 declare interface Window {
   nodeSystem: NodeSystemAPI;
   utils: UtilsAPI;
   botconfig: BotConfigAPI;
   database?: DatabaseAPI;
   Swal: SweetAlert2;
+  electron: {
+    ipcRenderer: ElectronIpcRenderer;
+  };
 }

@@ -1,41 +1,57 @@
 #!/bin/bash
-# Setup script for Python PDF processing dependencies
+# Setup script for Python PDF processing dependencies with venv
 
-echo "Setting up Python environment for PDF Editor..."
+set -e # stop on any error
 
-# Check if Python 3 is available
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is not installed. Please install Python 3 first."
-    exit 1
+echo "🚀 Setting up Python environment for PDF Editor..."
+
+# Check for python3
+if ! command -v python3 &>/dev/null; then
+  echo "❌ Python 3 is not installed. Please install it first."
+  exit 1
 fi
 
-# Check if pip is available
-if ! command -v pip3 &> /dev/null; then
-    echo "Error: pip3 is not installed. Please install pip first."
-    exit 1
+# Create virtual environment if it doesn't exist
+if [ ! -d ".venv" ]; then
+  echo "🛠 Creating virtual environment..."
+  python3 -m venv .venv
 fi
 
-# Install the required packages
-echo "Installing PDF processing libraries..."
-pip3 install -r requirements.txt
+# Activate virtual environment
+# shellcheck disable=SC1091
+source .venv/bin/activate
 
-# Check if installation was successful
-if [ $? -eq 0 ]; then
-    echo "✅ PDF Editor Python dependencies installed successfully!"
-    echo ""
-    echo "Available PDF Editor features:"
-    echo "- Text replacement by search"
-    echo "- Page-specific text insertion"
-    echo "- Coordinate-based text placement"
-    echo "- Full page text replacement"
-    echo ""
-    echo "Locator examples:"
-    echo "  'find:old_text' - Replace 'old_text' with new text"
-    echo "  'page:1' - Replace all text on page 1"
-    echo "  'coord:100,200,1' - Add text at coordinates (100,200) on page 1"
-    echo "  'all' - Add text to all pages"
-else
-    echo "❌ Failed to install PDF processing dependencies."
-    echo "Please check your Python and pip installation."
-    exit 1
+# Upgrade pip inside venv (optional but recommended)
+echo "⬆️ Upgrading pip inside virtual environment..."
+pip install --upgrade pip
+
+# Install dependencies
+if [ ! -f "requirements.txt" ]; then
+  echo "❌ requirements.txt not found! Please add your dependencies there."
+  deactivate
+  exit 1
 fi
+
+echo "📦 Installing PDF processing libraries..."
+pip install -r requirements.txt
+
+echo "✅ PDF Editor Python dependencies installed successfully!"
+
+cat <<EOF
+
+Available PDF Editor features:
+- Text replacement by search
+- Page-specific text insertion
+- Coordinate-based text placement
+- Full page text replacement
+
+Locator examples:
+  'find:old_text' - Replace 'old_text' with new text
+  'page:1' - Replace all text on page 1
+  'coord:100,200,1' - Add text at coordinates (100,200) on page 1
+  'all' - Add text to all pages
+
+EOF
+
+# deactivate venv before exiting script (optional)
+deactivate

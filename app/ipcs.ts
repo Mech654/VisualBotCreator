@@ -14,7 +14,7 @@ import {
   deleteBotConditionDb,
   removeBotFromDatabase,
 } from './core/database.js';
-import { nodeInstances, connections, arePortTypesCompatible } from './main.js';
+import { nodeInstances, connections, arePortTypesCompatible, debugBridge } from './main.js';
 
 export function setupIpcHandlers(): void {
   ipcMain.handle(
@@ -537,5 +537,9 @@ export function setupIpcHandlers(): void {
       console.error('Error removing bot from database:', error);
       throw error;
     }
+  });
+
+  ipcMain.handle('debug:send', (event, obj) => {
+    debugBridge.send(obj);
   });
 }

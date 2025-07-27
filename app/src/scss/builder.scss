@@ -29,6 +29,7 @@
 @use 'components/component-panel';
 @use 'components/modals';
 @use 'components/debug';
+@use 'components/debug-error-panel';
 
 // Bot Name Display
 .current-bot-name {

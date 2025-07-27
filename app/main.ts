@@ -9,45 +9,26 @@ import { Node, Connection, PortCategory, PortType, PORT_CATEGORIES } from './cor
 import { initDatabase } from './core/database.js';
 import { setupIpcHandlers } from './ipcs.js';
 
-const debugBridge = new DebugBridge(5000, '127.0.0.1');
-debugBridge.connect();
-
-debugBridge.on('connected', () => {
-  console.log('[DebugBridge] Connected to C# Debugger');
-});
-
-debugBridge.on('message', (msg) => {
-  console.log('[DebugBridge] Message from C#:', msg);
-  BrowserWindow.getAllWindows().forEach(win => {
-    win.webContents.send('debug:message', msg);
-  });
-});
-
-debugBridge.on('error', (err) => {
-  console.error('[DebugBridge] Error:', err);
-});
-
-ipcMain.handle('debug:send', (event, obj) => {
-  debugBridge.send(obj);
-});
-
-
+export const debugBridge = new DebugBridge(5000, '127.0.0.1');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 const botEnginePath = path.join(__dirname, '..', 'BotEngine', 'BotEngine.csproj');
-const dotnetProcess = spawn('dotnet', ['run', '--project', botEnginePath], {
-  cwd: path.dirname(botEnginePath),
-  stdio: 'ignore', // or 'inherit' for debug output
-  detached: true
-});
-process.on('exit', () => {
-  if (dotnetProcess.pid) {
-    try { process.kill(dotnetProcess.pid); } catch {}
-  }
-});
+
+if (false) { // Change as needed
+  const dotnetProcess = spawn('dotnet', ['run', '--project', botEnginePath], {
+    cwd: path.dirname(botEnginePath),
+    stdio: 'ignore', // or 'inherit' for debug output
+    detached: true
+  });
+  process.on('exit', () => {
+    if (dotnetProcess.pid) {
+      try { process.kill(dotnetProcess.pid); } catch {}
+    }
+  });
+}
 
 export const nodeInstances = new Map<string, Node>();
 export const connections: Connection[] = [];

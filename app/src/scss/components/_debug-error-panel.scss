@@ -1,0 +1,83 @@
+.debug-error-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 30, 40, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.debug-error-panel.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.debug-error-panel-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+  min-width: 340px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  animation: errorPanelPop 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes errorPanelPop {
+  0% { transform: scale(0.92) translateY(30px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.debug-error-icon {
+  margin-bottom: 1.2rem;
+}
+.debug-error-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #ff4d4f;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+.debug-error-node {
+  font-size: 1.05rem;
+  color: #222;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.debug-error-node-name {
+  font-weight: 500;
+  color: #1677ff;
+}
+.debug-error-message {
+  font-size: 1.08rem;
+  color: #444;
+  background: #f7f7fa;
+  border-radius: 8px;
+  padding: 0.7em 1em;
+  margin-bottom: 1.2rem;
+  margin-top: 0.2rem;
+  text-align: center;
+  word-break: break-word;
+}
+.debug-error-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 1.1rem;
+  background: none;
+  border: none;
+  font-size: 2.1rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.debug-error-close:hover {
+  color: #ff4d4f;
+}

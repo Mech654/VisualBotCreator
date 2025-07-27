@@ -1,6 +1,3 @@
-// Debug initialization for Visual Bot Creator Builder
-// Integrates the debug service with the builder UI
-
 import { debugService } from '../debugService/debugService.js';
 
 export function initDebugControls(): void {
@@ -12,7 +9,6 @@ export function initDebugControls(): void {
 
   debugButton.addEventListener('click', handleDebugButtonClick);
 
-  // Add keyboard shortcut for running bot (F5)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'F5') {
       e.preventDefault();
@@ -30,14 +26,12 @@ async function handleDebugButtonClick(): Promise<void> {
       return;
     }
 
-    // Find the start node
     const startNodeId = await debugService.findStartNode();
     if (!startNodeId) {
       showDebugError('No Start node found. Please add a Start node to run the bot.');
       return;
     }
 
-    // Start running the bot
     await startDebugging(startNodeId);
 
   } catch (error) {
@@ -52,23 +46,11 @@ async function startDebugging(startNodeId: string): Promise<void> {
   if (!debugButton) return;
 
   try {
-    // Update UI to show running state
     debugButton.classList.add('debug-active');
     debugButton.title = 'Running Bot...';
-
-    // Add debug mode overlay
-    addDebugModeOverlay();
-
-    // Temporarily disable the button during execution
     debugButton.classList.add('debug-disabled');
-
-    // Start the debug session
     await debugService.startDebugSession(startNodeId);
-
-    console.log('[DEBUG] Bot execution started successfully');
-
   } catch (error) {
-    // Reset UI on error
     resetDebugButton();
     removeDebugModeOverlay();
     throw error;
@@ -78,24 +60,17 @@ async function startDebugging(startNodeId: string): Promise<void> {
 function resetDebugButton(): void {
   const debugButton = document.getElementById('debug-button');
   if (!debugButton) return;
-
-  // Reset button to normal state
   debugButton.classList.remove('debug-active', 'debug-disabled');
   debugButton.title = 'Run Bot';
-
   console.log('[DEBUG] Run button reset');
 }
 
 function addDebugModeOverlay(): void {
-  // Remove existing overlay if present
   removeDebugModeOverlay();
-
   const overlay = document.createElement('div');
   overlay.className = 'debug-mode-overlay';
   overlay.id = 'debug-mode-overlay';
   document.body.appendChild(overlay);
-
-  // Activate after a small delay for animation
   setTimeout(() => overlay.classList.add('active'), 100);
 }
 
@@ -107,13 +82,10 @@ function removeDebugModeOverlay(): void {
   }
 }
 
-// Remove the old functions that are no longer needed
 function removeToolDisabling(): void {
-  // We don't disable tools anymore, just show visual feedback
 }
 
 function showDebugError(message: string): void {
-  // Create error notification
   const notification = document.createElement('div');
   notification.className = 'debug-notification debug-error';
   notification.innerHTML = `
@@ -122,13 +94,8 @@ function showDebugError(message: string): void {
       <span>${message}</span>
     </div>
   `;
-
   document.body.appendChild(notification);
-
-  // Animate in
   setTimeout(() => notification.classList.add('show'), 100);
-
-  // Auto remove after 5 seconds
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
