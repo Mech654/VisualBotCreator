@@ -247,7 +247,7 @@ class DebugService {
       if (!window.database) {
         return { success: false, error: 'Database not available' };
       }
-      const saveResult = await window.database.saveAllNodes(debugBotId);
+      const saveResult = await window.database.saveDebugNodes();
       if (!saveResult.success) {
         return { success: false, error: `Failed to save nodes: ${saveResult.error}` };
       }

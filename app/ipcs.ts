@@ -13,6 +13,7 @@ import {
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
   removeBotFromDatabase,
+  saveDebugNodes,
 } from './core/database.js';
 import { nodeInstances, connections, arePortTypesCompatible, debugBridge } from './main.js';
 
@@ -273,6 +274,17 @@ export function setupIpcHandlers(): void {
       throw new Error(
         `Failed to get connections: ${error instanceof Error ? error.message : String(error)}`
       );
+    }
+  });
+
+
+  ipcMain.handle('database:saveDebugNodes', async (event) => {
+    try {
+      const nodeObj: { [key: string]: Node } = Object.fromEntries(nodeInstances.entries());
+      return await saveDebugNodes(nodeObj);
+    } catch (error) {
+      console.error('Error in saveDebugNodes IPC handler:', error);
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   });
 

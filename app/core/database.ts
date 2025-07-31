@@ -435,6 +435,26 @@ function removeBotFromDatabase(botId: string): Promise<void> {
   });
 }
 
+async function saveDebugNodes(
+  nodes: { [key: string]: Node }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const botId = 'debug';
+    await ensureBotExists(botId);
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      const result = await saveNode(botId, node);
+      if (!result.success) {
+        return { success: false, error: result.error };
+      }
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('Error saving all nodes:', err);
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+
 app
   .whenReady()
   .then(async () => {
@@ -474,4 +494,5 @@ export {
   addOrUpdateBotConditionDb,
   deleteBotConditionDb,
   removeBotFromDatabase,
+  saveDebugNodes,
 };
