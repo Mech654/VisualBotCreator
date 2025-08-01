@@ -270,7 +270,7 @@ namespace BotEngine
             {
                 var startInfo = new ProcessStartInfo()
                 {
-                    FileName = "python",
+                    FileName = Path.Combine(Directory.GetCurrentDirectory(), "processes/python/.venv/bin/python"),
                     Arguments = $"{nodeObj.type}.py",
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,

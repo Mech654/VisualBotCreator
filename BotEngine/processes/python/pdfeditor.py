@@ -13,30 +13,19 @@ from pathlib import Path
 from BaseProcessor import BaseProcessor
 
 # PDF processing libraries
-try:
-    import PyPDF2
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.units import inch
-    import fitz  # PyMuPDF for advanced PDF operations
-    HAS_PDF_LIBS = True
-except ImportError as e:
-    HAS_PDF_LIBS = False
-    MISSING_LIBS = str(e)
+import PyPDF2
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.units import inch
+import fitz  # PyMuPDF for advanced PDF operations
 
 
 class PdfEditorProcessor(BaseProcessor):
     def process(self, execution_data):
         """Process PDF editing operations"""
         try:
-            if not HAS_PDF_LIBS:
-                return {
-                    "output": f"Error: Missing PDF libraries. Please install: pip install PyPDF2 reportlab PyMuPDF",
-                    "status": False,
-                    "exitCode": 1,
-                }            
             # Get PDF processing parameters using the base class helper
             pdf_path = self.get_runtime_input(execution_data, 'pdfPath', default='')
             new_text = self.get_runtime_input(execution_data, 'newText', default='')
