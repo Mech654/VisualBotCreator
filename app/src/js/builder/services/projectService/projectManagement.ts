@@ -173,17 +173,9 @@ async function saveProject(): Promise<void> {
       }
     }
 
-    console.log('[SaveProject] Using project name:', projectName);
-
-    if (!window.electron || !window.electron.ipcRenderer) {
-      showNotification('IPC is not available. Project cannot be saved.', 'error');
-      return;
-    }
-
-    await window.electron.ipcRenderer.invoke('database:saveAllNodes', projectName);
+    await window.database?.saveAllNodes(projectName);
 
     setBotName(projectName);
-
     showNotification('Project saved successfully!', 'success');
   } catch (error) {
     console.error('Failed to save project:', error);

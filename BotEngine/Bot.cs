@@ -18,7 +18,6 @@ namespace BotEngine
         public Dictionary<string, Dictionary<string, string>> RAM { get; private set; }
         public string StartId { get; private set; }
         private Debugger? Debugger { get; set; }
-
         public Bot(string startId, Debugger? debuggerInstance = null)
         {
             RAM = new Dictionary<string, Dictionary<string, string>>();

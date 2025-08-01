@@ -1,24 +1,17 @@
-
 import net from 'net';
 import { EventEmitter } from 'events';
 import { BrowserWindow } from 'electron';
 
-/**
- * DebugBridge: TCP client for communicating with the C# Debugger backend.
- * Emits: 'connected', 'disconnected', 'message', 'error'
- */
 export class DebugBridge extends EventEmitter {
   private port: number;
   private host: string;
   private client: net.Socket | null = null;
   private buffer = '';
-  // Removed sessionId tracking
 
   constructor(port = 5000, host = '127.0.0.1') {
     super();
     this.port = 5001;
     this.host = host;
-    // Removed sessionId tracking
     this.setup();
   }
 
@@ -38,9 +31,6 @@ export class DebugBridge extends EventEmitter {
     });
   }
 
-  /**
-   * Connect to the C# TCP debugger.
-   */
   connect(): void {
     this.client = new net.Socket();
     this.client.connect(this.port, this.host, () => {
@@ -72,18 +62,12 @@ export class DebugBridge extends EventEmitter {
     });
   }
 
-  /**
-   * Send a JSON object to the C# debugger.
-   */
   send(obj: unknown): void {
     if (this.client && this.client.writable) {
       this.client.write(JSON.stringify(obj) + '\n');
     }
   }
 
-  /**
-   * Disconnect from the C# debugger.
-   */
   disconnect(): void {
     if (this.client) {
       this.client.end();
