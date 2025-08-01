@@ -17,7 +17,7 @@ const projectRoot = path.resolve(__dirname, '..');
 
 const botEnginePath = path.join(__dirname, '..', 'BotEngine', 'BotEngine.csproj');
 
-if (false) { // Change as needed
+if (true) { // Change as needed
   const dotnetProcess = spawn('dotnet', ['run', '--project', botEnginePath], {
     cwd: path.dirname(botEnginePath),
     stdio: 'ignore', // or 'inherit' for debug output
@@ -25,7 +25,7 @@ if (false) { // Change as needed
   });
   process.on('exit', () => {
     if (dotnetProcess.pid) {
-      try { process.kill(dotnetProcess.pid); } catch {}
+      try { process.kill(dotnetProcess.pid); } catch { }
     }
   });
 }
@@ -54,7 +54,7 @@ function createWindow(): void {
   if (process.env.NODE_ENV === 'development') {
     const startUrl =
       typeof process.env.ELECTRON_START_URL === 'string' &&
-      process.env.ELECTRON_START_URL.trim() !== ''
+        process.env.ELECTRON_START_URL.trim() !== ''
         ? process.env.ELECTRON_START_URL
         : 'http://localhost:4000/src/index.html';
 

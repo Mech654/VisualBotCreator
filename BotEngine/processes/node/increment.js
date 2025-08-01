@@ -27,8 +27,6 @@ class IncrementProcessor extends BaseProcessor {
         status: true,
       };
 
-      console.error('[IncrementProcessor] Returning result:', JSON.stringify(responseData));
-
       return responseData;
     } catch (error) {
       console.error('[IncrementProcessor] Error during processing:', error.message);

@@ -35,8 +35,6 @@ class TextProcessor extends BaseProcessor {
         status: true,
       };
 
-      console.error('[TextProcessor] Returning result:', JSON.stringify(responseData));
-
       return responseData;
     } catch (error) {
       console.error('[TextProcessor] Error during processing:', error.message);

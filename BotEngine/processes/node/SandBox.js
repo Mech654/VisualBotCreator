@@ -91,8 +91,6 @@ class SandBoxProcessor extends BaseProcessor {
         exitCode: status ? 0 : 1,
       };
 
-      console.error('[SandBoxProcessor] Returning result:', JSON.stringify(responseData));
-
       return responseData;
     } catch (error) {
       console.error('[SandBoxProcessor] Error during processing:', error.message);

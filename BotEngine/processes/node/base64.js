@@ -30,8 +30,6 @@ class Base64Processor extends BaseProcessor {
         status: true,
       };
 
-      console.error('[Base64Processor] Returning result:', JSON.stringify(result));
-
       return result;
     } catch (error) {
       console.error('[Base64Processor] Error during processing:', error.message);

@@ -70,8 +70,6 @@ class PdfEditorProcessor extends BaseProcessor {
         exitCode: status ? 0 : 1,
       };
 
-      console.error('[PdfEditorProcessor] Returning result:', JSON.stringify(responseData));
-
       return responseData;
     } catch (error) {
       console.error('[PdfEditorProcessor] Error during processing:', error.message);

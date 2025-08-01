@@ -287,13 +287,19 @@ namespace BotEngine
                 string? errorOutput = process.StandardError.ReadToEnd();
                 process.StandardInput.Close();
                 process.WaitForExit();
-                if (!string.IsNullOrEmpty(errorOutput))
-                    return $"Node error: {errorOutput.Trim()}";
+                
+                // Only treat stderr as error if there's no valid response or if response indicates failure
                 if (!string.IsNullOrEmpty(responseJson))
                 {
                     var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseJson);
                     if (responseDict != null)
                     {
+                        // Check if the response indicates success
+                        if (responseDict.ContainsKey("status") && responseDict["status"] == "False")
+                        {
+                            return $"Node error: {responseDict.GetValueOrDefault("output", "Unknown error")}";
+                        }
+                        
                         RAM[nodeObj.type.ToString()] = responseDict;
                         return "Success";
                     }
@@ -301,7 +307,13 @@ namespace BotEngine
                         return "Node error: Invalid response format.";
                 }
                 else
-                    return "Node error: No response.";
+                {
+                    // No JSON response, check if stderr contains actual errors
+                    if (!string.IsNullOrEmpty(errorOutput))
+                        return $"Node error: {errorOutput.Trim()}";
+                    else
+                        return "Node error: No response.";
+                }
             }
             catch (Exception ex)
             {
@@ -376,8 +388,8 @@ namespace BotEngine
                 string? responseJson = process.StandardOutput.ReadLine();
                 string? errorOutput = process.StandardError.ReadToEnd();
                 process.WaitForExit();
-                if (!string.IsNullOrEmpty(errorOutput))
-                    return $"Node error: {errorOutput.Trim()}";
+                
+                // Only treat stderr as error if there's no valid response or if response indicates failure
                 if (!string.IsNullOrEmpty(responseJson))
                 {
                     try
@@ -389,6 +401,13 @@ namespace BotEngine
                             foreach (var prop in jObj.Properties())
                                 responseDict[prop.Name] = prop.Value?.ToString() ?? "";
                         }
+                        
+                        // Check if the response indicates success
+                        if (responseDict.ContainsKey("status") && responseDict["status"] == "False")
+                        {
+                            return $"Node error: {responseDict.GetValueOrDefault("output", "Unknown error")}";
+                        }
+                        
                         if (responseDict.Count > 0)
                         {
                             RAM[nodeObj.type.ToString()] = responseDict;
@@ -403,7 +422,13 @@ namespace BotEngine
                     }
                 }
                 else
-                    return "Node error: No response.";
+                {
+                    // No JSON response, check if stderr contains actual errors
+                    if (!string.IsNullOrEmpty(errorOutput))
+                        return $"Node error: {errorOutput.Trim()}";
+                    else
+                        return "Node error: No response.";
+                }
             }
             catch (Exception ex)
             {

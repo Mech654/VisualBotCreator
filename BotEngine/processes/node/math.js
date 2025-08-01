@@ -41,8 +41,6 @@ class MathProcessor extends BaseProcessor {
         status: !error,
       };
 
-      console.error('[MathProcessor] Returning result:', JSON.stringify(responseData));
-
       return responseData;
     } catch (error) {
       console.error('[MathProcessor] Error during processing:', error.message);
