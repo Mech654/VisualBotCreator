@@ -218,6 +218,13 @@ export function initDraggableNodes(nodes: HTMLElement[], allNodes: HTMLElement[]
 
               // Update node position in our tracking
               updateNodePosition(target);
+              // Persist position in backend
+              const nodeId = target.getAttribute('data-node-id');
+              if (nodeId && (window as any).nodeSystem?.setNodePosition) {
+                (window as any).nodeSystem
+                  .setNodePosition(nodeId, snappedX, snappedY)
+                  .catch((e: any) => console.error('Failed to persist node position:', e));
+              }
             }
 
             // Final update of connections after node movement is complete

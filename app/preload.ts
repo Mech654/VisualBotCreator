@@ -74,6 +74,9 @@ contextBridge.exposeInMainWorld('nodeSystem', {
   deleteNode: (nodeId: string) => {
     return ipcRenderer.invoke('node:delete', nodeId);
   },
+  setNodePosition: (id: string, x: number, y: number) => {
+    return ipcRenderer.invoke('node:updatePosition', { id, x, y });
+  },
 });
 
 contextBridge.exposeInMainWorld('utils', {

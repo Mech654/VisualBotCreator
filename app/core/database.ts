@@ -21,13 +21,13 @@ function initDatabase(): Promise<void> {
         const appPath = app.getAppPath();
         baseDir = path.resolve(appPath);
       }
-      
+
       // Additional fallback for AppImage if userData fails
       if (app.isPackaged && !fs.existsSync(path.dirname(baseDir))) {
         console.log('[DB] userData directory parent does not exist, trying temp directory');
         baseDir = path.join(require('os').tmpdir(), 'VisualBotCreator');
       }
-      
+
       if (!fs.existsSync(baseDir)) {
         console.log(`[DB] Creating directory: ${baseDir}`);
         fs.mkdirSync(baseDir, { recursive: true });
@@ -36,7 +36,7 @@ function initDatabase(): Promise<void> {
       console.log('[DB] App packaged:', app.isPackaged);
       console.log('[DB] Initializing at', dbPath);
       console.log('[DB] Directory exists:', fs.existsSync(baseDir));
-      
+
       // Test write permissions
       try {
         fs.accessSync(baseDir, fs.constants.W_OK);
@@ -211,17 +211,71 @@ async function saveAllNodes(
   botId: string,
   nodes: { [key: string]: Node }
 ): Promise<{ success: boolean; error?: string }> {
+  // True overwrite semantics: remove stale nodes not present in the provided set, atomically.
   try {
     await ensureBotExists(botId);
-    for (const [nodeId, node] of Object.entries(nodes)) {
-      const result = await saveNode(botId, node);
-      if (!result.success) {
-        return { success: false, error: result.error };
-      }
-    }
-    return { success: true };
+    const newNodeIds = new Set(Object.keys(nodes));
+    return await new Promise((resolve) => {
+      db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+        // Delete stale nodes
+        db.run(
+          `DELETE FROM Nodes WHERE BotId = ? AND NodeId NOT IN (${Array.from(newNodeIds)
+            .map(() => '?')
+            .join(',') || "''"})`,
+          [botId, ...Array.from(newNodeIds)],
+          (delErr: Error | null) => {
+            if (delErr) {
+              console.error('Error deleting stale nodes:', delErr);
+              db.run('ROLLBACK', () =>
+                resolve({ success: false, error: delErr.message })
+              );
+              return;
+            }
+
+            // Upsert each current node sequentially inside transaction
+            const entries = Object.entries(nodes);
+            let index = 0;
+            const upsertNext = () => {
+              if (index >= entries.length) {
+                db.run('COMMIT', (commitErr: Error | null) => {
+                  if (commitErr) {
+                    console.error('Commit failed:', commitErr);
+                    db.run('ROLLBACK', () =>
+                      resolve({ success: false, error: commitErr.message })
+                    );
+                  } else {
+                    resolve({ success: true });
+                  }
+                });
+                return;
+              }
+              const [nodeId, node] = entries[index++];
+              saveNode(botId, node)
+                .then(r => {
+                  if (!r.success) {
+                    console.error('Upsert failed for node', nodeId, r.error);
+                    db.run('ROLLBACK', () =>
+                      resolve({ success: false, error: r.error })
+                    );
+                  } else {
+                    upsertNext();
+                  }
+                })
+                .catch(err => {
+                  console.error('Upsert exception for node', nodeId, err);
+                  db.run('ROLLBACK', () =>
+                    resolve({ success: false, error: (err as Error).message })
+                  );
+                });
+            };
+            upsertNext();
+          }
+        );
+      });
+    });
   } catch (err) {
-    console.error('Error saving all nodes:', err);
+    console.error('Error saving all nodes (outer):', err);
     return { success: false, error: (err as Error).message };
   }
 }

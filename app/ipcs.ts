@@ -120,6 +120,24 @@ export function setupIpcHandlers(): void {
     };
   });
 
+  // Update node position (persist in backend map so saves capture latest coordinates)
+  ipcMain.handle(
+    'node:updatePosition',
+    (event, { id, x, y }: { id: string; x: number; y: number }) => {
+      try {
+        const node = nodeInstances.get(id);
+        if (!node) {
+          throw new Error(`Node not found with id: ${id}`);
+        }
+        node.position = { x, y };
+        return { success: true };
+      } catch (error) {
+        console.error('Error updating node position:', error);
+        return { success: false, error: (error as Error).message || 'Unknown error' };
+      }
+    }
+  );
+
   ipcMain.handle(
     'connection:create',
     (

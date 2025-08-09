@@ -171,6 +171,19 @@ async function saveProject(): Promise<void> {
         showNotification('Project name is required to save.', 'info');
         return;
       }
+      // Collision check: if a bot with this name already exists, confirm overwrite.
+      try {
+        const existingBots = await window.database?.getAllBots?.();
+        if (existingBots && existingBots.some((b: any) => b.Id === projectName)) {
+          const action = await showSaveConfirmationModal(projectName);
+            if (action === 'cancel') {
+              showNotification('Save cancelled.', 'info');
+              return;
+            }
+        }
+      } catch (e) {
+        console.warn('[SaveProject] Failed to check existing bots for collision:', e);
+      }
     }
 
     await window.database?.saveAllNodes(projectName);
