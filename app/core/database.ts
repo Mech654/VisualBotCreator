@@ -283,7 +283,7 @@ async function saveAllNodes(
 // Get all bots from the Bots table
 function getAllBots(): Promise<any[]> {
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM Bots', [], (err: Error | null, rows: any[]) => {
+    db.all("SELECT * FROM Bots WHERE Id <> 'debug'", [], (err: Error | null, rows: any[]) => {
       if (err) {
         console.error('Error fetching bots:', err);
         return reject(err);
