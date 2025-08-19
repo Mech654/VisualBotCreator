@@ -165,25 +165,17 @@ async function saveProject(): Promise<void> {
         return;
       }
       projectName = currentBot;
-    } else {
-      projectName = await showProjectNameModal();
-      if (!projectName) {
-        showNotification('Project name is required to save.', 'info');
-        return;
-      }
-      // Collision check: if a bot with this name already exists, confirm overwrite.
-      try {
-        const existingBots = await window.database?.getAllBots?.();
-        if (existingBots && existingBots.some((b: any) => b.Id === projectName)) {
-          const action = await showSaveConfirmationModal(projectName);
-            if (action === 'cancel') {
-              showNotification('Save cancelled.', 'info');
-              return;
-            }
-        }
-      } catch (e) {
-        console.warn('[SaveProject] Failed to check existing bots for collision:', e);
-      }
+    }
+
+    projectName = await showProjectNameModal();
+    if (!projectName) {
+      showNotification('Project name is required to save.', 'info');
+      return;
+    }
+
+    // Collision check: if a bot with this name already exists, confirm overwrite.
+    if (!(await checkProjectNameCollision(projectName))) {
+      return;
     }
 
     await window.database?.saveAllNodes(projectName);
@@ -193,6 +185,23 @@ async function saveProject(): Promise<void> {
   } catch (error) {
     console.error('Failed to save project:', error);
     showNotification('Failed to save project', 'error');
+  }
+}
+
+async function checkProjectNameCollision(projectName: string): Promise<boolean> {
+  try {
+    const existingBots = await window.database?.getAllBots?.();
+    if (existingBots && existingBots.some((b: any) => b.Id === projectName)) {
+      const action = await showSaveConfirmationModal(projectName);
+      if (action === 'cancel') {
+        showNotification('Save cancelled.', 'info');
+        return false;
+      }
+    }
+    return true;
+  } catch (e) {
+    console.warn('[SaveProject] Failed to check existing bots for collision:', e);
+    return false;
   }
 }
 
