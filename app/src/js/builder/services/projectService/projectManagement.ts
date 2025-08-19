@@ -317,18 +317,21 @@ function showProjectSelectionModal(): Promise<string | null> {
   });
 }
 
+async function clearNodesAndConnectionsEverywhere(): Promise<void> {
+  clearConnections();
+  setNodes([]);
+  await window.nodeSystem?.clearAllNodes?.();
+  const canvas = document.querySelector('.canvas-content') as HTMLElement;
+  if (canvas) {
+    const nodeElements = canvas.querySelectorAll('.node');
+    nodeElements.forEach(node => node.remove());
+  }
+  console.log('[ProjectManagement] Cleared all nodes and connections');
+}
+
 async function loadProjectFromDatabase(botId: string): Promise<void> {
   try {
-    clearConnections();
-    setNodes([]);
-
-    await window.nodeSystem?.clearAllNodes?.();
-
-    const canvas = document.querySelector('.canvas-content') as HTMLElement;
-    if (canvas) {
-      const nodeElements = canvas.querySelectorAll('.node');
-      nodeElements.forEach(node => node.remove());
-    }
+    await clearNodesAndConnectionsEverywhere();
 
     const nodeData = await window.database?.getBotNodes(botId);
     if (!nodeData || nodeData.length === 0) {
@@ -343,57 +346,57 @@ async function loadProjectFromDatabase(botId: string): Promise<void> {
   }
 }
 
+async function createNodesFromArray(nodeData: any[]): Promise<void> {
+  for (let i = 0; i < nodeData.length; i++) {
+    const node = nodeData[i];
+    try {
+      const { nodeId, type, properties, position } = node;
+      await window.nodeSystem.createNode(type, nodeId, properties, position || { x: 100, y: 100 });
+      await simulateDropPlacement(
+        type,
+        position?.x || 100,
+        position?.y || 100,
+        properties?.flowType || 'flow',
+        nodeId,
+        properties,
+        i * 100
+      );
+    } catch (error) {
+      console.error(`Error restoring node ${node.nodeId}:`, error);
+    }
+  }
+  await new Promise(resolve => setTimeout(resolve, Math.max(500, nodeData.length * 100 + 200)));
+}
+
+async function createConnectionsFromArray(nodeData: any[]): Promise<void> {
+  const connectionPromises: Promise<void>[] = [];
+  for (const node of nodeData) {
+    if (!node.outputs || !node.nodeId) {
+      continue;
+    }
+    for (const output of node.outputs) {
+      if (!output.connectedTo || output.connectedTo.length === 0) {
+        continue;
+      }
+      for (const connection of output.connectedTo) {
+        connectionPromises.push(
+          restoreConnection(
+            connection.fromNodeId,
+            connection.fromPortId,
+            connection.toNodeId,
+            connection.toPortId
+          )
+        );
+      }
+    }
+  }
+  await Promise.all(connectionPromises);
+}
+
 async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
   try {
-    const connectionPromises: Promise<void>[] = [];
-
-    for (let i = 0; i < nodeData.length; i++) {
-      const node = nodeData[i];
-      try {
-        const { nodeId, type, properties, position } = node;
-        await window.nodeSystem.createNode(
-          type,
-          nodeId,
-          properties,
-          position || { x: 100, y: 100 }
-        );
-        await simulateDropPlacement(
-          type,
-          position?.x || 100,
-          position?.y || 100,
-          properties?.flowType || 'flow',
-          nodeId,
-          properties,
-          i * 100
-        );
-      } catch (error) {
-        console.error(`Error restoring node ${node.nodeId}:`, error);
-      }
-    }
-
-    await new Promise(resolve => setTimeout(resolve, Math.max(500, nodeData.length * 100 + 200)));
-
-    for (const node of nodeData) {
-      if (node.outputs) {
-        for (const output of node.outputs) {
-          if (output.connectedTo && output.connectedTo.length > 0) {
-            for (const connection of output.connectedTo) {
-              connectionPromises.push(
-                restoreConnection(
-                  connection.fromNodeId,
-                  connection.fromPortId,
-                  connection.toNodeId,
-                  connection.toPortId
-                )
-              );
-            }
-          }
-        }
-      }
-    }
-
-    await Promise.all(connectionPromises);
-
+    await createNodesFromArray(nodeData);
+    await createConnectionsFromArray(nodeData);
     console.log(`[LoadProject] Successfully restored ${nodeData.length} nodes`);
   } catch (error) {
     console.error('Error restoring nodes and connections:', error);
@@ -428,62 +431,66 @@ async function simulateDropPlacement(
   );
 
   if (result) {
-    const { nodeElement } = result;
-    const canvas = document.querySelector('.canvas-content') as HTMLElement;
+    placeNode(result, x, y);
+  }
+}
 
-    if (canvas) {
-      canvas.appendChild(nodeElement);
-      addNode(nodeElement);
+function placeNode(result: any, x: number, y: number): void {
+  const { nodeElement } = result;
+  const canvas = document.querySelector('.canvas-content') as HTMLElement;
 
-      nodeElement.style.display = 'block';
-      nodeElement.style.visibility = 'visible';
-      nodeElement.style.opacity = '1';
-      nodeElement.style.position = 'absolute';
-      nodeElement.style.transform = 'none';
-      nodeElement.style.left = `${x}px`;
-      nodeElement.style.top = `${y}px`;
-      nodeElement.offsetHeight;
+  if (canvas) {
+    canvas.appendChild(nodeElement);
+    addNode(nodeElement);
 
-      initDraggableNodes([nodeElement], getNodes());
-      enterTransition(nodeElement, 'scale', 300);
-      setTimeout(() => {
-        highlightElement(nodeElement, 'var(--primary)', 800);
-      }, 300);
+    nodeElement.style.display = 'block';
+    nodeElement.style.visibility = 'visible';
+    nodeElement.style.opacity = '1';
+    nodeElement.style.position = 'absolute';
+    nodeElement.style.transform = 'none';
+    nodeElement.style.left = `${x}px`;
+    nodeElement.style.top = `${y}px`;
+    nodeElement.offsetHeight;
 
-      setTimeout(() => {
-        const rect = nodeElement.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const moveDelta = -30;
-        const pointerDown = new PointerEvent('pointerdown', {
-          bubbles: true,
-          clientX: centerX,
-          clientY: centerY,
-          pointerId: 1,
-          pointerType: 'mouse',
-          isPrimary: true,
-        });
-        nodeElement.dispatchEvent(pointerDown);
-        const pointerMove = new PointerEvent('pointermove', {
-          bubbles: true,
-          clientX: centerX + moveDelta,
-          clientY: centerY,
-          pointerId: 1,
-          pointerType: 'mouse',
-          isPrimary: true,
-        });
-        document.dispatchEvent(pointerMove);
-        const pointerUp = new PointerEvent('pointerup', {
-          bubbles: true,
-          clientX: centerX + moveDelta,
-          clientY: centerY,
-          pointerId: 1,
-          pointerType: 'mouse',
-          isPrimary: true,
-        });
-        document.dispatchEvent(pointerUp);
-      }, 400);
-    }
+    initDraggableNodes([nodeElement], getNodes());
+    enterTransition(nodeElement, 'scale', 300);
+    setTimeout(() => {
+      highlightElement(nodeElement, 'var(--primary)', 800);
+    }, 300);
+
+    setTimeout(() => {
+      const rect = nodeElement.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const moveDelta = -30;
+      const pointerDown = new PointerEvent('pointerdown', {
+        bubbles: true,
+        clientX: centerX,
+        clientY: centerY,
+        pointerId: 1,
+        pointerType: 'mouse',
+        isPrimary: true,
+      });
+      nodeElement.dispatchEvent(pointerDown);
+      const pointerMove = new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: centerX + moveDelta,
+        clientY: centerY,
+        pointerId: 1,
+        pointerType: 'mouse',
+        isPrimary: true,
+      });
+      document.dispatchEvent(pointerMove);
+      const pointerUp = new PointerEvent('pointerup', {
+        bubbles: true,
+        clientX: centerX + moveDelta,
+        clientY: centerY,
+        pointerId: 1,
+        pointerType: 'mouse',
+        isPrimary: true,
+      });
+      document.dispatchEvent(pointerUp);
+    }, 400);
   }
 }
 
