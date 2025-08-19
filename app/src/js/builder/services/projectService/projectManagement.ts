@@ -354,8 +354,7 @@ async function createNodesFromArray(nodeData: any[]): Promise<void> {
       await window.nodeSystem.createNode(type, nodeId, properties, position || { x: 100, y: 100 });
       await simulateDropPlacement(
         type,
-        position?.x || 100,
-        position?.y || 100,
+        position,
         properties?.flowType || 'flow',
         nodeId,
         properties,
@@ -410,8 +409,7 @@ async function restoreNodesAndConnections(nodeData: any[]): Promise<void> {
  */
 async function simulateDropPlacement(
   nodeType: string,
-  x: number,
-  y: number,
+  position: { x: number; y: number },
   flowType: string,
   existingNodeId: string,
   existingProperties: any,
@@ -423,15 +421,15 @@ async function simulateDropPlacement(
 
   const result = await createNodeInstance(
     nodeType,
-    x,
-    y,
+    position.x,
+    position.y,
     flowType,
     existingNodeId,
     existingProperties
   );
 
   if (result) {
-    placeNode(result, x, y);
+    placeNode(result, position.x, position.y);
   }
 }
 
