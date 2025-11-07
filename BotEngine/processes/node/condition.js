@@ -7,16 +7,20 @@ class ConditionProcessor extends BaseProcessor {
       const runtimeInputs = executionData.runtimeInputs || {};
       const conditionString = this.getProperty(properties, 'condition', 'value == true').trim();
       const valueToCheck = runtimeInputs.value;
+
       let result = false;
       let resultPath = 'false';
+
       try {
         // Sort operators by length (longest first) to avoid partial matches
         const operators = ['===', '!==', '>=', '<=', '==', '!=', '>', '<', '='];
         const sortedOperators = operators.sort((a, b) => b.length - a.length);
         const op = sortedOperators.find(o => conditionString.includes(o));
+
         if (!op) throw new Error('Invalid operator in: ' + conditionString);
         const [lhs, ...rhsParts] = conditionString.split(op);
         const rawValue = rhsParts.join(op).trim();
+
         let expected;
         if (rawValue === 'true') {
           expected = true;
@@ -24,7 +28,10 @@ class ConditionProcessor extends BaseProcessor {
           expected = false;
         } else if (/^-?\d+(?:\.\d+)?$/.test(rawValue)) {
           expected = parseFloat(rawValue);
-        } else if ((rawValue.startsWith('"') && rawValue.endsWith('"')) || (rawValue.startsWith("'") && rawValue.endsWith("'"))) {
+        } else if (
+          (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+          (rawValue.startsWith("'") && rawValue.endsWith("'"))
+        ) {
           expected = rawValue.slice(1, -1).trim();
         } else {
           expected = rawValue.trim();

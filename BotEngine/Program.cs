@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,9 +15,9 @@ namespace BotEngine
             var debugger = new Debugger();
             Task.Run(() => debugger.StartSocketServer());
 
-            
+
             Console.WriteLine("BotEngine started. Press Ctrl+C to stop.");
-            
+
             while (true)
             {
                 try
@@ -33,8 +31,8 @@ namespace BotEngine
                             var bot = new Bot(startNodeId);
                             await bot.Run(bot.StartId);
                         });
-                    }
-                    
+                    }  
+
                     // Wait 60 seconds before checking conditions again
                     System.Threading.Thread.Sleep(60000);
                 }
@@ -51,7 +49,7 @@ namespace BotEngine
         private static List<string> CheckRunCondition()
         {
             var startNodeIds = new List<string>();
-            
+
             try
             {
                 var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VisualBotCreator.db");
@@ -92,7 +90,7 @@ namespace BotEngine
                             var currentDayName = now.DayOfWeek.ToString();
                             var currentDayNumber = ((int)now.DayOfWeek == 0 ? 7 : (int)now.DayOfWeek).ToString(); // Convert Sunday=0 to Sunday=7
                             Console.WriteLine($"Day check: Current='{currentDayName}' (Day {currentDayNumber}), Value='{value}'");
-                            conditionMet = string.Equals(value, currentDayName, StringComparison.OrdinalIgnoreCase) || 
+                            conditionMet = string.Equals(value, currentDayName, StringComparison.OrdinalIgnoreCase) ||
                                           string.Equals(value, currentDayNumber);
                             Console.WriteLine($"Day condition met: {conditionMet}");
                             break;
@@ -100,7 +98,7 @@ namespace BotEngine
                         case "Specific Date (YYYY-MM-DD)":
                             var parts = value.Split(' ');
                             var datePart = parts[0];
-                            
+
                             if (DateTime.TryParse(datePart, out var targetDate))
                             {
                                 if (parts.Length > 1 && TimeSpan.TryParse(parts[1], out var specificTime))
@@ -132,8 +130,8 @@ namespace BotEngine
                     if (isBotEnabled == 1)
                     {
                         var startNodes = connection.Query<string>(
-                            @"SELECT NodeId FROM Nodes 
-                              WHERE BotId = @botId 
+                            @"SELECT NodeId FROM Nodes
+                              WHERE BotId = @botId
                               AND JSON_EXTRACT(Definition, '$.type') = 'start'",
                             new { botId }
                         ).ToList();
